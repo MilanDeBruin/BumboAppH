@@ -19,7 +19,6 @@ namespace Bumbo.App.Web
 
 
 
-
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
