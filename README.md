@@ -11,11 +11,13 @@
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#build-with">Built With</a></li>
+        <li><a href=#Communicatie></a></li>
+        <li><a href=#Code conventions></a></li>
+        <li><a href=#Code Review></a></li>
+      </ul>
     </li>
-    <li><a href=#communicatie></a></li>
-    <li><a href=#Code conventions></a></li>
-    <li><a href=#Code Review></a></li>
-
   </ol>
 </details>
 
@@ -27,7 +29,6 @@ Als groep hebben we besloten om onze communicatie soepel te houden door gebruik 
 * Communicatie(middelen): 
 * Discord (communicatie met groep) 
 * OneDrive (opslag van al onze documenten en verslagen) 
-
 
 ### Code conventions
 
