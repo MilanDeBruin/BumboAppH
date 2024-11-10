@@ -1,0 +1,82 @@
+﻿@using BumboApp.Models.Models
+@model WeekInputViewModel
+
+@{
+    ViewData["Title"] = "GeneratePrognose";
+    int currentWeek = Model.WeekNumber;
+    int year = Model.Year;
+}
+
+<div class="container">
+    <h2>Genereer prognose</h2>
+
+    <!-- Week Switching Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
+        <form method="get" action="@Url.Action("GeneratePrognose", "Forecast")" style="display: flex; align-items: center;">
+            @* Week Minder knop *@
+            <input type="hidden" name="weekNumber" value="@(currentWeek > 1 ? currentWeek - 1 : 52)" />
+            <input type="hidden" name="year" value="@year" />
+            <button type="submit" class="btn btn-secondary">Vorige week</button>
+        </form>
+
+        <span>Week: @currentWeek</span>
+        <span>Jaar: @year</span>
+
+        <form method="get" action="@Url.Action("GeneratePrognose", "Forecast")" style="display: flex; align-items: center;">
+            @* Week Meer knop *@
+            <input type="hidden" name="weekNumber" value="@(currentWeek < 52 ? currentWeek + 1 : 1)" />
+            <input type="hidden" name="year" value="@year" />
+            <button type="submit" class="btn btn-secondary">Volgende week</button>
+        </form>
+    </div>
+
+    <!-- Input Form for Each Day -->
+    <form method="post" asp-action="SubmitWeekInput">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="WeekNumber" />
+        <input type="hidden" asp-for="Year" />
+        
+        @for (int i = 0; i < Model.DayInputs.Count; i++)
+        {
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">@Model.DayInputs[i].DayName:</label>
+
+                <div class="col-sm-5">
+                    <label for="Collies_@i" class="form-label">Collies</label>
+                    <input type="number" class="form-control" asp-for="DayInputs[i].Collies" id="Collies_@i" placeholder="Collies" min="0" oninput="validateNumberInput(this)" />
+
+                    <span asp-validation-for="DayInputs[i].Collies" class="text-danger"></span>
+                </div>
+            </div>
+        }
+
+        <!-- Submit Button aligned to the bottom right -->
+        <div class="row">
+            <div class="col-sm-12 text-end">
+                <button type="submit" class="btn btn-primary">Genereer</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    function validateNumberInput(input) {
+        input.value = input.value.replace(/[^0-9]/g, '');
+    }
+</script>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+<!-- CSS -->
+<style>
+
+    .form-control {
+        padding: 4px 8px;
+        font-size: 0.875rem;
+        height: auto;
+    }
+
+
+    .col-sm-5 {
+        max-width: 250px; 
+    }
+</style>

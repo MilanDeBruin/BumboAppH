@@ -1,0 +1,39 @@
+﻿@model Bumbo.App.Web.Models.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Aanmelden Bumbo";
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/login.css">
+</head>
+<body>
+<header>
+    
+</header>
+<div class="login-wrapper">
+    <div class="login-container">
+        <h2>Aanmelden</h2>
+        <form asp-controller="Account" asp-action="Login" method="post"> 
+            <div asp-validation-summary="All" class="text-danger"></div> @* TODO: class="text-danger" is temporary solution, needs to be replaced *@
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="text" id="email" name="Email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Wachtwoord</label>
+                <input type="password" id="password" name="Password" required>
+            </div>
+            <input type="submit" value="Aanmelden">
+        </form>
+    </div>
+</div>
+
+<footer>
+</footer>
+</body>
+</html>

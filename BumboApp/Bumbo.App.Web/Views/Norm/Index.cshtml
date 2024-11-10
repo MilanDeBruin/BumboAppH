@@ -1,0 +1,33 @@
+﻿@model IEnumerable<Bumbo.Data.Models.Norm>
+@{
+    ViewData["Title"] = "Norm beheer";
+    var branchIds = ViewBag.BranchIds as List<int> ?? new List<int>();
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/NormBeheer.css" asp-append-version="true" />
+</head>
+
+<h1>@ViewData["Title"]</h1>
+
+<body>
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <th style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between;">
+                <span style="width: 33%; text-align: left;">Activiteit</span>
+                <span style="width: 33%; text-align: center;">antal per uur</span>
+                <span style="width: 33%; text-align: right;">Edit</span>
+            </th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="width: 33%; text-align: left;">@Html.DisplayFor(modelItem => item.SupermarketActivity)</span>
+                    <span style="width: 33%; text-align: center;">@Html.DisplayFor(modelItem => item.NormPerHour)</span>
+                    <span style="width: 33%; text-align: right;">@Html.ActionLink("Edit", "Edit", new { id = item.BranchId, hour = item.NormPerHour, activity = item.SupermarketActivity })</span>
+                </td>
+            </tr>
+        }
+    </table>
+</body>
