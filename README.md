@@ -8,17 +8,15 @@
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
-  <ol>
-    <li>
+  <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#build-with">Built With</a></li>
-        <li><a href=#Communicatie></a></li>
-        <li><a href=#Code conventions></a></li>
-        <li><a href=#Code Review></a></li>
+        <li><a href=#Communicatie>Communicatie</a></li>
+        <li><a href=#Code conventions>Code conventions</a></li>
+        <li><a href=#Code Review></a>Code Review</li>
       </ul>
     </li>
-  </ol>
 </details>
 
 
