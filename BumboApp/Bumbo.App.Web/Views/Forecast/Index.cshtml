@@ -1,0 +1,107 @@
+﻿@using Bumbo.App.Web.Models.Models
+@using Bumbo.App.Web.Models.ViewModels.Forecast;
+@using Microsoft.IdentityModel.Tokens
+
+@model WeekForecastViewModel;
+@{
+    ViewData["Title"] = "Prognose";
+}
+
+<h2>Prognose</h2>
+
+<!--Navigation-->
+<section style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
+    @if (DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Today)) < Model.FirstDayOfWeek)
+    {
+        <a asp-controller="Forecast" asp-action="GenerateForecast" asp-route-branchId="@Model.BranchId" asp-route-firstDayOfWeek="@Model.FirstDayOfWeek">
+            <button class="btn btn-primary">Prognose Genereren</button>
+        </a>
+    }
+    <div style="display: flex; align-items: center; gap: 20px; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+        <a asp-controller="Forecast" 
+           asp-action="Index" 
+           asp-route-branchId="@Model.BranchId" 
+           asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.AddDays(-7)"
+        >
+            <button class="btn btn-secondary">Week terug</button>
+        </a>
+        
+        <span>@Model.FirstDayOfWeek.ToString("dd-MM-yyyy")</span>
+        <span>tot</span>
+        <span>@Model.FirstDayOfWeek.AddDays(6).ToString("dd-MM-yyyy")</span>
+
+        <a asp-controller="Forecast"
+           asp-action="Index"
+           asp-route-branchId="@Model.BranchId"
+           asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.AddDays(7)"
+        >
+            <button class="btn btn-secondary">Week vooruit</button>
+        </a>
+    </div>
+    <div></div>
+
+</section>
+
+<!--Forecast-->
+<section>
+    @if (Model.DayForecasts.IsNullOrEmpty())
+    {
+        <p style="font-size: 2rem">Geen prognose gevonden van deze week</p>
+    }
+    else
+    {
+        <form method="post" asp-action="UpdateForecast">
+            <input type="hidden" asp-for="BranchId"/>
+            <input type="hidden" asp-for="FirstDayOfWeek"/>
+            <table>
+                <tr>
+                    <th>Dag</th>
+                    <th>Vers</th>
+                    <th>Kassa</th>
+                    <th>DKW</th>
+                </tr>
+                @for (int i = 0; i < 7; i++)
+                {
+                    <input type="hidden" asp-for="DayForecasts[i].Date"/>
+                    <tr>
+                        <td>@Model.DayForecasts[i].Date.ToString("dd-MM-yyyy")</td>
+                        <td><input type="number" disabled="disabled" asp-for="DayForecasts[i].FreshHours"/></td>
+                        <td><input type="number" disabled="disabled" asp-for="DayForecasts[i].CheckoutHours"/></td>
+                        <td><input type="number" disabled="disabled" asp-for="DayForecasts[i].ShelfStackerHours"/></td>
+                    </tr>
+                }
+            </table>
+            <button id="edit-forecast" class="btn btn-primary">Prognose aanpassen</button>
+            <button type="submit" id="submit-forecast" class="btn btn-primary" style="display: none">Aanpassing opslaan</button>
+        </form>
+    }
+</section>
+
+<script>
+    let editButton = document.getElementById("edit-forecast")
+    editButton.addEventListener("click", ev => {
+        let submitButton = document.getElementById("submit-forecast");
+        let inputs = document.getElementsByTagName("input");
+        for (let i = 0; i < inputs.length; i++) {
+            inputs[i].removeAttribute("disabled");
+        }
+        editButton.remove();
+        submitButton.style.display = "initial";
+    })
+</script>
+
+<style>
+    th {
+        text-align: center;
+    }
+    
+    input {
+        width: 10rem;
+        text-align: center;
+    }
+    
+    input:disabled {
+        border: none;
+        color: black;
+    }
+</style>

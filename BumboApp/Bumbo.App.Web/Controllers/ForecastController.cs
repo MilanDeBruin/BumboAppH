@@ -1,145 +1,157 @@
-﻿using Bumbo.App.Web.Models.Services;
+﻿using Bumbo.App.Web.Models.Enums;
+using Bumbo.App.Web.Models.Models;
+using Bumbo.App.Web.Models.Models.Forecast;
+using Bumbo.App.Web.Models.Repositorys;
+using Bumbo.App.Web.Models.ViewModels.Forecast;
 using Bumbo.Data.Context;
+using Bumbo.Data.External;
 using Bumbo.Data.Models;
 using BumboApp.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BumboApp.Controllers
 {
     [Authorize]
     public class ForecastController : Controller
     {
-        private readonly ILogger<ForecastGenerator> _logger;
-        private readonly ILogger<ForecastController> _loggerCon;
-
-        private readonly ForecastGenerator forecastGenerator;
-
-       
-        public ForecastController(ILogger<ForecastGenerator> logger, ILogger<ForecastController> loggerCon,BumboDbContext context)
+        private readonly BumboDbContext _dbContext;
+        
+        public ForecastController(BumboDbContext context)
         {
-            _logger = logger;
-            _loggerCon = loggerCon;
-            this.forecastGenerator = new ForecastGenerator(_logger, context);
+            _dbContext = context;
         }
 
         [HttpGet]
-        public IActionResult GeneratePrognose(int weekNumber, int year)
+        public IActionResult Index(int branchId, DateOnly? firstDayOfWeek)
         {
-            WeekInputViewModel viewModel = new WeekInputViewModel
+            DateOnly date = firstDayOfWeek ?? DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            ForecastRepository forecastRepository = new ForecastRepository(_dbContext);
+            List<Forecast> weekForecasts =
+                forecastRepository.GetWeekForecast(branchId, date).OrderBy(f => f.Date).ToList();
+            WeekForecastViewModel viewModel = new WeekForecastViewModel();
+            viewModel.BranchId = branchId;
+            viewModel.FirstDayOfWeek = date;
+
+            if (weekForecasts.IsNullOrEmpty())
             {
-                WeekNumber = weekNumber,
-                Year = year,
-                DayInputs = new List<DayData>
+                return View(viewModel);
+            }
+
+            viewModel.DayForecasts = new List<DayForecastViewModel>();
+            for (int i = 0; i < 7; i++)
+            {
+                DateOnly dayDate = date.AddDays(i);
+                viewModel.DayForecasts.Add(new DayForecastViewModel()
                 {
-                    new DayData() { DayName = "Maandag",Collies = 0,ExpectedCustomers = 0 },
-                    new DayData { DayName = "Dinsdag" ,Collies = 0,ExpectedCustomers = 0 },
-                    new DayData { DayName = "Woensdag",Collies = 0,ExpectedCustomers = 0 },
-                    new DayData { DayName = "Donderdag",Collies = 0,ExpectedCustomers = 0 },
-                    new DayData { DayName = "Vrijdag",Collies = 0,ExpectedCustomers = 0 },
-                    new DayData { DayName = "Zaterdag",Collies = 0,ExpectedCustomers = 0 },
-                    new DayData { DayName = "Zondag",Collies = 0,ExpectedCustomers = 0 }
-                }
+                    Date = dayDate,
+                    CheckoutHours = weekForecasts.Find(f => f.Date == dayDate && f.Department == "Kassa").ManHours,
+                    FreshHours = weekForecasts.Find(f => f.Date == dayDate && f.Department == "Vers").ManHours,
+                    ShelfStackerHours = weekForecasts.Find(f => f.Date == dayDate && f.Department == "Shelf").ManHours
+                });
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public IActionResult GenerateForecast(int branchId, DateOnly firstDayOfWeek)
+        {
+            HolidayRepository holidayRepository = new HolidayRepository();
+            GenerateForecastViewModel viewModel = new GenerateForecastViewModel()
+            {
+                BranchId = branchId,
+                FirstDateOfWeek = firstDayOfWeek,
+                NextHoliday = holidayRepository.GetHoliday(branchId, firstDayOfWeek),
+                Days = new List<GenerateForecastDayViewModel>()
             };
+
+            WeatherRepository weatherRepository = new WeatherRepository();
+            List<WeatherDayModel>? weather = weatherRepository.GetWeather(branchId, firstDayOfWeek);
+
+            for (int i = 0; i < 7; i++)
+            {
+                DateOnly dayDate = firstDayOfWeek.AddDays(i);
+                double? dayTemp = null;
+                int dayCustomers = 1000;
+                int dayCollies = 0;
+                if (weather != null)
+                {
+                    dayTemp = weather[i].MaxTemp;
+                }
+
+                viewModel.Days.Add(new GenerateForecastDayViewModel()
+                {
+                    Date = dayDate,
+                    AmountOfCustomers = dayCustomers,
+                    AmountOfCollies = dayCollies,
+                    Temperature = dayTemp
+                });
+            }
 
             return View(viewModel);
         }
 
         [HttpPost]
-        public IActionResult SubmitWeekInput(WeekInputViewModel viewModel)
+        public IActionResult GenerateForecast(GenerateForecastViewModel viewModel)
         {
-            int branchId = 1;
-            
-            DateOnly firstDayOfWeek = FirstDateOfWeek(viewModel.WeekNumber, viewModel.Year);
-            StoreTrafficEstimationService storeTrafficEstimationService = new StoreTrafficEstimationService();
-            List<StoreTraffic> estimatedStoreTraffic;
-            try
+            List<GenerateForecastDayModel> dayModels = new List<GenerateForecastDayModel>();
+            foreach (var day in viewModel.Days)
             {
-                estimatedStoreTraffic =
-                    storeTrafficEstimationService.EstimateStoreTraffic(branchId, firstDayOfWeek);
-            }
-            catch (Exception e)
-            {
-                return RedirectToAction("GeneratePrognoseError");
+                dayModels.Add(new GenerateForecastDayModel(day.Date, day.AmountOfCustomers, day.AmountOfCollies,
+                    day.Temperature));
             }
 
-            List<DayData> dayDataList = new List<DayData>();
+            GenerateForecastModel forecastModel =
+                new GenerateForecastModel(viewModel.BranchId, viewModel.NextHoliday, dayModels, _dbContext);
+            forecastModel.GenerateForecast();
 
-            for (int i = 0; i < 7; i++)
+            return RedirectToAction("Index", "Forecast", new
             {
-                _loggerCon.LogInformation("voeg data toe");
-                DayData data = new DayData();
-                data.ExpectedCustomers = estimatedStoreTraffic[i].Amount;
-                data.Collies = viewModel.DayInputs[i].Collies;
-                dayDataList.Add(data);
-            }
-            forecastGenerator.GenerateAllForecasts(dayDataList, viewModel.WeekNumber, firstDayOfWeek, branchId);
-
-            
-            return RedirectToAction("prognose", "Home",new { weekNumber = viewModel.WeekNumber, year = viewModel.Year });
+                branchId = viewModel.BranchId,
+                firstDayOfWeek = viewModel.FirstDateOfWeek
+            });
         }
 
-
-        [Route("Home/Prognose/{weekNumber:int?}")]
-        public ActionResult Prognose(int? weekNumber)
+        [HttpPost]
+        public IActionResult UpdateForecast(WeekForecastViewModel viewModel)
         {
-            DateTime today = DateTime.Now;
-            var year = today.Year;
-            int currentWeek = this.GetWeekNumber(today);
+            ForecastRepository repository = new ForecastRepository(_dbContext);
+            List<Forecast> updatedForecasts = new List<Forecast>();
 
-            int selectedWeek = weekNumber ?? currentWeek;
-
-            if (selectedWeek < 1)
+            foreach (var dayForecast in viewModel.DayForecasts)
             {
-                selectedWeek = 1;
-            }
-            if (selectedWeek > 52)
-            {
-                selectedWeek = 52;
-            }
-
-            ViewBag.SelectedWeek = selectedWeek;
-            ViewBag.CurrentYear = today.Year;
-            ViewBag.WeekForecast = this.GetWeekForecast(selectedWeek, year);
-
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult GeneratePrognoseError()
-        {
-            return View();
-        }
-
-        private int GetWeekNumber(DateTime date)
-        {
-            System.Globalization.CultureInfo cul = System.Globalization.CultureInfo.CurrentCulture;
-            return cul.Calendar.GetWeekOfYear(date, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-        }
-
-        private DateOnly FirstDateOfWeek(int weekNumber, int year)
-        {
-            var jan1 = new DateOnly(year, 1, 1);
-            var daysOffset = DayOfWeek.Monday - jan1.DayOfWeek;
-            var firstMonday = jan1.AddDays(daysOffset >= 0 ? daysOffset : daysOffset + 7);
-            var day = firstMonday.AddDays((weekNumber - 1) * 7);
-            day = new DateOnly(year, day.Month, day.Day);
-            return day;
-        }
-
-
-        private WeekForecast GetWeekForecast(int weekNumber, int year)
-        {
-            List<DateOnly> dates = new List<DateOnly>();
-            for (var i = 0; i < 7; i++)
-            {
-                dates.Add(this.FirstDateOfWeek(weekNumber, year).AddDays(i));
+                updatedForecasts.Add(new Forecast()
+                {
+                    BranchId = viewModel.BranchId,
+                    Date = dayForecast.Date,
+                    Department = DepartmentEnum.Kassa.ToString(),
+                    ManHours = dayForecast.CheckoutHours
+                });
+                updatedForecasts.Add(new Forecast()
+                {
+                    BranchId = viewModel.BranchId,
+                    Date = dayForecast.Date,
+                    Department = DepartmentEnum.Vers.ToString(),
+                    ManHours = dayForecast.FreshHours
+                });
+                updatedForecasts.Add(new Forecast()
+                {
+                    BranchId = viewModel.BranchId,
+                    Date = dayForecast.Date,
+                    Department = DepartmentEnum.Shelf.ToString(),
+                    ManHours = dayForecast.ShelfStackerHours
+                });
             }
 
-            WeekForecast weekForecast = this.forecastGenerator.GetWeekForecast(dates);
+            repository.SetWeekForecast(updatedForecasts);
 
-            return weekForecast;
+            return RedirectToAction("Index", new
+            {
+                branchid = viewModel.BranchId,
+                firstDayOfWeek = viewModel.FirstDayOfWeek
+            });
         }
     }
 }
