@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Bumbo.App.Web.Models
+namespace Bumbo.App.Web.Models.ViewModels
 {
     public class EmployeeModel
     {
@@ -9,7 +9,7 @@ namespace Bumbo.App.Web.Models
 
         [Required(ErrorMessage = "Branch ID is verplicht.")]
         public int branch_id { get; set; }
-        
+
         [Required(ErrorMessage = "Afdeling is verplicht.")]
         public string position { get; set; }
 

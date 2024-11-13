@@ -1,7 +1,8 @@
-﻿using Bumbo.App.Web.Models.Services;
+﻿using Bumbo.Functionality.Services;
+using Bumbo.Functionality.Forecasts;
 using Bumbo.Data.Context;
 using Bumbo.Data.Models;
-using BumboApp.Models.Models;
+using Bumbo.App.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
@@ -21,7 +22,7 @@ namespace BumboApp.Controllers
         {
             _logger = logger;
             _loggerCon = loggerCon;
-            this.forecastGenerator = new ForecastGenerator(_logger, context);
+            this.forecastGenerator = new ForecastGenerator(context);
         }
 
         [HttpGet]

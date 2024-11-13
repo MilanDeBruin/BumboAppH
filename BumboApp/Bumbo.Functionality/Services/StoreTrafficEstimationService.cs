@@ -3,7 +3,7 @@ using BumboApp.Models.Models;
 using BumboApp.Models.Repositorys;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Bumbo.App.Web.Models.Services;
+namespace Bumbo.Functionality.Services;
 
 public class StoreTrafficEstimationService
 {
@@ -114,6 +114,4 @@ public class StoreTrafficEstimationService
     {
         return (holiday.Date.Date - day.DateTime.Date).Days;
     }
-    
-    
 }

@@ -1,10 +1,11 @@
 using System.Collections.Immutable;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Bumbo.App.Web.Models.Services;
+using Bumbo.Functionality.Services;
 using Bumbo.Data.Context;
 using Bumbo.Data.Models;
-using BumboApplicatie.Models;
+using Bumbo.App.Web.Models.ViewModels;
+
 
 namespace Bumbo.App.Web.Controllers
 {
