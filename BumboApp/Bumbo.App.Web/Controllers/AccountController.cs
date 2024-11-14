@@ -34,8 +34,10 @@ public class AccountController : Controller
         }
 
         // Attempt to find the employee with the provided email and password
-        var employee = await this._context.Employees
-            .FirstOrDefaultAsync(e => e.EmailAdres == viewModel.Email && e.Password == viewModel.Password);
+        var employee = (await this._context.Employees
+                .ToListAsync()).Find(e =>
+                e.EmailAdres.Equals(viewModel.Email, StringComparison.Ordinal) &&
+                e.Password.Equals(viewModel.Password, StringComparison.Ordinal));
 
         if (employee != null)
         {
