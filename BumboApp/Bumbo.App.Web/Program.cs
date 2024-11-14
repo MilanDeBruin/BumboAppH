@@ -15,17 +15,14 @@ namespace Bumbo.App.Web
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<Bumbo.Data.Interfaces.INormRepository, Bumbo.Data.SqlRepository.NormRepository>();
             builder.Services.AddDbContext<BumboDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("Bumbo")));
-
-
-
+                options.UseSqlServer(builder.Configuration.GetConnectionString("Bumbo"))); // TODO: Move this logic to DbContext itself
+            
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/Account/Login";
                     options.LogoutPath = "/Account/Logout";
                 });
-
 
             var app = builder.Build();
 
