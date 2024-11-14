@@ -1,32 +1,27 @@
 using Bumbo.App.Web.Models.Enums;
-using Bumbo.App.Web.Models.Repositorys;
 using Bumbo.Data.Context;
 using Bumbo.Data.Models;
+using Bumbo.Data.SqlRepository;
 using BumboApp.Models.Models;
 
 namespace Bumbo.App.Web.Models.Models.Forecast;
 
 public class GenerateForecastModel
 {
-    private readonly ForecastRepository _repository;
-    private readonly BumboDbContext _dbContext;
     
-    public GenerateForecastModel(int branchId, HolidayModel? nextHoliday, List<GenerateForecastDayModel> forecastDays, BumboDbContext dbContext)
+    public GenerateForecastModel(int branchId, HolidayModel? nextHoliday, List<GenerateForecastDayModel> forecastDays)
     {
-        _repository = new ForecastRepository(dbContext);
-        _dbContext = dbContext;
         BranchId = branchId;
         NextHoliday = nextHoliday;
         ForecastDays = forecastDays;
     }
     
-    private int BranchId { get; }
+    public int BranchId { get; }
     private HolidayModel? NextHoliday { get; }
     private List<GenerateForecastDayModel> ForecastDays { get; }
 
-    public void GenerateForecast()
+    public List<Data.Models.Forecast> GenerateForecast(List<Norm> norms)
     {
-        List<Norm> norms = _dbContext.Norms.Where(n => n.BranchId == BranchId).ToList();
         List<Data.Models.Forecast> forecasts = new List<Data.Models.Forecast>();
 
         foreach (var forecastDay in ForecastDays)
@@ -67,7 +62,8 @@ public class GenerateForecastModel
                 
             });
         }
-        _repository.SetWeekForecast(forecasts);
+
+        return forecasts;
     }
 
     private int CalculateShelfStackerHours(Norm? unloadNorm, Norm? shelfStackingNorm, int amountOfCollies)

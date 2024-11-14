@@ -1,9 +1,10 @@
 using Bumbo.Data.Context;
+using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 
-namespace Bumbo.App.Web.Models.Repositorys;
+namespace Bumbo.Data.SqlRepository;
 
-public class ForecastRepository
+public class ForecastRepository : IForecastRepository
 {
     private readonly BumboDbContext _dbContext;
 

@@ -1,11 +1,13 @@
 ﻿using Bumbo.App.Web.Models.Enums;
 using Bumbo.App.Web.Models.Models;
 using Bumbo.App.Web.Models.Models.Forecast;
-using Bumbo.App.Web.Models.Repositorys;
+using Bumbo.App.Web.Models.Services;
 using Bumbo.App.Web.Models.ViewModels.Forecast;
 using Bumbo.Data.Context;
 using Bumbo.Data.External;
+using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
+using Bumbo.Data.SqlRepository;
 using BumboApp.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,20 +18,21 @@ namespace BumboApp.Controllers
     [Authorize]
     public class ForecastController : Controller
     {
-        private readonly BumboDbContext _dbContext;
+        private readonly IGenerateForecastService _generateForecastService;
+        private readonly IForecastRepository _forecastRepository;
         
-        public ForecastController(BumboDbContext context)
+        public ForecastController(BumboDbContext context, IGenerateForecastService generateForecastService, IForecastRepository forecastRepository)
         {
-            _dbContext = context;
+            _generateForecastService = generateForecastService;
+            _forecastRepository = forecastRepository;
         }
 
         [HttpGet]
         public IActionResult Index(int branchId, DateOnly? firstDayOfWeek)
         {
             DateOnly date = firstDayOfWeek ?? DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
-            ForecastRepository forecastRepository = new ForecastRepository(_dbContext);
             List<Forecast> weekForecasts =
-                forecastRepository.GetWeekForecast(branchId, date).OrderBy(f => f.Date).ToList();
+                _forecastRepository.GetWeekForecast(branchId, date).OrderBy(f => f.Date).ToList();
             WeekForecastViewModel viewModel = new WeekForecastViewModel();
             viewModel.BranchId = branchId;
             viewModel.FirstDayOfWeek = date;
@@ -104,8 +107,9 @@ namespace BumboApp.Controllers
             }
 
             GenerateForecastModel forecastModel =
-                new GenerateForecastModel(viewModel.BranchId, viewModel.NextHoliday, dayModels, _dbContext);
-            forecastModel.GenerateForecast();
+                new GenerateForecastModel(viewModel.BranchId, viewModel.NextHoliday, dayModels);
+            
+            _generateForecastService.GenerateForecast(forecastModel);
 
             return RedirectToAction("Index", "Forecast", new
             {
@@ -117,7 +121,6 @@ namespace BumboApp.Controllers
         [HttpPost]
         public IActionResult UpdateForecast(WeekForecastViewModel viewModel)
         {
-            ForecastRepository repository = new ForecastRepository(_dbContext);
             List<Forecast> updatedForecasts = new List<Forecast>();
 
             foreach (var dayForecast in viewModel.DayForecasts)
@@ -145,7 +148,7 @@ namespace BumboApp.Controllers
                 });
             }
 
-            repository.SetWeekForecast(updatedForecasts);
+            _forecastRepository.SetWeekForecast(updatedForecasts);
 
             return RedirectToAction("Index", new
             {

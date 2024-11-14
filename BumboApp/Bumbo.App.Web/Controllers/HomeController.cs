@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Bumbo.App.Web.Models;
 using Bumbo.Data.Context;
 using Bumbo.Data.Models;
+using Bumbo.Data.SqlRepository;
 using BumboApplicatie.Models;
 
 namespace Bumbo.App.Web.Controllers
