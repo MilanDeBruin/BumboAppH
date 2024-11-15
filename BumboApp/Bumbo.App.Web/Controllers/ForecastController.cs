@@ -28,9 +28,14 @@ namespace BumboApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(int branchId, DateOnly? firstDayOfWeek)
+        public IActionResult Index(int branchId, string? firstDayOfWeek)
         {
-            DateOnly date = firstDayOfWeek ?? DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            
+            DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            if (firstDayOfWeek != null)
+            {
+                date = DateOnly.Parse(firstDayOfWeek);
+            }
             List<Forecast> weekForecasts =
                 _forecastRepository.GetWeekForecast(branchId, date).OrderBy(f => f.Date).ToList();
             WeekForecastViewModel viewModel = new WeekForecastViewModel();
