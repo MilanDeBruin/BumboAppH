@@ -46,7 +46,7 @@ public partial class Employee
     public string? Addition { get; set; }
 
     [Column("zip_code")]
-    [StringLength(6)]
+    [StringLength(20)]
     public string ZipCode { get; set; } = null!;
 
     [Column("email_adres")]
