@@ -120,7 +120,7 @@ namespace BumboApp.Controllers
             return RedirectToAction("Index", "Forecast", new
             {
                 branchId = viewModel.BranchId,
-                firstDayOfWeek = viewModel.FirstDateOfWeek
+                firstDayOfWeek = viewModel.FirstDateOfWeek.ToString("yyyy-MM-dd")
             });
         }
 
