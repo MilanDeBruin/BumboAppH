@@ -1,4 +1,4 @@
-﻿namespace Bumbo.App.Web.Models.ViewModels;
+﻿namespace Bumbo.App.Web.Models.ViewModels.Forecast;
 
 public class LoginViewModel
 {

@@ -13,10 +13,16 @@ namespace Bumbo.App.Web
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddScoped<Bumbo.Data.Interfaces.INormRepository, Bumbo.Data.SqlRepository.NormRepository>();
             builder.Services.AddDbContext<BumboDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("Bumbo"))); // TODO: Move this logic to DbContext itself
+                options.UseSqlServer(builder.Configuration.GetConnectionString("Bumbo")));
             
+            builder.Services.AddTransient<Bumbo.Data.Interfaces.INormRepository, Bumbo.Data.SqlRepository.NormRepository>();
+            builder.Services.AddTransient<Bumbo.Data.Interfaces.IForecastRepository, Bumbo.Data.SqlRepository.ForecastRepository>();
+            builder.Services.AddTransient<Bumbo.App.Web.Models.Services.IGenerateForecastService, Bumbo.App.Web.Models.Services.GenerateForecastService>();
+
+
+
+
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {

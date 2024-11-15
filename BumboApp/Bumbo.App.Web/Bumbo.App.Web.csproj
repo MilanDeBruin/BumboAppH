@@ -14,13 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Models\" />
-    <Folder Include="Models\Repositorys\" />
-    <Folder Include="Models\ViewModels\" />
+    <ProjectReference Include="..\Bumbo.Data\Bumbo.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bumbo.Data\Bumbo.Data.csproj" />
+    <Folder Include="Models\Repositorys\" />
   </ItemGroup>
 
 </Project>
