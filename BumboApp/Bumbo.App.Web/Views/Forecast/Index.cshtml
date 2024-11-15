@@ -65,9 +65,9 @@
                     <input type="hidden" asp-for="DayForecasts[i].Date"/>
                     <tr>
                         <td>@Model.DayForecasts[i].Date.ToString("dd-MM-yyyy")</td>
-                        <td><input type="number" disabled="disabled" asp-for="DayForecasts[i].FreshHours"/></td>
-                        <td><input type="number" disabled="disabled" asp-for="DayForecasts[i].CheckoutHours"/></td>
-                        <td><input type="number" disabled="disabled" asp-for="DayForecasts[i].ShelfStackerHours"/></td>
+                        <td><input type="number" disabled="disabled" min="1" max="1000" asp-for="DayForecasts[i].FreshHours"/></td>
+                        <td><input type="number" disabled="disabled" min="1" max="1000" asp-for="DayForecasts[i].CheckoutHours"/></td>
+                        <td><input type="number" disabled="disabled" min="1" max="1000" asp-for="DayForecasts[i].ShelfStackerHours"/></td>
                     </tr>
                 }
             </table>
