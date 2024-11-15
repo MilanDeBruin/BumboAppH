@@ -21,7 +21,7 @@
         <a asp-controller="Forecast" 
            asp-action="Index" 
            asp-route-branchId="@Model.BranchId" 
-           asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.AddDays(-7)"
+           asp-route-firstDayOfWeek="@DateOnly.Parse(Model.FirstDayOfWeek.AddDays(7).ToString("MM-dd-yyyy"))"
         >
             <button class="btn btn-secondary">Week terug</button>
         </a>
@@ -33,7 +33,7 @@
         <a asp-controller="Forecast"
            asp-action="Index"
            asp-route-branchId="@Model.BranchId"
-           asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.AddDays(7)"
+           asp-route-firstDayOfWeek="@DateOnly.Parse(Model.FirstDayOfWeek.AddDays(7).ToString("MM-dd-yyyy"))"
         >
             <button class="btn btn-secondary">Week vooruit</button>
         </a>
