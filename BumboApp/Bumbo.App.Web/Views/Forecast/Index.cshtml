@@ -13,7 +13,7 @@
 <section style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
     @if (DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Today)) < Model.FirstDayOfWeek)
     {
-        <a asp-controller="Forecast" asp-action="GenerateForecast" asp-route-branchId="@Model.BranchId" asp-route-firstDayOfWeek="@Model.FirstDayOfWeek">
+        <a asp-controller="Forecast" asp-action="GenerateForecast" asp-route-branchId="@Model.BranchId" asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.ToString("yyyy-MM-dd")">
             <button class="btn btn-primary">Prognose Genereren</button>
         </a>
     }
