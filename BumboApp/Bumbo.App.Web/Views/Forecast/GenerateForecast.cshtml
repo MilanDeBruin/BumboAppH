@@ -1,0 +1,64 @@
+﻿@using Bumbo.App.Web.Models.ViewModels.Forecast
+@model GenerateForecastViewModel
+
+@{
+    ViewData["Title"] = "Prognose Genereren";
+    DateOnly lastDateOfWeek = Model.FirstDateOfWeek.AddDays(6);
+    string nextHoliday;
+    if (Model.NextHoliday != null)
+    {
+        nextHoliday = Model.NextHoliday.Date.ToString("dd-MM-yyyy");
+    }
+    else
+    {
+        nextHoliday = "null";
+    }
+}
+<link rel="stylesheet" href="~/css/GenerateForecast.css" asp-append-version="true"/>
+
+<div class="container">
+    <h2>Genereer prognose</h2>
+
+    <!-- Info section -->
+    <div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <span style="margin: 0 10px 0 10px;">@Model.FirstDateOfWeek.ToString("dd-MM-yyyy")</span>
+        <span>tot</span>
+        <span style="margin: 0 10px 0 10px;">@lastDateOfWeek.ToString("dd-MM-yyyy")</span>
+    </div>
+    
+    <p>Next holiday: @nextHoliday</p>
+
+    <!-- Input Form for Each Day -->
+    <form class="form" method="post" asp-action="GenerateForecast">
+        <input type="hidden" asp-for="BranchId"/>
+        <input type="hidden" asp-for="FirstDateOfWeek"/>
+        <input type="hidden" asp-for="NextHoliday"/>
+        <table>
+            <tr>
+                <th>Dag</th>
+                <th>Aantal klanten</th>
+                <th>Aantal collies</th>
+                <th>Temperatuur</th>
+            </tr>
+
+            @for (int i = 0; i < Model.Days.Count; i++)
+            {
+                <input type="hidden" asp-for="Days[i].Date"/>
+                <tr>
+                    <td>@Model.Days[i].Date.ToString("dd-MM-yyyy")</td>
+                    <td><input type="number" asp-for="@Model.Days[i].AmountOfCustomers" placeholder="Aantal klanten" min="0" max="10000"/></td>
+                    <td><input type="number" asp-for="@Model.Days[i].AmountOfCollies" placeholder="Collies" min="0" max="500"/></td>
+                    <td>@Model.Days[i].Temperature</td>
+                </tr>
+            }
+
+        </table>
+
+        <!-- Submit Button aligned to the bottom right -->
+        <div class="row">
+            <div class="col-sm-12 text-end">
+                <button type="submit" class="btn btn-primary knopje">Genereer</button>
+            </div>
+        </div>
+    </form>
+</div>
