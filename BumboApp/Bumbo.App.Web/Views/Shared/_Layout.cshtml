@@ -25,16 +25,20 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         @if (User.FindFirst("position")?.Value == "Manager"){
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Forecast" asp-action="Index" asp-route-branchId="1">Prognose</a>
-                            </li>
-                            <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Employee" asp-action="Index">Medewerker</a>
-                            </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Prognose">Prognose</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Employee" asp-action="Index">Medewerker</a>
+                        </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Norm" asp-action="Index">Normbeheer</a>
-                            </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Norm" asp-action="Index">Normbeheer</a>
+                        </li>
+
+                        <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Scheduling" asp-action="Rooster">Roostering</a>
+                        </li>
                         }
                     </ul>
                 </div>

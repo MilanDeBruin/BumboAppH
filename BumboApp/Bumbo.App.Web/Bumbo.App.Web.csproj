@@ -14,11 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bumbo.Data\Bumbo.Data.csproj" />
+    <Folder Include="Models\Models\" />
+    <Folder Include="Models\Repositorys\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Repositorys\" />
+    <ProjectReference Include="..\Bumbo.Data\Bumbo.Data.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 namespace Bumbo.App.Web.Controllers;
 
 using System.Security.Claims;
-using Models.ViewModels.Forecast;
+using Bumbo.App.Web.Models.ViewModels;
 using Bumbo.Data.Context;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
