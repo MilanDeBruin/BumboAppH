@@ -1,4 +1,4 @@
-﻿using Bumbo.App.Web.Models;
+﻿using Bumbo.App.Web.Models.ViewModels.Employee;
 using Bumbo.Data.Context;
 using Bumbo.Data.Models;
 using Microsoft.AspNetCore.Authorization;
