@@ -30,7 +30,6 @@ namespace Bumbo.App.Web
                     options.LogoutPath = "/Account/Logout";
                 });
 
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

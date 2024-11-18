@@ -16,14 +16,14 @@ public partial class OpeningHour
 
     [Key]
     [Column("weekday")]
-    [StringLength(8)]
+    [StringLength(9)]
     public string Weekday { get; set; } = null!;
 
     [Column("opening_time")]
     public TimeOnly OpeningTime { get; set; }
 
-    [Column("clsoing_time")]
-    public TimeOnly ClsoingTime { get; set; }
+    [Column("closing_time")]
+    public TimeOnly ClosingTime { get; set; }
 
     [ForeignKey("BranchId")]
     [InverseProperty("OpeningHours")]

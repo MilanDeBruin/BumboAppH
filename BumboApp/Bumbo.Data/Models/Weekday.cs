@@ -11,7 +11,7 @@ public partial class Weekday
 {
     [Key]
     [Column("weekday")]
-    [StringLength(8)]
+    [StringLength(9)]
     public string Weekday1 { get; set; } = null!;
 
     [InverseProperty("WeekdayNavigation")]
