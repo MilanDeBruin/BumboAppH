@@ -13,7 +13,7 @@
 <section style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
     @if (DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Today)) < Model.FirstDayOfWeek)
     {
-        <a asp-controller="Forecast" asp-action="GenerateForecast" asp-route-branchId="@Model.BranchId" asp-route-firstDayOfWeek="@Model.FirstDayOfWeek">
+        <a asp-controller="Forecast" asp-action="GenerateForecast" asp-route-branchId="@Model.BranchId" asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.ToString("yyyy-MM-dd")">
             <button class="btn btn-primary">Prognose Genereren</button>
         </a>
     }
@@ -21,7 +21,7 @@
         <a asp-controller="Forecast" 
            asp-action="Index" 
            asp-route-branchId="@Model.BranchId" 
-           asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.AddDays(-7)"
+           asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.AddDays(-7).ToString("yyyy-MM-dd")"
         >
             <button class="btn btn-secondary">Week terug</button>
         </a>
@@ -33,7 +33,7 @@
         <a asp-controller="Forecast"
            asp-action="Index"
            asp-route-branchId="@Model.BranchId"
-           asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.AddDays(7)"
+           asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.AddDays(7).ToString("yyyy-MM-dd")"
         >
             <button class="btn btn-secondary">Week vooruit</button>
         </a>
@@ -65,9 +65,9 @@
                     <input type="hidden" asp-for="DayForecasts[i].Date"/>
                     <tr>
                         <td>@Model.DayForecasts[i].Date.ToString("dd-MM-yyyy")</td>
-                        <td><input type="number" disabled="disabled" asp-for="DayForecasts[i].FreshHours"/></td>
-                        <td><input type="number" disabled="disabled" asp-for="DayForecasts[i].CheckoutHours"/></td>
-                        <td><input type="number" disabled="disabled" asp-for="DayForecasts[i].ShelfStackerHours"/></td>
+                        <td><input type="number" disabled="disabled" min="1" max="1000" asp-for="DayForecasts[i].FreshHours"/></td>
+                        <td><input type="number" disabled="disabled" min="1" max="1000" asp-for="DayForecasts[i].CheckoutHours"/></td>
+                        <td><input type="number" disabled="disabled" min="1" max="1000" asp-for="DayForecasts[i].ShelfStackerHours"/></td>
                     </tr>
                 }
             </table>

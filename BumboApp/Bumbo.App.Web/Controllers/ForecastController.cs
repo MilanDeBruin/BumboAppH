@@ -28,9 +28,14 @@ namespace BumboApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(int branchId, DateOnly? firstDayOfWeek)
+        public IActionResult Index(int branchId, string? firstDayOfWeek)
         {
-            DateOnly date = firstDayOfWeek ?? DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            
+            DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            if (firstDayOfWeek != null)
+            {
+                date = DateOnly.Parse(firstDayOfWeek);
+            }
             List<Forecast> weekForecasts =
                 _forecastRepository.GetWeekForecast(branchId, date).OrderBy(f => f.Date).ToList();
             WeekForecastViewModel viewModel = new WeekForecastViewModel();
@@ -59,23 +64,24 @@ namespace BumboApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult GenerateForecast(int branchId, DateOnly firstDayOfWeek)
+        public IActionResult GenerateForecast(int branchId, string firstDayOfWeek)
         {
+            DateOnly date = DateOnly.Parse(firstDayOfWeek);
             HolidayRepository holidayRepository = new HolidayRepository();
             GenerateForecastViewModel viewModel = new GenerateForecastViewModel()
             {
                 BranchId = branchId,
-                FirstDateOfWeek = firstDayOfWeek,
-                NextHoliday = holidayRepository.GetHoliday(branchId, firstDayOfWeek),
+                FirstDateOfWeek = date,
+                NextHoliday = holidayRepository.GetHoliday(branchId, date),
                 Days = new List<GenerateForecastDayViewModel>()
             };
 
             WeatherRepository weatherRepository = new WeatherRepository();
-            List<WeatherDayModel>? weather = weatherRepository.GetWeather(branchId, firstDayOfWeek);
+            List<WeatherDayModel>? weather = weatherRepository.GetWeather(branchId, date);
 
             for (int i = 0; i < 7; i++)
             {
-                DateOnly dayDate = firstDayOfWeek.AddDays(i);
+                DateOnly dayDate = date.AddDays(i);
                 double? dayTemp = null;
                 int dayCustomers = 1000;
                 int dayCollies = 0;
@@ -114,7 +120,7 @@ namespace BumboApp.Controllers
             return RedirectToAction("Index", "Forecast", new
             {
                 branchId = viewModel.BranchId,
-                firstDayOfWeek = viewModel.FirstDateOfWeek
+                firstDayOfWeek = viewModel.FirstDateOfWeek.ToString("yyyy-MM-dd")
             });
         }
 
