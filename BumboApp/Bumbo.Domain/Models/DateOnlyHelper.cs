@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices.JavaScript;
 
-namespace Bumbo.App.Web.Models.Models;
+namespace Bumbo.Domain.Models;
 
 public class DateOnlyHelper
 {

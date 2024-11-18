@@ -1,7 +1,7 @@
-﻿using Bumbo.App.Web.Models.Enums;
-using Bumbo.App.Web.Models.Models;
-using Bumbo.App.Web.Models.Models.Forecast;
-using Bumbo.App.Web.Models.Services;
+﻿using Bumbo.Domain.Enums;
+using Bumbo.Domain.Services.Forecast;
+using Bumbo.Domain.Models.Forecast;
+using Bumbo.Domain.Models;
 using Bumbo.App.Web.Models.ViewModels.Forecast;
 using Bumbo.Data.Context;
 using Bumbo.Data.External;

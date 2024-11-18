@@ -1,6 +1,6 @@
-using Bumbo.App.Web.Models.Models.Forecast;
+using Bumbo.Domain.Models.Forecast;
 
-namespace Bumbo.App.Web.Models.Services;
+namespace Bumbo.Domain.Services.Forecast;
 
 public interface IGenerateForecastService
 {
