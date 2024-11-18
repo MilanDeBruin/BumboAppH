@@ -1,4 +1,4 @@
-﻿using Bumbo.App.Web.Models.Enums;
+﻿using Bumbo.Domain.Enums;
 using Bumbo.App.Web.Models.ViewModels;
 using Bumbo.Data.Context;
 using Bumbo.Data.Models;

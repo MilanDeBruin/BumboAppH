@@ -1,6 +1,6 @@
 ﻿using BumboApp.Models.Models;
 using Bumbo.App.Web.Models.ViewModels;
-using Bumbo.App.Web.Models.Enums;
+using Bumbo.Domain.Enums;
 
 namespace Bumbo.App.Web.Models.ViewModels
 {
