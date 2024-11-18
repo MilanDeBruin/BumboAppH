@@ -1,6 +1,6 @@
 using BumboApp.Models.Models;
 
-namespace Bumbo.App.Web.Models.Models.Forecast;
+namespace Bumbo.Domain.Models.Forecast;
 
 public class GenerateForecastDayModel
 {
