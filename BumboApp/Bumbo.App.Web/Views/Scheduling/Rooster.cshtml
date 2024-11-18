@@ -1,0 +1,321 @@
+﻿@using Bumbo.App.Web.Models.ViewModels
+@using BumboApp.Models.Models
+@using Bumbo.App.Web.Models.Enums
+@model IEnumerable<EmployeeScheduleViewModel>
+
+<h2>Medewerker Roostering</h2>
+
+<div class="filters-container">
+    <div class="week-select-container">
+        <label for="yearSelect">Jaar:</label>
+        <select id="yearSelect" class="form-control" style="display:inline-block; width:auto;">
+            @for (int year = DateTime.Now.Year - 5; year <= DateTime.Now.Year + 5; year++)
+            {
+                <option value="@year">@year</option>
+            }
+        </select>
+        <label for="weekSelect">Week:</label>
+        <select id="weekSelect" class="form-control" style="display:inline-block; width:auto;">
+            @for (int week = 1; week <= 52; week++)
+            {
+                <option value="@week">@week</option>
+            }
+        </select>
+        <span id="weekRange"></span>
+    </div>
+
+    <div class="function-filter-container">
+        <label for="functionFilter">Filter op functie:</label>
+        <select id="functionFilter" class="form-control" style="display:inline-block; width:auto;" onchange="filterEmployees()">
+            <option value="all">Alle functies</option>
+            @foreach (var functionName in Model.Select(e => e.MainFunction).Distinct())
+            {
+                <option value="@functionName">@functionName</option>
+            }
+        </select>
+    </div>
+</div>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Medewerker</th>
+            @foreach (var day in Enum.GetValues(typeof(DayNameOfWeek)).Cast<DayNameOfWeek>())
+            {
+                <th>@day</th>
+            }
+        </tr>
+    </thead>
+    <tbody id="employeeTableBody">
+        @foreach (var employee in Model)
+        {
+            <tr class="employee-row" data-function="@employee.MainFunction">
+                <td>
+                    <strong>@employee.Name</strong>
+                    <br />
+                    <small>@employee.MainFunction</small>
+                </td>
+
+                @foreach (var day in Enum.GetValues(typeof(DayNameOfWeek)).Cast<DayNameOfWeek>())
+                {
+                    <td class="schedule-cell">
+                        <div id="schedule-container-@employee.EmployeeId-@day"></div>
+                        <button class="btn btn-sm btn-primary"
+                                onclick="openScheduleModal(@employee.EmployeeId, '@day')">
+                            +
+                        </button>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div id="scheduleModal" class="modal" tabindex="-1" role="dialog" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Voeg een planning toe</h5>
+                <button type="button" class="close" onclick="closeScheduleModal()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm">
+                    <input type="hidden" id="modalEmployeeId">
+                    <input type="hidden" id="modalDay">
+                    <input type="hidden" id="modalDate">
+
+                    <div class="form-group">
+                        <label for="modalStartTime">Start tijd:</label>
+                        <input type="time" id="modalStartTime" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="modalEndTime">Eind tijd:</label>
+                        <input type="time" id="modalEndTime" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="modalDepartment">Afdeling:</label>
+                        <select id="modalDepartment" class="form-control">
+                            @foreach (var dept in Enum.GetValues(typeof(DepartmentEnum)))
+                            {
+                                <option value="@dept">@dept</option>
+                            }
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="saveSchedule()">Opslaan</button>
+                <button type="button" class="btn btn-secondary" onclick="closeScheduleModal()">Annuleren</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openScheduleModal(employeeId, day) {
+            document.getElementById("modalEmployeeId").value = employeeId;
+            document.getElementById("modalDay").value = day;
+
+            document.getElementById("scheduleModal").style.display = "block";
+        }
+
+        function closeScheduleModal() {
+            document.getElementById("scheduleModal").style.display = "none";
+        }
+
+        function saveSchedule() {
+            const employeeId = document.getElementById("modalEmployeeId").value;
+            const day = document.getElementById("modalDay").value;
+            const date = document.getElementById("modalDate").value;
+            const startTime = document.getElementById("modalStartTime").value;
+            const endTime = document.getElementById("modalEndTime").value;
+            const department = document.getElementById("modalDepartment").value;
+
+            const scheduleEntry = {
+                EmployeeId: parseInt(employeeId),
+                Day: day,
+                Date: new Date(date).toISOString(), 
+                StartTime: startTime + ":00",     
+                EndTime: endTime + ":00",
+                Department: department
+            };
+
+
+            console.log("Schedule Entry:", scheduleEntry);
+
+            $.ajax({
+                url: '@Url.Action("AddSchedule", "Scheduling")',
+                type: 'POST',
+                data: JSON.stringify(scheduleEntry),
+                contentType: 'application/json',
+                success: function (response) {
+                    console.log("Response from server:", response);
+
+                  
+                    addScheduleToCell({
+                        employeeId: scheduleEntry.EmployeeId,
+                        day: scheduleEntry.Day,
+                        startTime: scheduleEntry.StartTime.slice(0, 5), 
+                        endTime: scheduleEntry.EndTime.slice(0, 5),
+                        department: scheduleEntry.Department
+                    });
+
+                    closeScheduleModal();
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error saving schedule:", status, error);
+                    alert("Failed to save the schedule. Please try again.");
+                }
+            });
+        }
+
+        function addScheduleToCell(schedule) {
+            const containerId = `schedule-container-${schedule.employeeId}-${schedule.day}`;
+            console.log("Looking for container with ID:", containerId);
+
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container not found for ID: ${containerId}`);
+                return;
+            }
+
+            const scheduleElement = document.createElement("div");
+            scheduleElement.classList.add("schedule-entry");
+
+            scheduleElement.innerHTML = `
+                        ${schedule.startTime} - ${schedule.endTime} (${schedule.department})
+                        <button class="btn btn-sm btn-danger" onclick="removeSchedule(this)">X</button>
+                    `;
+
+            container.appendChild(scheduleElement);
+        }
+
+        function removeSchedule(button) {
+            const scheduleEntry = button.parentElement;
+            scheduleEntry.remove();
+
+            // database data removal hier
+        }
+
+        function getWeekDates(year, week) {
+            const date = new Date(year, 0, 1);
+            const days = (week - 1) * 7;
+            date.setDate(date.getDate() + days);
+
+            const startDate = date;
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+
+            return { startDate, endDate };
+        }
+
+        function updateWeekRange() {
+            const selectedYear = document.getElementById("yearSelect").value;
+            const selectedWeek = document.getElementById("weekSelect").value;
+
+            const { startDate, endDate } = getWeekDates(selectedYear, selectedWeek);
+
+            const rangeText = `Week ${selectedWeek} of ${selectedYear}: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
+            document.getElementById("weekRange").textContent = rangeText;
+
+            document.getElementById("modalDate").value = startDate.toISOString().split('T')[0];
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            updateWeekRange();
+
+            document.getElementById("yearSelect").addEventListener("change", updateWeekRange);
+            document.getElementById("weekSelect").addEventListener("change", updateWeekRange);
+        });
+
+        function filterEmployees() {
+            const selectedFunction = document.getElementById('functionFilter').value.toLowerCase();
+            const rows = document.querySelectorAll('.employee-row');
+
+            rows.forEach(row => {
+                const employeeFunction = row.getAttribute('data-function').toLowerCase();
+                if (selectedFunction === 'all' || employeeFunction === selectedFunction) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+    </script>
+}
+
+<style>
+    .schedule-entry {
+        margin-bottom: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f8f9fa;
+        padding: 5px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+    }
+
+    .schedule-cell {
+        vertical-align: top;
+        padding: 10px;
+    }
+
+    .schedule-cell button {
+        margin-top: 5px;
+    }
+    .schedule-entry button {
+        margin-left: 10px;
+        font-size: 0.8em;
+    }
+
+    .schedule-cell {
+        cursor: pointer;
+        vertical-align: top;
+    }
+
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        width: 500px;
+    }
+
+    .close {
+        float: right;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+     .close:hover {
+        color: red;
+     }
+
+    .filters-container {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .function-filter-container {
+        margin-left: 20px;
+    }
+</style>
