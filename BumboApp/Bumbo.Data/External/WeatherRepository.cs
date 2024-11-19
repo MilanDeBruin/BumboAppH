@@ -60,8 +60,17 @@ public class WeatherRepository
     private List<WeatherDayModel> ParseJson(string jsonString)
     {
         List<WeatherDayModel> dayForecasts = new List<WeatherDayModel>();
-        JsonNode json = JsonNode.Parse(jsonString)["daily"];
-        int lenght = JsonNode.Parse(json["time"].ToString()).AsArray().Count;
+        JsonNode json;
+        int lenght;
+        try
+        {
+            json = JsonNode.Parse(jsonString)["daily"];
+            lenght = JsonNode.Parse(json["time"].ToString()).AsArray().Count;
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
 
         for (int i = 0; i < lenght; i++)
         {
