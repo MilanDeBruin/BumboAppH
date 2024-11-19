@@ -1,4 +1,4 @@
-namespace Bumbo.App.Web.Models;
+namespace Bumbo.Domain.Enums;
 
 public enum DayNameEnum
 {

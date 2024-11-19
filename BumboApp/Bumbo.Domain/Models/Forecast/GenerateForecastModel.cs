@@ -1,10 +1,10 @@
-using Bumbo.App.Web.Models.Enums;
+using Bumbo.Domain.Enums;
 using Bumbo.Data.Context;
 using Bumbo.Data.Models;
 using Bumbo.Data.SqlRepository;
 using BumboApp.Models.Models;
 
-namespace Bumbo.App.Web.Models.Models.Forecast;
+namespace Bumbo.Domain.Models.Forecast;
 
 public class GenerateForecastModel
 {
