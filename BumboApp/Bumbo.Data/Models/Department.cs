@@ -17,6 +17,9 @@ public partial class Department
     [InverseProperty("DepartmentNavigation")]
     public virtual ICollection<Forecast> Forecasts { get; set; } = new List<Forecast>();
 
+    [InverseProperty("DepartmentNavigation")]
+    public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new List<WorkSchedule>();
+
     [ForeignKey("Department")]
     [InverseProperty("Departments")]
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();

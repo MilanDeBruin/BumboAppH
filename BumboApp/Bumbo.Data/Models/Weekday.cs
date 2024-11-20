@@ -15,5 +15,11 @@ public partial class Weekday
     public string Weekday1 { get; set; } = null!;
 
     [InverseProperty("WeekdayNavigation")]
+    public virtual ICollection<Availability> Availabilities { get; set; } = new List<Availability>();
+
+    [InverseProperty("WeekdayNavigation")]
     public virtual ICollection<OpeningHour> OpeningHours { get; set; } = new List<OpeningHour>();
+
+    [InverseProperty("WeekdayNavigation")]
+    public virtual ICollection<SchoolSchedule> SchoolSchedules { get; set; } = new List<SchoolSchedule>();
 }
