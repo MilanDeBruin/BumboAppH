@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Bumbo.Data.Models;
 
 [Table("employee")]
+[Index("EmailAdres", Name = "IX_employee", IsUnique = true)]
 public partial class Employee
 {
     [Key]
