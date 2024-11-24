@@ -25,10 +25,8 @@ public class AccountController : Controller
         {
             return this.RedirectToAction("Index", "Home");
         }
-
-
-
-        return this.View();
+        var model = new LoginViewModel();
+        return View(model);
     }
 
     [HttpPost]
