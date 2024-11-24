@@ -21,6 +21,13 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Login()
     {
+        if(User.Identity.IsAuthenticated)
+        {
+            return this.RedirectToAction("Index", "Home");
+        }
+
+
+
         return this.View();
     }
 
