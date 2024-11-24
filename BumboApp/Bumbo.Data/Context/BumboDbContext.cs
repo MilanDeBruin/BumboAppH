@@ -1,11 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Bumbo.Data.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bumbo.Data.Context;
 
-public partial class BumboDbContext : DbContext
+public partial class BumboDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<int>, int>
 {
 
     public virtual DbSet<Availability> Availabilities { get; set; }
@@ -46,6 +48,23 @@ public partial class BumboDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        OnModelCreatingPartial(modelBuilder);
+        
+        modelBuilder.Entity<IdentityUserLogin<int>>(entity =>
+        {
+            entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
+        });
+
+        modelBuilder.Entity<IdentityUserRole<int>>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.RoleId });
+        });
+
+        modelBuilder.Entity<IdentityUserToken<int>>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
+        });
+        
         modelBuilder.Entity<Availability>(entity =>
         {
             entity.HasOne(d => d.Employee).WithMany(p => p.Availabilities)
