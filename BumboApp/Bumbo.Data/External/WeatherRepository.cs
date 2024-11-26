@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
 using BumboApp.Models.Models;
 
-namespace BumboApp.Models.Repositorys;
+namespace Bumbo.Data.External;
 
 public class WeatherRepository
 {
@@ -12,28 +12,34 @@ public class WeatherRepository
         this._baseUri = "https://api.open-meteo.com/v1/";
     }
 
-    public List<WeatherDayModel> GetWeather(double lat, double lon, DateTime startDate)
+    public List<WeatherDayModel>? GetWeather(int branchId, DateOnly startDate)
     {
+        double lat = 51.688;
+        double lon = 5.287;
+        
         string jsonString;
+        List<WeatherDayModel> weatherDayModels;
 
         try
         {
             jsonString = Task.Run(() => this.GetAsyncWeather(lat, lon, startDate, startDate.AddDays(6))).Result;
+            weatherDayModels = ParseJson(jsonString);
         }
         catch (Exception e)
         {
-            throw e;
+            return null;
         }
 
-        if (jsonString.Contains("error"))
+        if (jsonString.Contains("error") || jsonString.Contains("null"))
         {
-            throw new Exception(jsonString);
+            return null;
         }
         
-        return this.ParseJson(jsonString);
+        
+        return weatherDayModels;
     }
 
-    private async Task<string> GetAsyncWeather(double lat, double lon, DateTime startDate, DateTime endDate)
+    private async Task<string> GetAsyncWeather(double lat, double lon, DateOnly startDate, DateOnly endDate)
     {
         string startDateString = startDate.ToString("yyyy-MM-dd");
         string endDateString = endDate.ToString("yyyy-MM-dd");
@@ -54,9 +60,17 @@ public class WeatherRepository
     private List<WeatherDayModel> ParseJson(string jsonString)
     {
         List<WeatherDayModel> dayForecasts = new List<WeatherDayModel>();
-        Console.WriteLine(jsonString);
-        JsonNode json = JsonNode.Parse(jsonString)["daily"];
-        int lenght = JsonNode.Parse(json["time"].ToString()).AsArray().Count;
+        JsonNode json;
+        int lenght;
+        try
+        {
+            json = JsonNode.Parse(jsonString)["daily"];
+            lenght = JsonNode.Parse(json["time"].ToString()).AsArray().Count;
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
 
         for (int i = 0; i < lenght; i++)
         {

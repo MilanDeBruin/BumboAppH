@@ -1,17 +1,14 @@
 using System.Collections.Immutable;
-using BumboApp.Models.Models;
-using BumboApplicatie.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Bumbo.App.Web.Models.Services;
+using Bumbo.App.Web.Models;
 using Bumbo.Data.Context;
 using Bumbo.Data.Models;
+using Bumbo.Data.SqlRepository;
 using BumboApplicatie.Models;
 
 namespace Bumbo.App.Web.Controllers
 {
-    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -38,5 +35,12 @@ namespace Bumbo.App.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult Error404()
+        {
+            Response.StatusCode = 404;
+            return View("404");
+        }
+
     }
 }

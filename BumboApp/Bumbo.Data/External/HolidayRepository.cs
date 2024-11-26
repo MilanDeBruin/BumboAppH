@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using BumboApp.Models.Models;
 
-namespace BumboApp.Models.Repositorys;
+namespace Bumbo.Data.External;
 
 public class HolidayRepository
 {
@@ -13,23 +13,26 @@ public class HolidayRepository
         this._baseUri = "https://openholidaysapi.org/PublicHolidays";
     }
 
-    public List<HolidayModel> GetHolidays(string country, DateTime startDate)
+    public HolidayModel? GetHoliday(int branchId, DateOnly startDate)
     {
+        string country = "NL";
         string jsonString;
+        HolidayModel holidayModel;
 
         try
         {
             jsonString = Task.Run(() => this.GetAsyncHolidays(country, startDate, startDate.AddDays(9))).Result;
+            holidayModel = ParseHolidayJson(jsonString)[0];
         }
         catch (Exception e)
         {
-            throw e;
+            return null;
         }
 
-        return this.ParseHolidayJson(jsonString);
+        return holidayModel;
     }
 
-    private async Task<string> GetAsyncHolidays(string country, DateTime startDate, DateTime endDate)
+    private async Task<string> GetAsyncHolidays(string country, DateOnly startDate, DateOnly endDate)
     {
         string startDateString = startDate.ToString("yyyy-MM-dd");
         string endDateString = endDate.ToString("yyyy-MM-dd");

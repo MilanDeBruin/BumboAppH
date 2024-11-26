@@ -1,5 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bumbo.Data.Models;
 
@@ -18,8 +21,18 @@ public partial class Branch
     public string? Addition { get; set; }
 
     [Column("zip_code")]
-    [StringLength(6)]
+    [StringLength(20)]
     public string ZipCode { get; set; } = null!;
+
+    [Column("country_code")]
+    [StringLength(3)]
+    public string CountryCode { get; set; } = null!;
+
+    [Column("latitude", TypeName = "decimal(8, 6)")]
+    public decimal Latitude { get; set; }
+
+    [Column("longitude", TypeName = "decimal(9, 6)")]
+    public decimal Longitude { get; set; }
 
     [InverseProperty("Branch")]
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
@@ -38,4 +51,7 @@ public partial class Branch
 
     [InverseProperty("Branch")]
     public virtual ICollection<StoreTraffic> StoreTraffics { get; set; } = new List<StoreTraffic>();
+
+    [InverseProperty("Branch")]
+    public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new List<WorkSchedule>();
 }

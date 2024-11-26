@@ -1,4 +1,4 @@
-namespace BumboApp.Models.Repositorys;
+namespace Bumbo.Data.External;
 
 public class StaticHttpClient
 {

@@ -1,39 +1,38 @@
-﻿@model Bumbo.App.Web.Models.ViewModels.LoginViewModel
+﻿@model Bumbo.App.Web.Models.ViewModels.Forecast.LoginViewModel
 
 @{
     ViewData["Title"] = "Aanmelden Bumbo";
 }
 
 <!DOCTYPE html>
-
-<html lang="en">
+<html lang="nl">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/login.css">
 </head>
 <body>
-<header>
-    
-</header>
-<div class="login-wrapper">
+    <div class="background-overlay"></div>
     <div class="login-container">
-        <h2>Aanmelden</h2>
-        <form asp-controller="Account" asp-action="Login" method="post"> 
+        <div class="login-header">
+            <img src="~/images/bumbo-logo.png" alt="Bumbo Logo" class="login-logo">
+            <h1>Aanmelden</h1>
+        </div>
+        <form asp-controller="Account" asp-action="Login" method="post" class="login-form">
             <div asp-validation-summary="All" class="text-danger"></div> @* TODO: class="text-danger" is temporary solution, needs to be replaced *@
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="text" id="email" name="Email" required>
+                <label for="email">E-mailadres</label>
+                <input type="text" id="email" name="Email" placeholder="E-mailadres" required value="@Model.Email">
             </div>
+
             <div class="form-group">
                 <label for="password">Wachtwoord</label>
-                <input type="password" id="password" name="Password" required>
+                <input type="password" id="password" name="Password" placeholder="Wachtwoord" required>
             </div>
-            <input type="submit" value="Aanmelden">
+
+            <button type="submit" class="btn-submit">Inloggen</button>
         </form>
     </div>
-</div>
-
-<footer>
-</footer>
 </body>
 </html>
