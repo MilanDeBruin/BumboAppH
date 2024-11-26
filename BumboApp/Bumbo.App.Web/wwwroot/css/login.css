@@ -1,68 +1,132 @@
 ﻿:root {
-    --border-radius: 8px
+    --primary-color: #fcc419;
+    --secondary-color: #333;
+    --background-color: #f9f9f9;
+    --text-color: #000;
+    --error-color: #d9534f;
+    --border-radius: 10px;
+}
+
+.background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('~/images/supermarket-bg.jpg') no-repeat center center;
+    background-size: cover;
+    z-index: -1;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    margin: 0; /* Remove default margin */
-    padding: 0; /* Remove default padding */
-    display: flex;
-    height: 100vh;
-    justify-content: center;
-    flex-direction: column; /* Allows stacking of header, main content, and footer */
-}
-
-.login-wrapper {
-    /*height: 100vh;*/
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
-    flex-grow: 1;
+    height: 100vh;
+    margin: 0;
+    background-color: var(--background-color);
 }
 
 .login-container {
-    background-color: #d9d9d9;
-    padding: 20px; 
+    background: white;
     border-radius: var(--border-radius);
-    width: 33%;
-    margin: auto;
-}
-
-h2 {
-    text-align: start;
-    margin-bottom: 20px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-label {
-    display: block; /* Label takes full width */
-    margin-bottom: 5px;
-}
-
-input[type="text"],
-input[type="password"] {
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 30px 40px;
     width: 100%;
-    padding: 10px;
+    max-width: 400px;
+    text-align: center;
+    z-index: 2;
+    margin: 0 auto;
+}
+
+
+.login-header {
+    width: auto;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.login-logo {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.login-header h1 {
+    font-size: 1.8em;
+    color: var(--secondary-color);
+    margin: 0;
+}
+
+.login-form .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.login-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--secondary-color);
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px;
     border: 1px solid #ccc;
     border-radius: var(--border-radius);
-}
-
-input[type="submit"] {
-    background-color: black;
-    color: white;
-    border: none;
-    padding: 10px;
+    font-size: 1em;
     box-sizing: border-box;
-    border-radius: var(--border-radius);
-    cursor: pointer;
 }
 
-input[type="submit"]:hover {
-    background-color: white;
-    color: black;
-    border: 1px solid black;
+    .login-form input:focus {
+        border-color: var(--primary-color);
+        outline: none;
+    }
+
+.btn-submit {
+    background: var(--primary-color);
+    color: var(--text-color);
+    padding: 12px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1em;
+    width: 100%;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
+
+    .btn-submit:hover {
+        background: #e6ac00;
+        color: white;
+    }
+
+.error-summary {
+    background-color: var(--error-color);
+    color: white;
+    padding: 10px;
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+    display: none;
+}
+
+    .error-summary:not(:empty) {
+        display: block;
+    }
+
+.login-footer {
+    margin-top: 20px;
+    font-size: 0.9em;
+}
+
+    .login-footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
