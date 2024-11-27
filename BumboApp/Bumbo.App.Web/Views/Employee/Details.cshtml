@@ -1,5 +1,5 @@
 ﻿@using Bumbo.App.Web.Models.ViewModels.Employee;
-@model EmployeeModel
+@model EmployeeViewModel
 
 @{
     ViewData["Title"] = "Medewerkersgegevens";
@@ -18,6 +18,11 @@
 </div>
 
 <h1>Medewerkersgegevens</h1>
+
+<div>
+    <label class="fw-bold">Medewerkers ID</label>
+    <p>@Model.employee_id</p>
+</div>
 
 <div>
     <label class="fw-bold">Branch ID</label>

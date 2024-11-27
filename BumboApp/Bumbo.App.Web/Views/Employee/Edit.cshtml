@@ -1,5 +1,5 @@
 ﻿@using Bumbo.App.Web.Models.ViewModels.Employee;
-@model EmployeeModel
+@model EmployeeViewModel
 
 @{
     ViewData["Title"] = "Medewerkersgegevens Wijzigen";
@@ -9,6 +9,7 @@
 
 <form asp-action="Edit" asp-controller="Employee" method="post">
     <input type="hidden" asp-for="employee_id" />
+
     <div>
         <label asp-for="branch_id">Branch ID</label>
         <select asp-for="branch_id" class="form-control" asp-items="ViewBag.BranchIDs">

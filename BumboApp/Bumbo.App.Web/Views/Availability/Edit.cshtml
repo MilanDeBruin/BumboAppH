@@ -1,0 +1,43 @@
+﻿@model Bumbo.App.Web.Models.ViewModels.Availability.AvailabilityViewModel;
+
+@{
+    ViewData["Title"] = "Beschikbaarheid Wijzigen";
+}
+
+<h1>Beschikbaarheid Wijzigen</h1>
+
+<form asp-action="Edit" method="post">
+    <input asp-for="EmployeeId" type="hidden" />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Dag</th>
+                <th>Starttijd</th>
+                <th>Eindtijd</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.DailyAvailabilities.Count; i++)
+            {
+                <tr>
+                    <td>
+                        @Model.DailyAvailabilities[i].Weekday
+                        <input type="hidden" asp-for="DailyAvailabilities[@i].Weekday" />
+                    </td>
+                    <td>
+                        <input asp-for="DailyAvailabilities[@i].StartTime" type="time" class="form-control" />
+                        <span asp-validation-for="DailyAvailabilities[@i].StartTime" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <input asp-for="DailyAvailabilities[@i].EndTime" type="time" class="form-control" />
+                        <span asp-validation-for="DailyAvailabilities[@i].EndTime" class="text-danger"></span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-action="Index" class="btn btn-secondary">Annuleren</a>
+    <button type="submit" class="btn btn-success">Opslaan</button>
+</form>
