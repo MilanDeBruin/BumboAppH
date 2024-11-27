@@ -1,68 +1,65 @@
-﻿@using Bumbo.App.Web.Models.ViewModels.Employee;
+﻿@using Bumbo.App.Web.Models.ViewModels.Employee
 @model IEnumerable<EmployeeViewModel>
 
 @{
     ViewData["Title"] = "Medewerkers";
 }
 
-<h1>Alle Medewerkers (@Model.Count())</h1>
+<div class="container">
+    <h1 class="text-center mb-4">Alle Medewerkers (@Model.Count())</h1>
 
-<div>
-    <a asp-action="Create" asp-controller="Employee" class="btn btn-success mb-3">Medewerker Toevoegen</a>
-</div>
+    <div class="mb-3 text-end">
+        <a asp-action="Create" asp-controller="Employee" class="btn btn-success">Medewerker Toevoegen</a>
+    </div>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["SuccessMessage"]</div>
+    }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Naam</th>
-            <th>Leeftijd</th>
-            <th>Afdeling</th>
-            <th>Acties</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var employee in Model)
+    <table class="table table-bordered table-striped text-center">
+        <thead class="thead-dark">
+            <tr>
+                <th>Naam</th>
+                <th>Leeftijd</th>
+                <th>Afdeling</th>
+                <th>Acties</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var employee in Model)
+                {
+                    <tr>
+                        <td>@employee.first_name @employee.infix @employee.last_name</td>
+                        <td class="text-center">
+                            @if (employee.date_of_birth != default(DateOnly))
+                            {
+                                var dob = employee.date_of_birth;
+                                var today = DateOnly.FromDateTime(DateTime.Now);
+                                var age = today.Year - dob.Year;
+                                if (today < dob.AddYears(age)) { age--; }
+                                @age
+                            }
+                            else
+                            {
+                                <span>Niet bekend</span>
+                            }
+                        </td>
+                        <td class="text-center">@employee.position</td>
+                        <td class="text-center">
+                            <a asp-action="Details" asp-route-id="@employee.employee_id" class="btn btn-secondary btn-sm">Details</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@employee.first_name @employee.infix @employee.last_name</td>
-                    <td>
-                        @if (employee.date_of_birth != default(DateOnly))
-                        {
-                            var dob = employee.date_of_birth;
-                            var today = DateOnly.FromDateTime(DateTime.Now);
-                            var age = today.Year - dob.Year;
-                            
-                            if (today < dob.AddYears(age))
-                            {
-                                age--;
-                            }
-
-                            @age
-                        }
-                        else
-                        {
-                            <span>Niet bekend</span>
-                        }
-                    </td>
-                    <td>@employee.position</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@employee.employee_id" class="btn btn-secondary">Details</a>
-                    </td>
+                    <td colspan="4" class="text-center">Geen medewerkers gevonden.</td>
                 </tr>
             }
-        }
-        else
-        {
-            <tr>
-                <td colspan="5">Geen medewerkers gevonden.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>

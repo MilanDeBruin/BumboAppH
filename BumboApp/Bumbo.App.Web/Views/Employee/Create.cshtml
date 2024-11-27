@@ -1,89 +1,95 @@
-﻿@using Bumbo.App.Web.Models.ViewModels.Employee;
+﻿@using Bumbo.App.Web.Models.ViewModels.Employee
 @model EmployeeViewModel
 
 @{
     ViewData["Title"] = "Nieuwe Medewerker Toevoegen";
 }
 
-<h1>Nieuwe Medewerker Toevoegen</h1>
+<div class="container mt-4">
+    <h1 class="mb-4">Nieuwe Medewerker Toevoegen</h1>
 
-<form asp-action="Create" method="post">
-    <div>
-        <label asp-for="branch_id">Branch ID</label>
-        <select asp-for="branch_id" class="form-control" asp-items="ViewBag.BranchIDs">
-            <option value="">Selecteer een branch</option>
-        </select>
-        <span asp-validation-for="branch_id" class="text-danger"></span>
-    </div>
+     <form asp-action="Create" method="post" class="needs-validation">
+        <div class="row gy-3">
+            <div class="col-md-6">
+                <label asp-for="branch_id" class="form-label">Branch ID</label>
+                <select asp-for="branch_id" class="form-select" asp-items="ViewBag.BranchIDs">
+                    <option value="">Selecteer een branch</option>
+                </select>
+                <span asp-validation-for="branch_id" class="text-danger"></span>
+            </div>
 
-    <div>
-        <label asp-for="position">Afdeling</label>
-        <select asp-for="position" class="form-control" asp-items="ViewBag.Positions">
-            <option value="">Selecteer een afdeling</option>
-        </select>
-        <span asp-validation-for="position" class="text-danger"></span>
-    </div>
+            <div class="col-md-6">
+                <label asp-for="position" class="form-label">Afdeling</label>
+                <select asp-for="position" class="form-select" asp-items="ViewBag.Positions">
+                    <option value="">Selecteer een afdeling</option>
+                </select>
+                <span asp-validation-for="position" class="text-danger"></span>
+            </div>
 
-    <div>
-        <label asp-for="hiring_date">Startdatum contract</label>
-        <input asp-for="hiring_date" type="date" class="form-control" />
-        <span asp-validation-for="hiring_date" class="text-danger"></span>
-    </div>
+            <div class="col-md-6">
+                <label asp-for="hiring_date" class="form-label">Startdatum contract</label>
+                <input asp-for="hiring_date" type="date" class="form-control" />
+                <span asp-validation-for="hiring_date" class="text-danger"></span>
+            </div>
 
-    <div>
-        <label asp-for="first_name">Voornaam</label>
-        <input asp-for="first_name" class="form-control" required />
-        <span asp-validation-for="first_name" class="text-danger"></span>
-    </div>
+            <div class="col-md-6">
+                <label asp-for="first_name" class="form-label">Voornaam</label>
+                <input asp-for="first_name" class="form-control" required />
+                <span asp-validation-for="first_name" class="text-danger"></span>
+            </div>
 
-    <div>
-        <label asp-for="infix">Tussenvoegsel</label>
-        <input asp-for="infix" class="form-control" />
-        <span asp-validation-for="infix" class="text-danger"></span>
-    </div>
+            <div class="col-md-6">
+                <label asp-for="infix" class="form-label">Tussenvoegsel</label>
+                <input asp-for="infix" class="form-control" />
+                <span asp-validation-for="infix" class="text-danger"></span>
+            </div>
 
-    <div>
-        <label asp-for="last_name">Achternaam</label>
-        <input asp-for="last_name" class="form-control" required />
-        <span asp-validation-for="last_name" class="text-danger"></span>
-    </div>
+            <div class="col-md-6">
+                <label asp-for="last_name" class="form-label">Achternaam</label>
+                <input asp-for="last_name" class="form-control" required />
+                <span asp-validation-for="last_name" class="text-danger"></span>
+            </div>
 
-    <div>
-        <label asp-for="date_of_birth">Geboortedatum</label>
-        <input asp-for="date_of_birth" type="date" class="form-control" required />
-        <span asp-validation-for="date_of_birth" class="text-danger"></span>
-    </div>
+            <div class="col-md-6">
+                <label asp-for="date_of_birth" class="form-label">Geboortedatum</label>
+                <input asp-for="date_of_birth" type="date" class="form-control" required />
+                <span asp-validation-for="date_of_birth" class="text-danger"></span>
+            </div>
 
-    <div>
-        <label asp-for="house_number">Huisnummer</label>
-        <input asp-for="house_number" class="form-control" />
-        <span asp-validation-for="house_number" class="text-danger"></span>
-    </div>
+            <div class="col-md-6">
+                <label asp-for="house_number" class="form-label">Huisnummer</label>
+                <input asp-for="house_number" class="form-control" />
+                <span asp-validation-for="house_number" class="text-danger"></span>
+            </div>
 
-    <div>
-        <label asp-for="addition">Toevoeging</label>
-        <input asp-for="addition" class="form-control" />
-        <span asp-validation-for="addition" class="text-danger"></span>
-    </div>
+            <div class="col-md-6">
+                <label asp-for="addition" class="form-label">Toevoeging</label>
+                <input asp-for="addition" class="form-control" />
+                <span asp-validation-for="addition" class="text-danger"></span>
+            </div>
 
-    <div>
-        <label asp-for="zip_code">Postcode</label>
-        <input asp-for="zip_code" class="form-control" />
-        <span asp-validation-for="zip_code" class="text-danger"></span>
-    </div>
+            <div class="col-md-6">
+                <label asp-for="zip_code" class="form-label">Postcode</label>
+                <input asp-for="zip_code" class="form-control" />
+                <span asp-validation-for="zip_code" class="text-danger"></span>
+            </div>
 
-    <div>
-        <label asp-for="email_adres">E-mailadres</label>
-        <input asp-for="email_adres" type="email" class="form-control" />
-        <span asp-validation-for="email_adres" class="text-danger"></span>
-    </div>
+            <div class="col-md-6">
+                <label asp-for="email_adres" class="form-label">E-mailadres</label>
+                <input asp-for="email_adres" type="email" class="form-control" />
+                <span asp-validation-for="email_adres" class="text-danger"></span>
+            </div>
 
-    <div>
-        <label asp-for="password">Wachtwoord</label>
-        <input asp-for="password" type="password" class="form-control" />
-        <span asp-validation-for="password" class="text-danger"></span>
-    </div>
+            <div class="col-md-6">
+                <label asp-for="password" class="form-label">Wachtwoord</label>
+                <input asp-for="password" type="password" class="form-control" />
+                <span asp-validation-for="password" class="text-danger"></span>
+            </div>
+        </div>
 
-    <a asp-action="Index" class="btn btn-secondary">Annuleren</a>
-    <button type="submit" class="btn btn-success">Opslaan</button>
-</form>
+        <div class="mt-4 d-flex gap-3">
+            <a asp-action="Index" class="btn btn-secondary">Annuleren</a>
+            <button type="submit" class="btn btn-success">Opslaan</button>
+        </div>
+    </form>
+</div>
