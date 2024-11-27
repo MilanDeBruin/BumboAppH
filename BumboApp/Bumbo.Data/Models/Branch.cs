@@ -51,4 +51,7 @@ public partial class Branch
 
     [InverseProperty("Branch")]
     public virtual ICollection<StoreTraffic> StoreTraffics { get; set; } = new List<StoreTraffic>();
+
+    [InverseProperty("Branch")]
+    public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new List<WorkSchedule>();
 }

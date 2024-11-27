@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Bumbo.Data.Models;
 
 [Table("employee")]
+[Index("EmailAdres", Name = "IX_employee", IsUnique = true)]
 public partial class Employee
 {
     [Key]
@@ -57,13 +58,33 @@ public partial class Employee
     [StringLength(50)]
     public string Password { get; set; } = null!;
 
+    [Column("labor_contract")]
+    [StringLength(50)]
+    public string LaborContract { get; set; } = null!;
+
+    [InverseProperty("Employee")]
+    public virtual ICollection<Availability> Availabilities { get; set; } = new List<Availability>();
+
     [ForeignKey("BranchId")]
     [InverseProperty("Employees")]
     public virtual Branch Branch { get; set; } = null!;
 
+    [ForeignKey("LaborContract")]
+    [InverseProperty("Employees")]
+    public virtual LaborContract LaborContractNavigation { get; set; } = null!;
+
+    [InverseProperty("Employee")]
+    public virtual ICollection<Leave> Leaves { get; set; } = new List<Leave>();
+
     [ForeignKey("Position")]
     [InverseProperty("Employees")]
     public virtual Position PositionNavigation { get; set; } = null!;
+
+    [InverseProperty("Employee")]
+    public virtual ICollection<SchoolSchedule> SchoolSchedules { get; set; } = new List<SchoolSchedule>();
+
+    [InverseProperty("Employee")]
+    public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new List<WorkSchedule>();
 
     [ForeignKey("EmployeeId")]
     [InverseProperty("Employees")]
