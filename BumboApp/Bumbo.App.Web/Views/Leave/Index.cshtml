@@ -1,0 +1,48 @@
+﻿@model Bumbo.App.Web.Models.ViewModels.LeaveRequest.LeaveRequestModel;   
+
+
+
+
+<h1>Verlof aanvraag</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Index">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <input asp-for="employeeId" type="hidden" />
+
+
+            <div class="form-group mb-3">
+                <label class="control-label">employeeId</label>
+                <input asp-for="employeeId" class="form-control" />
+                <span asp-validation-for="employeeId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" >
+                <label asp-for="start" class="control-label"></label>
+                <input asp-for="today" type="date" class="form-control" />
+                <span asp-validation-for="start" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="end" class="control-label"></label>
+                <input asp-for="today" type ="date" class="form-control" />
+                <span asp-validation-for="end" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+               
+                <div class="form-group">
+                    <input type="submit" value="Aanvragen" class="btn btn-primary" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
