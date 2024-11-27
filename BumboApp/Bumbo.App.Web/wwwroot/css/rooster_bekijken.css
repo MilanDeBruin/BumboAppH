@@ -12,7 +12,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    width: auto; /* 4 vierkanten van 100px + 3 gaps van 10px */
+    width: auto; 
     margin: 0 auto 20px;
 }
 

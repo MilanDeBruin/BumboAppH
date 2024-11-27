@@ -22,14 +22,27 @@ namespace Bumbo.App.Web.Controllers
 
         public IActionResult Index()
         {
+            var Werktijd = _db.WorkSchedules
+                //.Where(Ws => Ws.EmployeeId == 2)
+                .Select(Ws => new
+                {
+                    Ws.EmployeeId,
+                    Ws.Date,
+                    Ws.StartTime,
+                    Ws.EndTime,
+                    Ws.BranchId,
+                    Ws.Department
 
-            return View();
+                }).ToList();
+            Console.WriteLine("test");
+            Console.WriteLine(Werktijd[0]);
+            return View(Werktijd);
         }
         
         public IActionResult Prognose()
         {
             return View();
-        }
+        }   
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
