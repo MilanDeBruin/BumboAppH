@@ -5,8 +5,5 @@ namespace Bumbo.Data.Interfaces;
 
 public interface IScheduleRepository
 {
-    public List<WorkSchedule> GetWeeklyWorkSchedules(DateOnly firstDayOfWeek)
-    {
-        throw new NotImplementedException();
-    }
+    public List<WorkSchedule> GetWeeklyWorkSchedules(DateOnly firstDayOfWeek, int employeeId);
 }
