@@ -7,5 +7,5 @@ public interface ICaoRepository
     public List<BonusModel> GetAllBonus();
     public SickSalaryRate GetSickSalaryRate();
     public List<WorkHourRestrictionModel> GetWorkHourRestrictions();
-    public List<BreakTimeModel> GetBreakTime();
+    public BreakTimeModel GetBreakTime();
 }
