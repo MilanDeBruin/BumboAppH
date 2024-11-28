@@ -6,22 +6,10 @@
 <h2>Medewerker Roostering</h2>
 
 <div class="filters-container">
-    <div class="week-select-container">
-        <label for="yearSelect">Jaar:</label>
-        <select id="yearSelect" class="form-control" style="display:inline-block; width:auto;">
-            @for (int year = DateTime.Now.Year - 5; year <= DateTime.Now.Year + 5; year++)
-            {
-                <option value="@year">@year</option>
-            }
-        </select>
-        <label for="weekSelect">Week:</label>
-        <select id="weekSelect" class="form-control" style="display:inline-block; width:auto;">
-            @for (int week = 1; week <= 52; week++)
-            {
-                <option value="@week">@week</option>
-            }
-        </select>
+    <div class="week-navigation-container">
+        <button id="previousWeek" class="btn btn-secondary">Week Terug</button>
         <span id="weekRange"></span>
+        <button id="nextWeek" class="btn btn-secondary">Week Vooruit</button>
     </div>
 
     <div class="function-filter-container">
@@ -55,13 +43,11 @@
                     <br />
                     <small>@employee.MainFunction</small>
                 </td>
-
                 @foreach (var day in Enum.GetValues(typeof(DayNameOfWeek)).Cast<DayNameOfWeek>())
                 {
-                    <td class="schedule-cell">
+                    <td class="schedule-cell" data-employee-id="@employee.EmployeeId">
                         <div id="schedule-container-@employee.EmployeeId-@day"></div>
-                        <button class="btn btn-sm btn-primary"
-                                onclick="openScheduleModal(@employee.EmployeeId, '@day')">
+                        <button class="btn btn-sm btn-primary" onclick="openScheduleModal(@employee.EmployeeId, '@day')">
                             +
                         </button>
                     </td>
@@ -69,8 +55,13 @@
             </tr>
         }
     </tbody>
+    
 </table>
-
+<div class="pagination-container">
+    <button id="vorige" class="btn btn-secondary" onclick="changePage(-1)" disabled>Previous</button>
+    <span id="pageInfo">Page 1</span>
+    <button id="volgende" class="btn btn-secondary" onclick="changePage(1)">Next</button>
+</div>
 <!-- Modal -->
 <div id="scheduleModal" class="modal" tabindex="-1" role="dialog" style="display: none;">
     <div class="modal-dialog" role="document">
@@ -89,11 +80,11 @@
 
                     <div class="form-group">
                         <label for="modalStartTime">Start tijd:</label>
-                        <input type="time" id="modalStartTime" class="form-control">
+                        <input type="time" id="modalStartTime" class="form-control" value="09:00">
                     </div>
                     <div class="form-group">
                         <label for="modalEndTime">Eind tijd:</label>
-                        <input type="time" id="modalEndTime" class="form-control">
+                        <input type="time" id="modalEndTime" class="form-control" value="21:00">
                     </div>
                     <div class="form-group">
                         <label for="modalDepartment">Afdeling:</label>
@@ -113,13 +104,18 @@
         </div>
     </div>
 </div>
-
+<div class="publish-container" style="position: fixed; bottom: 20px; right: 20px;">
+    <button class="btn btn-primary" onclick="publishSchedules()">Publish</button>
+</div>
 @section Scripts {
     <script>
+
+        
         function openScheduleModal(employeeId, day) {
             document.getElementById("modalEmployeeId").value = employeeId;
             document.getElementById("modalDay").value = day;
-
+            document.getElementById("modalStartTime").value = "09:00";
+            document.getElementById("modalEndTime").value = "21:00";  
             document.getElementById("scheduleModal").style.display = "block";
         }
 
@@ -128,23 +124,46 @@
         }
 
         function saveSchedule() {
+            const dayMapping = { 'Maandag': 0, 'Dinsdag': 1, 'Woensdag': 2, 'Donderdag': 3, 'Vrijdag': 4, 'Zaterdag': 5, 'Zondag': 6 };
+
             const employeeId = document.getElementById("modalEmployeeId").value;
             const day = document.getElementById("modalDay").value;
-            const date = document.getElementById("modalDate").value;
+            
             const startTime = document.getElementById("modalStartTime").value;
             const endTime = document.getElementById("modalEndTime").value;
             const department = document.getElementById("modalDepartment").value;
 
+
+            const start = parseTime(startTime);
+            const end = parseTime(endTime);
+
+            
+            if (start >= end) {
+                alert("Eind tijd moet later zijn dan start tijd.");
+                return;
+            }
+
+            const baseDate = document.getElementById("modalDate").value;
+            const dayOffset = dayMapping[day];
+            const dateObj = new Date(baseDate);
+            dateObj.setDate(dateObj.getDate() + dayOffset);
+
+            updatedDate = dateObj.toISOString().split('T')[0]; 
+
+            console.log(`Base Date: ${baseDate}, Day: ${day}, Updated Date: ${updatedDate}  ---------------------------------------`);
+                
+            
+            console.log(`dag fix voor ding effe keeke wat voor type data hiermee wordt gestuurd zodat ik het als offset kan gebruiken: ${day}`)
             const scheduleEntry = {
                 EmployeeId: parseInt(employeeId),
                 Day: day,
-                Date: new Date(date).toISOString(), 
+                Date: new Date(updatedDate).toISOString(),  
                 StartTime: startTime + ":00",     
                 EndTime: endTime + ":00",
                 Department: department
             };
 
-
+            
             console.log("Schedule Entry:", scheduleEntry);
 
             $.ajax({
@@ -155,20 +174,58 @@
                 success: function (response) {
                     console.log("Response from server:", response);
 
-                  
                     addScheduleToCell({
                         employeeId: scheduleEntry.EmployeeId,
                         day: scheduleEntry.Day,
+                        date: scheduleEntry.Date,
                         startTime: scheduleEntry.StartTime.slice(0, 5), 
                         endTime: scheduleEntry.EndTime.slice(0, 5),
                         department: scheduleEntry.Department
                     });
+
 
                     closeScheduleModal();
                 },
                 error: function (xhr, status, error) {
                     console.error("Error saving schedule:", status, error);
                     alert("Failed to save the schedule. Please try again.");
+                }
+            });
+        }
+        function parseTime(timeStr) {
+            const timeParts = timeStr.split(":");
+            const hours = parseInt(timeParts[0], 10);
+            const minutes = parseInt(timeParts[1], 10);
+            return new Date(0, 0, 0, hours, minutes);
+        }
+
+        function publishSchedules() {
+            const modalDate = document.getElementById("modalDate").value;
+
+            if (!modalDate) {
+                alert("No date selected for publishing schedules.");
+                return;
+            }
+
+            const publishData = {
+                Date: modalDate
+            };
+
+            console.log("Publishing schedules for date:", publishData);
+
+            
+            $.ajax({
+                url: '@Url.Action("PublishSchedules", "Scheduling")',
+                type: 'POST',
+                data: JSON.stringify(publishData),
+                contentType: 'application/json',
+                success: function (response) {
+                    alert("Schedules published successfully.");
+                    console.log("Response from server:", response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error publishing schedules:", status, error);
+                    alert("Failed to publish schedules. Please try again.");
                 }
             });
         }
@@ -186,65 +243,296 @@
             const scheduleElement = document.createElement("div");
             scheduleElement.classList.add("schedule-entry");
 
-            scheduleElement.innerHTML = `
-                        ${schedule.startTime} - ${schedule.endTime} (${schedule.department})
-                        <button class="btn btn-sm btn-danger" onclick="removeSchedule(this)">X</button>
-                    `;
+            const hiddenEmployeeId = document.createElement("input");
+            hiddenEmployeeId.type = "hidden";
+            hiddenEmployeeId.name = "employeeId";
+            hiddenEmployeeId.value = schedule.employeeId;
 
+            const hiddenDate = document.createElement("input");
+            hiddenDate.type = "hidden";
+            hiddenDate.name = "date";
+            hiddenDate.value = schedule.date;
+
+            const startTimeSpan = document.createElement("span");
+            startTimeSpan.classList.add("startTime");
+            startTimeSpan.textContent = schedule.startTime;
+
+            const endTimeSpan = document.createElement("span");
+            endTimeSpan.classList.add("endTime");
+            endTimeSpan.textContent = schedule.endTime;
+
+            const departmentSpan = document.createElement("span");
+            departmentSpan.classList.add("department");
+            departmentSpan.textContent = schedule.department;
+
+            scheduleElement.innerHTML = `
+                                <span class="startTime">${schedule.startTime}</span> -
+                                <span class="endTime">${schedule.endTime}</span>
+                                (<span class="department">${schedule.department}</span>)
+                                <button class="btn btn-sm btn-danger" onclick="removeSchedule(this)">X</button>
+                                `;
+
+            scheduleElement.appendChild(hiddenEmployeeId);
+            scheduleElement.appendChild(hiddenDate);
             container.appendChild(scheduleElement);
         }
 
         function removeSchedule(button) {
-            const scheduleEntry = button.parentElement;
+            const scheduleEntry = button.closest(".schedule-entry");
+
+            console.log(scheduleEntry);
+
+            const employeeIdInput = scheduleEntry.querySelector('input[name="employeeId"]');
+            const dateInput = scheduleEntry.querySelector('input[name="date"]');
+            const startTimeElement = scheduleEntry.querySelector(".startTime");
+            const endTimeElement = scheduleEntry.querySelector(".endTime");
+            const departmentElement = scheduleEntry.querySelector(".department");
+
+            if (!employeeIdInput || !dateInput || !startTimeElement || !endTimeElement || !departmentElement) {
+                console.error("Missing one or more required elements in the schedule entry");
+                return;
+            }
+
+            const employeeId = employeeIdInput.value;
+            const date = dateInput.value;
+            const startTime = startTimeElement.textContent.trim();
+            const endTime = endTimeElement.textContent.trim();
+            const department = departmentElement.textContent.trim();
+
+            console.log("Removing schedule:", { employeeId, date, startTime, endTime, department });
+
+            const userConfirmed = confirm(`weet je zeker dat je deze wilt verwijderen? ${date} van ${startTime} tot ${endTime}?`);
+
+            if (!userConfirmed) {
+                console.log("Schedule removal canceled.");
+                return; 
+            }
+
             scheduleEntry.remove();
 
-            // database data removal hier
+            const scheduleData = {
+                EmployeeId: parseInt(employeeId),
+                Date: new Date(date).toISOString(),
+                StartTime: startTime + ":00",
+                EndTime: endTime + ":00",
+                Department: department
+            };
+            
+            fetch('/Scheduling/RemoveSchedule', {  
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(scheduleData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to remove schedule");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        console.log("Schedule successfully removed from database");
+                    } else {
+                        console.error("Failed to remove schedule:", data);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
         }
 
-        function getWeekDates(year, week) {
-            const date = new Date(year, 0, 1);
-            const days = (week - 1) * 7;
-            date.setDate(date.getDate() + days);
 
-            const startDate = date;
+        function getWeekDates(year, week) {
+            const jan1 = new Date(year, 0, 1);
+
+
+            const jan1Day = jan1.getDay();
+
+            const firstMonday = new Date(jan1);
+            if (jan1Day !== 1) { 
+                const offset = (jan1Day === 0 ? 1 : 8) - jan1Day;
+                firstMonday.setDate(jan1.getDate() + offset);
+            }
+
+            const startDate = new Date(firstMonday);
+            startDate.setDate(firstMonday.getDate() + (week - 1) * 7);
+
             const endDate = new Date(startDate);
             endDate.setDate(startDate.getDate() + 6);
 
             return { startDate, endDate };
         }
-
-        function updateWeekRange() {
-            const selectedYear = document.getElementById("yearSelect").value;
-            const selectedWeek = document.getElementById("weekSelect").value;
-
-            const { startDate, endDate } = getWeekDates(selectedYear, selectedWeek);
-
-            const rangeText = `Week ${selectedWeek} of ${selectedYear}: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
-            document.getElementById("weekRange").textContent = rangeText;
-
-            document.getElementById("modalDate").value = startDate.toISOString().split('T')[0];
-        }
+        
 
         document.addEventListener("DOMContentLoaded", function () {
+            let currentDate = new Date();
+            let currentYear = currentDate.getFullYear();
+
+            function getCurrentWeek(date) {
+                const jan1 = new Date(date.getFullYear(), 0, 1);
+                const days = Math.floor((date - jan1) / (24 * 60 * 60 * 1000));
+                return Math.ceil((days + jan1.getDay() + 1) / 7);
+            }
+
+            let currentWeek = getCurrentWeek(currentDate);
+
+            
+            function updateWeekRange() {
+                const { startDate, endDate } = getWeekDates(currentYear, currentWeek);
+
+                const rangeText = `Week ${currentWeek} of ${currentYear}: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
+                document.getElementById("weekRange").textContent = rangeText;
+
+                document.getElementById("modalDate").value = startDate.toISOString().split('T')[0];
+
+                console.log("ik kom hier update week range")
+                console.log(`hier is de start datum: ${startDate.toISOString().split('T')[0]}`)
+                fetchSchedulesForWeek(currentYear, currentWeek);
+            }
+
+            function changeWeek(increment) {
+                currentWeek += increment;
+
+                if (currentWeek < 1) {
+                    currentYear -= 1;
+                    currentWeek = 52;
+                } else if (currentWeek > 52) {
+                    currentYear += 1;
+                    currentWeek = 1;
+                }
+
+                updateWeekRange();
+            }
+
+            function fetchSchedulesForWeek(year, week) {
+
+                $.ajax({
+                    url: `@Url.Action("GetSchedulesForWeek", "Scheduling")?year=${year}&week=${week}`,
+                    type: 'GET',
+                    success: function (schedules) {
+                                updateScheduleGrid(schedules);        
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Failed to fetch schedules. Please try again.");
+                    }
+                });
+            }
+
+            
+            function updateScheduleGrid(schedules) {
+                const dayMapping = { 0: 'Zondag', 1: 'Maandag', 2: 'Dinsdag', 3: 'Woensdag', 4: 'Donderdag', 5: 'Vrijdag', 6: 'Zaterdag' };
+
+                document.querySelectorAll('.schedule-cell div').forEach(cell => (cell.innerHTML = ''));
+
+                schedules.forEach(schedule => {
+                    const dayOfWeek = new Date(schedule.date).getDay();
+
+                    const dayName = dayMapping[dayOfWeek] || "unknown";
+
+                    const containerId = `schedule-container-${schedule.employeeId}-${dayName}`;
+                    const container = document.getElementById(containerId);
+                    console.log(`${schedule.date} deze dag wordt getekent momenteel ----------------`);
+
+                    if (container) {
+                        const scheduleElement = document.createElement("div");
+                        scheduleElement.classList.add("schedule-entry");
+
+                        const hiddenEmployeeId = document.createElement("input");
+                        hiddenEmployeeId.type = "hidden";
+                        hiddenEmployeeId.name = "employeeId";
+                        hiddenEmployeeId.value = schedule.employeeId;
+
+                        const hiddenDate = document.createElement("input");
+                        hiddenDate.type = "hidden";
+                        hiddenDate.name = "date";
+                        hiddenDate.value = schedule.date;
+
+                        const startTimeSpan = document.createElement("span");
+                        startTimeSpan.classList.add("startTime");
+                        startTimeSpan.textContent = schedule.startTime;
+
+                        const endTimeSpan = document.createElement("span");
+                        endTimeSpan.classList.add("endTime");
+                        endTimeSpan.textContent = schedule.endTime;
+
+                        const departmentSpan = document.createElement("span");
+                        departmentSpan.classList.add("department");
+                        departmentSpan.textContent = schedule.department;
+
+                        scheduleElement.innerHTML = `
+                        <span class="startTime">${schedule.startTime}</span> -
+                        <span class="endTime">${schedule.endTime}</span>
+                        (<span class="department">${schedule.department}</span>)
+                        <button class="btn btn-sm btn-danger" onclick="removeSchedule(this)">X</button>
+                        `;
+
+                        scheduleElement.appendChild(hiddenEmployeeId);
+                        scheduleElement.appendChild(hiddenDate);
+                        container.appendChild(scheduleElement);
+                    } else {
+                        console.log("hij is empty");
+                    }
+                });
+
+            }
+
+            document.getElementById("previousWeek").addEventListener("click", () => changeWeek(-1));
+            document.getElementById("nextWeek").addEventListener("click", () => changeWeek(1));
+
             updateWeekRange();
 
-            document.getElementById("yearSelect").addEventListener("change", updateWeekRange);
-            document.getElementById("weekSelect").addEventListener("change", updateWeekRange);
+            function filterEmployees() {
+                const selectedFunction = document.getElementById('functionFilter').value.toLowerCase();
+                const rows = document.querySelectorAll('.employee-row');
+
+                rows.forEach(row => {
+                    const employeeFunction = row.getAttribute('data-function').toLowerCase();
+                    if (selectedFunction === 'all' || employeeFunction === selectedFunction) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+
+            document.getElementById('functionFilter').addEventListener('change', filterEmployees);
+
+            const rowsPerPage = 2;
+            let currentPage = 1;
+            const employeeRows = Array.from(document.querySelectorAll('.employee-row'));
+
+            function renderPage(page) {
+                const totalRows = employeeRows.length;
+                const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+                
+                document.getElementById("prevPage").disabled = page === 1;
+                document.getElementById("nextPage").disabled = page === totalPages;
+
+                
+                document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
+
+                
+                employeeRows.forEach((row, index) => {
+                    if (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            }
+
+            
+            window.changePage = function (increment) {
+                currentPage += increment;
+                renderPage(currentPage);
+            };
+
+            renderPage(currentPage);
         });
 
-        function filterEmployees() {
-            const selectedFunction = document.getElementById('functionFilter').value.toLowerCase();
-            const rows = document.querySelectorAll('.employee-row');
-
-            rows.forEach(row => {
-                const employeeFunction = row.getAttribute('data-function').toLowerCase();
-                if (selectedFunction === 'all' || employeeFunction === selectedFunction) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
     </script>
 }
 
@@ -318,4 +606,16 @@
     .function-filter-container {
         margin-left: 20px;
     }
+
+    .pagination-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: start;
+        align-items: start;
+        gap: 10px;
+    }
+
+        .pagination-container button {
+            min-width: 100px;
+        }
 </style>
