@@ -16,7 +16,8 @@ public class ScheduleRepository : IScheduleRepository
 
     public List<WorkSchedule> GetWeeklyWorkSchedules(DateOnly firstDayOfWeek, int employeeId)
     {
-        throw new NotImplementedException();
+            return _dbContext.WorkSchedules.Where(s =>
+                s.EmployeeId == employeeId && s.Date >= firstDayOfWeek && s.Date < firstDayOfWeek.AddDays(7)).ToList();
     }
     
 }
