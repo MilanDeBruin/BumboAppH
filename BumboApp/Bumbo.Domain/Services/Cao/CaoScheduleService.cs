@@ -2,6 +2,7 @@ using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 using Bumbo.Data.Models.Cao;
 using Bumbo.Domain.Enums;
+using Bumbo.Domain.Models;
 
 namespace Bumbo.Domain.Services.CAO;
 
@@ -20,6 +21,10 @@ public class CaoScheduleService : ICaoScheduleService
     {
         BreakTimeModel breakTimeModel = _caoRepository.GetBreakTime();
         List<WorkHourRestrictionModel> workHourRestrictionModels = _caoRepository.GetWorkHourRestrictions();
+        List<WorkSchedule> weeklyWorkSchedule =
+            _scheduleRepository.GetWeeklyWorkSchedules(DateOnlyHelper.GetFirstDayOfWeek(schedule.Date),
+                schedule.EmployeeId);
+        
         
         
         throw new NotImplementedException();
