@@ -1,34 +1,43 @@
 ﻿using Bumbo.App.Web.Models.ViewModels.LeaveRequest;
+using Bumbo.Data.Interfaces;
+using Bumbo.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bumbo.App.Web.Controllers
 {
     public class LeaveController : Controller
     {
+        private readonly ILeaveRepository repo;
+
+        public LeaveController(ILeaveRepository repo)
+        {
+            this.repo = repo;
+        }
         public IActionResult Index()
         {
 
             LeaveRequestModel viewModel = new LeaveRequestModel();
-            viewModel.today = DateTime.Today;
+            viewModel.start = DateOnly.FromDateTime(DateTime.Now);
+            viewModel.end = viewModel.start;
+
+            viewModel.status = "Requested";
+
             return View(viewModel);
         }
 
-        //[HttpPost]
-        //public IActionResult Index(DateTime start, DateTime end)
-        //{
-
-        //    return RedirectToAction("Index");
-        //}
-
         [HttpPost]
-        public IActionResult Index(int employeeId,DateTime start, DateTime end)
+        public IActionResult Index(LeaveRequestModel viewModel)
         {
-            LeaveRequestModel viewModel = new LeaveRequestModel();
-            viewModel.employeeId = employeeId;
-            viewModel.start = start;
-            viewModel.end = end;
+            
+            Leave newRequest = new Leave();
+            newRequest.EmployeeId = viewModel.employeeId;
+            newRequest.StartDate = viewModel.start;
+            newRequest.EndDate = viewModel.end;
+            newRequest.LeaveStatus = viewModel.status;
 
-            // call naar de database sturen voor een aanvraag
+
+            repo.SetLeaveRequest(newRequest);
+
             return RedirectToAction("Index");
         }
 

@@ -15,7 +15,8 @@ namespace Bumbo.App.Web
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<BumboDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Bumbo")));
-            
+
+            builder.Services.AddTransient<Bumbo.Data.Interfaces.ILeaveRepository, Bumbo.Data.SqlRepository.LeaveRepository>();
             builder.Services.AddTransient<Bumbo.Data.Interfaces.INormRepository, Bumbo.Data.SqlRepository.NormRepository>();
             builder.Services.AddTransient<Bumbo.Data.Interfaces.IForecastRepository, Bumbo.Data.SqlRepository.ForecastRepository>();
             builder.Services.AddTransient<Bumbo.Domain.Services.Forecast.IGenerateForecastService, Bumbo.Domain.Services.Forecast.GenerateForecastService>();

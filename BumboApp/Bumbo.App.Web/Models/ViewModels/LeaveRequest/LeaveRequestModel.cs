@@ -4,10 +4,10 @@
     {
 
         public int employeeId { get; set; }
-        public DateTime start { get; set; }
-        public DateTime end { get; set; }
+        public DateOnly start { get; set; }
+        public DateOnly end { get; set; }
         public string status { get; set; }
-        public DateTime today { get; set; }
+        
 
 
     }
