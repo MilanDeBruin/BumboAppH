@@ -39,7 +39,7 @@ public class SchedulingController : Controller
             EmployeeScheduleViewModel empData = new EmployeeScheduleViewModel
             {
                 EmployeeId = employee.EmployeeId,
-                Name = employee.FirstName + employee.LastName,
+                Name = employee.FirstName + " " + employee.LastName,
                 MainFunction = employee.Position,
                 Schedules = employee.WorkSchedules,
             };
