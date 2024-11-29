@@ -16,9 +16,21 @@ namespace Bumbo.App.Web
             builder.Services.AddDbContext<BumboDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Bumbo")));
             
-            builder.Services.AddTransient<Bumbo.Data.Interfaces.INormRepository, Bumbo.Data.SqlRepository.NormRepository>();
-            builder.Services.AddTransient<Bumbo.Data.Interfaces.IForecastRepository, Bumbo.Data.SqlRepository.ForecastRepository>();
-            builder.Services.AddTransient<Bumbo.Domain.Services.Forecast.IGenerateForecastService, Bumbo.Domain.Services.Forecast.GenerateForecastService>();
+            builder.Services
+                .AddTransient<Bumbo.Data.Interfaces.INormRepository, Bumbo.Data.SqlRepository.NormRepository>();
+            builder.Services.
+                AddTransient<Bumbo.Data.Interfaces.IForecastRepository, Bumbo.Data.SqlRepository.ForecastRepository>();
+            builder.Services
+                .AddTransient<Bumbo.Data.Interfaces.ICaoRepository, Bumbo.Data.SqlRepository.CaoRepository>();
+            builder.Services
+                .AddTransient<Bumbo.Data.Interfaces.IScheduleRepository, Bumbo.Data.SqlRepository.ScheduleRepository>();
+            
+            builder.Services
+                .AddTransient<Bumbo.Domain.Services.Forecast.IGenerateForecastService, 
+                    Bumbo.Domain.Services.Forecast.GenerateForecastService>();
+            builder.Services
+                .AddTransient<Bumbo.Domain.Services.CAO.ICaoScheduleService,
+                    Bumbo.Domain.Services.CAO.CaoScheduleServiceStandin>();
 
 
 
@@ -46,7 +58,9 @@ namespace Bumbo.App.Web
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            
+
+            app.UseStatusCodePagesWithReExecute("/Home/Error404");
+
             app.MapControllerRoute(
                 name: "login",
                 pattern: "{controller=Account}/{action=Login}/{id?}");

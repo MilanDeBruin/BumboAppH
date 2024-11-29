@@ -4,49 +4,36 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit - @Html.DisplayFor(m => m.SupermarketActivity)</h1>
+<h1 class="text-center mb-4">Bewerken - @Html.DisplayFor(m => m.SupermarketActivity)</h1>
 
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert"></div>
 
-            @* Hidden field for primary key (BranchId) *@
-            <input asp-for="BranchId" type="hidden" />
+                @* Verborgen veld voor de primaire sleutel (BranchId) *@
+                <input asp-for="BranchId" type="hidden" />
 
-            <div class="form-group" hidden>
-
-                @Html.DisplayFor(m => m.SupermarketActivity)
-                <input asp-for="SupermarketActivity" class="form-control" type="hidden" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label class="control-label">Norm per uur</label>
-                <input asp-for="NormPerHour" class="form-control" min="1"/>
-                <span asp-validation-for="NormPerHour" class="text-danger"></span>
-            </div>
-
-            <div class="form-group" hidden>
-                <label asp-for="Unit" class="control-label"></label>
-                <input asp-for="Unit" class="form-control" />
-                <span asp-validation-for="Unit" class="text-danger"></span>
-            </div>
-
-            <div class="d-flex gap-2 mt-4">
-                <div>
-                    <a asp-action="Index" class="btn btn-secondary">Terug</a>
+                @* Verborgen veld voor SupermarketActivity *@
+                <input asp-for="SupermarketActivity" type="hidden" />
+                
+                <div class="mb-3">
+                    <label class="form-label">Norm per uur</label>
+                    <input asp-for="NormPerHour" class="form-control" />
+                    <span asp-validation-for="NormPerHour" class="text-danger"></span>
                 </div>
-                <div class="form-group">
+
+                @* Verborgen veld voor Unit *@
+                <input asp-for="Unit" type="hidden" />
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-secondary">Terug</a>
                     <input type="submit" value="Opslaan" class="btn btn-primary" />
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

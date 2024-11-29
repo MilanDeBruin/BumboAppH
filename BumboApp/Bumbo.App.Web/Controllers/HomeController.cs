@@ -1,10 +1,8 @@
 using System.Collections.Immutable;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Bumbo.App.Web.Models;
 using Bumbo.Data.Context;
-using Bumbo.Data.Models;
-using Bumbo.Data.SqlRepository;
+using Bumbo.Domain.Services.CAO;
 using BumboApplicatie.Models;
 
 namespace Bumbo.App.Web.Controllers
@@ -14,7 +12,7 @@ namespace Bumbo.App.Web.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly BumboDbContext _db;
 
-        public HomeController(ILogger<HomeController> logger, BumboDbContext db)
+        public HomeController(ILogger<HomeController> logger, BumboDbContext db, ICaoScheduleService service)
         {
             _logger = logger;
             _db = db;
@@ -35,5 +33,12 @@ namespace Bumbo.App.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult Error404()
+        {
+            Response.StatusCode = 404;
+            return View("404");
+        }
+
     }
 }

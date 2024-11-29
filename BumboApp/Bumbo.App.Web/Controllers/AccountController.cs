@@ -21,7 +21,12 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Login()
     {
-        return this.View();
+        if(User.Identity.IsAuthenticated)
+        {
+            return this.RedirectToAction("Index", "Home");
+        }
+        var model = new LoginViewModel();
+        return View(model);
     }
 
     [HttpPost]
