@@ -1,11 +1,13 @@
 using System.Collections.Immutable;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Bumbo.App.Web.Models;
 using Bumbo.Data.Context;
 using Bumbo.Data.Models;
 using Bumbo.Data.SqlRepository;
 using BumboApplicatie.Models;
+using Microsoft.VisualBasic;
+using Bumbo.Domain.Models;
+using Bumbo.App.Web.Models.ViewModels.Home;
 
 namespace Bumbo.App.Web.Controllers
 {
@@ -13,7 +15,8 @@ namespace Bumbo.App.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly BumboDbContext _db;
-
+        public int id_employee = 1;
+        
         public HomeController(ILogger<HomeController> logger, BumboDbContext db)
         {
             _logger = logger;
@@ -22,27 +25,19 @@ namespace Bumbo.App.Web.Controllers
 
         public IActionResult Index()
         {
-            var Werktijd = _db.WorkSchedules
-                //.Where(Ws => Ws.EmployeeId == 2)
-                .Select(Ws => new
-                {
-                    Ws.EmployeeId,
-                    Ws.Date,
-                    Ws.StartTime,
-                    Ws.EndTime,
-                    Ws.BranchId,
-                    Ws.Department
 
-                }).ToList();
-            Console.WriteLine("test");
-            Console.WriteLine(Werktijd[0]);
-            return View(Werktijd);
-        }
-        
-        public IActionResult Prognose()
-        {
+    
             return View();
-        }   
+        }
+
+        public DateOnly FirstDayOfWeek(DateOnly date)
+        {
+            DateOnly firstWeekDay = DateOnlyHelper.GetFirstDayOfWeek(date);
+            Console.WriteLine(firstWeekDay.DayOfWeek);
+            Console.WriteLine(firstWeekDay);
+            return firstWeekDay;
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

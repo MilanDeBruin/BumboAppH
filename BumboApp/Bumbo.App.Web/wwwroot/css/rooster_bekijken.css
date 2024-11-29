@@ -17,15 +17,17 @@
 }
 
 .square {
-    width: 300px;
-    height: 150px;
-    background-color: grey;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    font-size: 14px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px auto; /* Add spacing between divs */
+    width: 300px; /* Set a fixed width */
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.button{
+    margin-right: 10px;
+    background-color:lightgrey;
+
 }

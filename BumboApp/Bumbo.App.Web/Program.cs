@@ -19,7 +19,7 @@ namespace Bumbo.App.Web
             builder.Services.AddTransient<Bumbo.Data.Interfaces.INormRepository, Bumbo.Data.SqlRepository.NormRepository>();
             builder.Services.AddTransient<Bumbo.Data.Interfaces.IForecastRepository, Bumbo.Data.SqlRepository.ForecastRepository>();
             builder.Services.AddTransient<Bumbo.Domain.Services.Forecast.IGenerateForecastService, Bumbo.Domain.Services.Forecast.GenerateForecastService>();
-
+            builder.Services.AddTransient<Bumbo.Data.Interfaces.IHomeRepository, Bumbo.Data.SqlRepository.HomeRepository>();
 
 
 

@@ -9,17 +9,30 @@
 </head>
 
 <body>
+    <h2>
+        Planning voor deze week:
+    </h2>
 
-    <div class="flex-container">
-        <div class="square">Tekst 1</div>
-        <div class="square">Tekst 2</div>
-        <div class="square">Tekst 3</div>
-        <div class="square">Tekst 4</div>
-        <div class="square">Tekst 5</div>
-        <div class="square">Tekst 6</div>
-        <div class="square">Tekst 7</div>
-        <div class="square">Tekst 8</div>
+    <div style="display: flex; align-items: center; gap: 20px; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+         
+        <button class="button">Week vooruit</button>
+
+        <button class="button">Week terug</button>
+       
+
     </div>
+    <div class="flex-container">
+        @foreach (var schedule in Model)
+        {
+            <div class="square">
+                <strong>Datum:</strong> @schedule.Date.ToString("dd-mm-yyyy") <br />
+                <strong>Tijd:</strong> @schedule.StartTime.ToString(@"hh\:mm") - @schedule.EndTime.ToString(@"hh\:mm") <br />
+                <strong>Afdeling:</strong> @schedule.Department <br />
+                <strong>Dag:</strong> @schedule.DayOfWeek <br />
+            </div>
+        }
+
+        </div>
 
 
 </body> 
