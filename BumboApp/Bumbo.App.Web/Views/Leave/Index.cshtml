@@ -7,6 +7,11 @@
 <h1>Verlof aanvraag</h1>
 
 <hr />
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Index">
@@ -30,8 +35,8 @@
                 <span asp-validation-for="end" class="text-danger"></span>
             </div>
 
-            <div class="form-group mb-3">
-                <input asp-for="status"  class="form-control" />
+            <div class="form-group mb-3" >
+                <input asp-for="status" type="hidden" class="form-control" />
                 <span asp-validation-for="status" class="text-danger"></span>
             </div>
 
@@ -43,6 +48,15 @@
             </div>
         </form>
     </div>
+    <div>
+
+        <div class="d-flex gap-2 mt-4">
+            <div>
+                <a asp-action="MyRequest" class="btn btn-secondary">Mijn aanvragen</a>
+            </div>
+
+    </div>
+
 </div>
 
 @section Scripts {

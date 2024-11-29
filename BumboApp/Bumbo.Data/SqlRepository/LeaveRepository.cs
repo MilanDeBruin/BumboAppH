@@ -27,6 +27,8 @@ namespace Bumbo.Data.SqlRepository
 
         public List<string> GetLeaveStatuses() => ctx.LeaveStatuses.Select(n => n.LeaveStatus1).ToList();
 
+        public List<Leave> getAllRequestsOfEmployee(int id) => ctx.Leaves.Where(n => n.EmployeeId == id).ToList();
+
         
     }
 }

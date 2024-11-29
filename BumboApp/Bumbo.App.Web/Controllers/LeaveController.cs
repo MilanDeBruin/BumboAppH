@@ -1,4 +1,5 @@
-﻿using Bumbo.App.Web.Models.ViewModels.LeaveRequest;
+﻿using Bumbo.App.Web.Models.ViewModels.Leave;
+using Bumbo.App.Web.Models.ViewModels.LeaveRequest;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ namespace Bumbo.App.Web.Controllers
         [HttpPost]
         public IActionResult Index(LeaveRequestModel viewModel)
         {
-            
+
             Leave newRequest = new Leave();
             newRequest.EmployeeId = viewModel.employeeId;
             newRequest.StartDate = viewModel.start;
@@ -37,10 +38,29 @@ namespace Bumbo.App.Web.Controllers
 
 
             repo.SetLeaveRequest(newRequest);
-
+            TempData["SuccessMessage"] = $"Verlof is aangevraagd!";
             return RedirectToAction("Index");
         }
 
+        public IActionResult MyRequest()
+        {
+            int employeeID = 1;
+            MyLeaveRequestsModel viewModel = new MyLeaveRequestsModel();
+            viewModel.myRequests = new List<LeaveRequestModel>(); 
 
+            var requests = repo.getAllRequestsOfEmployee(employeeID);
+
+            foreach (var request in requests)
+            {
+                LeaveRequestModel model = new LeaveRequestModel(); 
+                model.employeeId = employeeID;
+                model.start = request.StartDate;
+                model.end = request.EndDate;
+                model.status = request.LeaveStatus;
+                viewModel.myRequests.Add(model);
+            }
+
+            return View(viewModel);
+        }
     }
 }
