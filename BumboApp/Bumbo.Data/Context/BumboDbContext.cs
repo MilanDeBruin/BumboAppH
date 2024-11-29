@@ -48,22 +48,7 @@ public partial class BumboDbContext : IdentityDbContext<IdentityUser<int>, Ident
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        OnModelCreatingPartial(modelBuilder);
-        
-        modelBuilder.Entity<IdentityUserLogin<int>>(entity =>
-        {
-            entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
-        });
-
-        modelBuilder.Entity<IdentityUserRole<int>>(entity =>
-        {
-            entity.HasKey(e => new { e.UserId, e.RoleId });
-        });
-
-        modelBuilder.Entity<IdentityUserToken<int>>(entity =>
-        {
-            entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
-        });
+        base.OnModelCreating(modelBuilder);
         
         modelBuilder.Entity<Availability>(entity =>
         {
@@ -208,8 +193,6 @@ public partial class BumboDbContext : IdentityDbContext<IdentityUser<int>, Ident
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_work_schedule_work_status");
         });
-
-        OnModelCreatingPartial(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
