@@ -46,8 +46,8 @@
                 <input type="hidden" asp-for="Days[i].Date"/>
                 <tr>
                     <td>@Model.Days[i].Date.ToString("dd-MM-yyyy")</td>
-                    <td><input type="number" asp-for="@Model.Days[i].AmountOfCustomers" placeholder="Aantal klanten" min="0" max="10000"/></td>
-                    <td><input type="number" asp-for="@Model.Days[i].AmountOfCollies" placeholder="Collies" min="0" max="500"/></td>
+                    <td><input type="number" asp-for="@Model.Days[i].AmountOfCustomers" placeholder="Aantal klanten" min="0" max="10000" required/></td>
+                    <td><input type="number" asp-for="@Model.Days[i].AmountOfCollies" placeholder="Collies" min="0" max="500" required/></td>
                     <td>@Model.Days[i].Temperature</td>
                 </tr>
             }
