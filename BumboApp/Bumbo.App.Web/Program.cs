@@ -35,7 +35,7 @@ namespace Bumbo.App.Web
                 options.Password.RequiredUniqueChars = 0;
                 
                 options.User.RequireUniqueEmail = true;
-            });
+            }).AddEntityFrameworkStores<BumboDbContext>();
             
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
