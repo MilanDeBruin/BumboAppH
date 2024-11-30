@@ -12,6 +12,11 @@
 {
     <div class="alert alert-success">@TempData["SuccessMessage"]</div>
 }
+
+@if (TempData["FailedMessage"] != null)
+{
+    <div class="alert alert-warning">@TempData["FailedMessage"]</div>
+}
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Index">

@@ -2,7 +2,7 @@
 using Bumbo.App.Web.Models.ViewModels.LeaveRequest;
 namespace Bumbo.App.Web.Models.ViewModels.Leave
 {
-    public class MyLeaveRequestsModel
+    public class AllLeaveRequestsModel
     {
 
         public List<LeaveRequestModel> myRequests { get; set; }
