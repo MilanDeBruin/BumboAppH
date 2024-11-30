@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Bumbo.Domain.Services.CAO;
+using Bumbo.Domain.Enums;
 
 namespace Bumbo.Domain.Services.Scheduling;
 
@@ -18,10 +20,12 @@ public class Scheduling
 {
     BumboDbContext Context;
     private readonly ILogger<Scheduling> _logger;
-    public Scheduling(BumboDbContext context, ILogger<Scheduling> _Slogger)
+    private readonly ICaoScheduleService icss;
+    public Scheduling(BumboDbContext context, ILogger<Scheduling> _Slogger, ICaoScheduleService icss)
     {
         Context = context;
         _logger = _Slogger;
+        this.icss = icss;
     }
 
     public DateTime GetStartOfWeek(int year, int week)
@@ -32,7 +36,7 @@ public class Scheduling
         var firstMonday = jan1.AddDays(daysOffset);
         return firstMonday.AddDays((week - 1) * 7);
     }
-    public void SendDataToDb(ScheduleModel model)
+    public CaoSheduleValidatorEnum SendDataToDb(ScheduleModel model)
     {
         DateOnly date = DateOnly.FromDateTime(model.Date).AddDays(1);
         TimeOnly startTime = TimeOnly.FromTimeSpan(model.StartTime);
@@ -53,18 +57,35 @@ public class Scheduling
                 IsSick = false
             };
 
-            _logger.LogInformation($" deze datum wordt naar de db gestuurd: {date} --------------------------------------------------------------------------------------------------------------------------------------------------- key word");
+            if (icss.ValidateSchedule(schedule) == CaoSheduleValidatorEnum.Valid)
+            {
+                _logger.LogInformation($" deze datum wordt naar de db gestuurd: {date} --------------------------------------------------------------------------------------------------------------------------------------------------- key word");
 
-            Context.WorkSchedules.Add(schedule);
-            Context.SaveChanges();
+                Context.WorkSchedules.Add(schedule);
+                Context.SaveChanges();
+                return CaoSheduleValidatorEnum.Valid;
+            }
+            else 
+            {
+                icss.ValidateSchedule(schedule);
+            }
+
         }
         else 
         {
-            _logger.LogInformation($" deze datum wordt naar de db gestuurd: {date} --------------------------------------------------------------------------------------------------------------------------------------------------- key word");
-
             checker.EndTime = TimeOnly.FromTimeSpan(model.EndTime);
             checker.Department = model.Department;
-            Context.SaveChanges();
+
+            if (icss.ValidateSchedule(checker) == CaoSheduleValidatorEnum.Valid)
+            {
+                Context.SaveChanges();
+                return CaoSheduleValidatorEnum.Valid;
+            }
+            else
+            {
+                icss.ValidateSchedule(checker);
+            }
+            
         }
     }
 

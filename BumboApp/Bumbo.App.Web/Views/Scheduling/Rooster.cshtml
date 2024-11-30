@@ -174,21 +174,26 @@
                 success: function (response) {
                     console.log("Response from server:", response);
 
-                    addScheduleToCell({
-                        employeeId: scheduleEntry.EmployeeId,
-                        day: scheduleEntry.Day,
-                        date: scheduleEntry.Date,
-                        startTime: scheduleEntry.StartTime.slice(0, 5), 
-                        endTime: scheduleEntry.EndTime.slice(0, 5),
-                        department: scheduleEntry.Department
-                    });
+                    if (response.success) {
+                        addScheduleToCell({
+                            employeeId: scheduleEntry.EmployeeId,
+                            day: scheduleEntry.Day,
+                            date: scheduleEntry.Date,
+                            startTime: scheduleEntry.StartTime.slice(0, 5),
+                            endTime: scheduleEntry.EndTime.slice(0, 5),
+                            department: scheduleEntry.Department
+                        });
 
+                        closeScheduleModal();
+                    } else {
 
-                    closeScheduleModal();
+                        console.error("Failed to save schedule:", response.message);
+                        alert(`Failed to save the schedule: ${response.message}`);
+                    }
                 },
                 error: function (xhr, status, error) {
                     console.error("Error saving schedule:", status, error);
-                    alert("Failed to save the schedule. Please try again.");
+                    alert("An unexpected error occurred. Please try again.");
                 }
             });
         }

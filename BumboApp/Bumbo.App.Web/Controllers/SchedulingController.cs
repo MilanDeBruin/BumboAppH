@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using Bumbo.Domain.Services.Scheduling;
 using Bumbo.Domain.Models.Schedueling;
+using Bumbo.Domain.Services.CAO;
 
 namespace Bumbo.App.Web.Controllers;
 
@@ -18,13 +19,14 @@ public class SchedulingController : Controller
     private readonly ILogger<SchedulingController> _logger;
 
 
+
     private Scheduling Scheduling;
 
-    public SchedulingController(BumboDbContext context, ILogger<SchedulingController> logger, ILogger<Scheduling> _Slogger)
+    public SchedulingController(BumboDbContext context, ILogger<SchedulingController> logger, ILogger<Scheduling> _Slogger, ICaoScheduleService _caoScheduleService)
     {
         _context = context;
         _logger = logger;
-        Scheduling = new Scheduling(_context, _Slogger);
+        Scheduling = new Scheduling(_context, _Slogger, _caoScheduleService);
     }
 
     public IActionResult Rooster()
@@ -41,7 +43,7 @@ public class SchedulingController : Controller
                 EmployeeId = employee.EmployeeId,
                 Name = employee.FirstName + " " + employee.LastName,
                 MainFunction = employee.Position,
-                Schedules = employee.WorkSchedules,
+                //Schedules = employee.WorkSchedules,
             };
 
             Employees.Add(empData);
@@ -69,11 +71,19 @@ public class SchedulingController : Controller
             }
         }
 
-      
+
         //_logger.LogInformation($"Received data: {schedule.EmployeeId} {schedule.Date} {schedule.StartTime} {schedule.EndTime} {schedule.Department}");
-       // _logger.LogInformation($"-------------------------  {schedule.Date} --------------------------------------------------------------------------");
-        Scheduling.SendDataToDb(schedule);
-        return Json(new { success = true });
+        // _logger.LogInformation($"-------------------------  {schedule.Date} --------------------------------------------------------------------------");
+        CaoSheduleValidatorEnum result = Scheduling.SendDataToDb(schedule);
+        if (result == CaoSheduleValidatorEnum.Valid)
+        {
+            return Json(new { success = true });
+        }
+        else 
+        {
+            return Json(new { success = false, message = $"Het rooster kon niet opgeslagen worden doordat: {result}" });
+        }
+        
     }
 
     [HttpPost]
