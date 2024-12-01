@@ -65,8 +65,8 @@ namespace BumboApp.Controllers
                     HouseNumber = employeeModel.house_number,
                     Addition = employeeModel.addition,
                     ZipCode = employeeModel.zip_code,
-                    EmailAdres = employeeModel.email_adres,
-                    Password = employeeModel.password,
+                    // EmailAdres = employeeModel.email_adres, TODO: Implement with identity
+                    // Password = employeeModel.password, 
                 };
 
                 _context.Employees.Add(employee);
@@ -113,8 +113,8 @@ namespace BumboApp.Controllers
                 house_number = employee.HouseNumber,
                 addition = employee.Addition,
                 zip_code = employee.ZipCode,
-                email_adres = employee.EmailAdres,
-                password = employee.Password,
+                // email_adres = employee.EmailAdres, TODO: Implement with identity
+                // password = employee.Password,
             };
 
             return View(employeeModel);
@@ -140,8 +140,8 @@ namespace BumboApp.Controllers
                 house_number = employee.HouseNumber,
                 addition = employee.Addition,
                 zip_code = employee.ZipCode,
-                email_adres = employee.EmailAdres,
-                password = employee.Password,
+                // email_adres = employee.EmailAdres, TODO: Implement with identity
+                // password = employee.Password,
             };
 
             var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
@@ -172,8 +172,8 @@ namespace BumboApp.Controllers
                 employee.HouseNumber = employeeModel.house_number;
                 employee.Addition = employeeModel.addition;
                 employee.ZipCode = employeeModel.zip_code;
-                employee.EmailAdres = employeeModel.email_adres;
-                employee.Password = employeeModel.password;
+                // employee.EmailAdres = employeeModel.email_adres; TODO: Implement with identity
+                // employee.Password = employeeModel.password;
 
                 _context.SaveChanges();
 

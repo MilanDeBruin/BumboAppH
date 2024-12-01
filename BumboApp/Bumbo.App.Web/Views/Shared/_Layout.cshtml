@@ -1,3 +1,6 @@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser<int>> SignInManager
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +12,7 @@
     <link rel="stylesheet" href="~/css/navbar.css" asp-append-version="true" />
 </head>
 <body>
-    @if (User.Identity.IsAuthenticated || ViewData["Title"]?.ToString() != "Aanmelden Bumbo")
+     @if (SignInManager.IsSignedIn(User) || ViewData["Title"]?.ToString() != "Aanmelden Bumbo")
     {
         <header>
             <nav class="navbar navbar-expand-lg navbar-light">
@@ -35,9 +38,13 @@
                                 </li>
                             }
                         </ul>
-                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-flex">
-                            <button type="submit" class="btn-logout">Uitloggen</button>
-                        </form>
+                        <ul class="navbar-nav">
+                             <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post">
+                                    <button type="submit" class="btn-logout">Uitloggen</button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </nav>

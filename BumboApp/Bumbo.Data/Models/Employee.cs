@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace Bumbo.Data.Models;
 
 [Table("employee")]
-[Index("EmailAdres", Name = "IX_employee", IsUnique = true)]
 public partial class Employee
 {
     [Key]
@@ -18,7 +17,7 @@ public partial class Employee
     public int BranchId { get; set; }
 
     [Column("position")]
-    [StringLength(50)]
+    [StringLength(256)]
     public string Position { get; set; } = null!;
 
     [Column("hiring_date")]
@@ -49,14 +48,6 @@ public partial class Employee
     [Column("zip_code")]
     [StringLength(20)]
     public string ZipCode { get; set; } = null!;
-
-    [Column("email_adres")]
-    [StringLength(254)]
-    public string EmailAdres { get; set; } = null!;
-
-    [Column("password")]
-    [StringLength(50)]
-    public string Password { get; set; } = null!;
 
     [Column("labor_contract")]
     [StringLength(50)]

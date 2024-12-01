@@ -11,7 +11,7 @@ public partial class Position
 {
     [Key]
     [Column("position")]
-    [StringLength(50)]
+    [StringLength(256)]
     public string Position1 { get; set; } = null!;
 
     [InverseProperty("PositionNavigation")]

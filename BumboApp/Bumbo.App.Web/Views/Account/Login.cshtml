@@ -1,4 +1,4 @@
-﻿@model Bumbo.App.Web.Models.ViewModels.Forecast.LoginViewModel
+@model Bumbo.App.Web.Models.ViewModels.Forecast.LoginViewModel
 
 @{
     ViewData["Title"] = "Aanmelden Bumbo";
@@ -22,13 +22,13 @@
         <form asp-controller="Account" asp-action="Login" method="post" class="login-form">
             <div asp-validation-summary="All" class="text-danger"></div> @* TODO: class="text-danger" is temporary solution, needs to be replaced *@
             <div class="form-group">
-                <label for="email">E-mailadres</label>
-                <input type="text" id="email" name="Email" placeholder="E-mailadres" required value="@Model.Email">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email">
             </div>
 
             <div class="form-group">
-                <label for="password">Wachtwoord</label>
-                <input type="password" id="password" name="Password" placeholder="Wachtwoord" required>
+                <label asp-for="Password">Wachtwoord</label>
+                <input asp-for="Password">
             </div>
 
             <button type="submit" class="btn-submit">Inloggen</button>

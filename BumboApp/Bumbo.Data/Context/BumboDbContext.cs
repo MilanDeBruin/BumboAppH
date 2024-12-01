@@ -175,8 +175,6 @@ public partial class BumboDbContext : IdentityDbContext<IdentityUser<int>, Ident
 
         modelBuilder.Entity<WorkSchedule>(entity =>
         {
-            entity.Property(e => e.Concept).HasDefaultValue(true);
-
             entity.HasOne(d => d.Branch).WithMany(p => p.WorkSchedules)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_work_schedule_branch");

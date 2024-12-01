@@ -1,76 +1,50 @@
+using Bumbo.App.Web.Models.ViewModels.Forecast;
+using Bumbo.Data.Context;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+
 namespace Bumbo.App.Web.Controllers;
 
-using System.Security.Claims;
-using Models.ViewModels.Forecast;
-using Bumbo.Data.Context;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-public class AccountController : Controller
+[Authorize]
+public class AccountController_3 : Controller
 {
     private readonly BumboDbContext _context;
+    private readonly SignInManager<IdentityUser<int>> _signInManager;
 
-    public AccountController(BumboDbContext bumboDbContext)
+    public AccountController_3(BumboDbContext context, SignInManager<IdentityUser<int>> signInManager)
     {
-        this._context = bumboDbContext;
-    }
-
-    [HttpGet]
-    public IActionResult Login()
-    {
-        if(User.Identity.IsAuthenticated)
-        {
-            return this.RedirectToAction("Index", "Home");
-        }
-        var model = new LoginViewModel();
-        return View(model);
+        _context = context;
+        _signInManager = signInManager;
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Login(LoginViewModel viewModel)
     {
-        // Check if the model state is valid
-        if (!this.ModelState.IsValid)
+        if (ModelState.IsValid)
         {
-            return this.View(viewModel);
-        }
+            
+            var result = await _signInManager.PasswordSignInAsync(viewModel.Email, viewModel.Password, false, false);
 
-        // Attempt to find the employee with the provided email and password
-        var employee = await this._context.Employees
-            .FirstOrDefaultAsync(e => e.EmailAdres == viewModel.Email && e.Password == viewModel.Password);
-
-        if (employee != null)
-        {
-            // Create claims for the authenticated user
-            var claims = new List<Claim>
+            if (result.Succeeded)
             {
-                new Claim(ClaimTypes.Name, viewModel.Email),
-                new Claim("position", employee.Position),
-            };
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            // Sign in the user with the created claims
-            await this.HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity));
-
-            // Redirect to the Home page upon successful login
-            return this.RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return View(viewModel);
+            }
         }
 
-        // Add an error message to the model state if authentication fails
-        this.ModelState.AddModelError(string.Empty, "Invalid email or password");
         return this.View(viewModel);
     }
 
-    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Logout()
     {
-        await this.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return this.RedirectToAction("Login", "Account");
+        await _signInManager.SignOutAsync();
+        return RedirectToAction("Index", "Home");
     }
 }
