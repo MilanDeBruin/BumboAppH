@@ -9,6 +9,7 @@ using System.Diagnostics;
 using Bumbo.Domain.Services.Scheduling;
 using Bumbo.Domain.Models.Schedueling;
 using Bumbo.Domain.Services.CAO;
+using Bumbo.App.Web.Models.ViewModels.Schedule;
 
 namespace Bumbo.App.Web.Controllers;
 
@@ -115,27 +116,47 @@ public class SchedulingController : Controller
         var startDate = Scheduling.GetStartOfWeek(year, week);
         var endDate = startDate.AddDays(6);
 
-        
-
         var schedules = _context.WorkSchedules
             .Where(s => s.Date >= DateOnly.FromDateTime(startDate) && s.Date <= DateOnly.FromDateTime(endDate))
-            .Select(s => new
-            {
-                s.EmployeeId,
-                s.Date,
-                s.StartTime,
-                s.EndTime,
-                Department = s.Department.ToString()
-            })
             .ToList();
-        return Json(schedules.Select(s => new
+
+        var forecasts = _context.Forecasts
+            .Where(f => f.Date >= DateOnly.FromDateTime(startDate) && f.Date <= DateOnly.FromDateTime(endDate))
+            .ToList();
+
+        var employees = _context.Employees // Assuming you have an Employees table
+            .Select(e => new { e.EmployeeId, Name = e.FirstName + " " + e.LastName, e.Position })
+            .ToList();
+
+        var viewModel = employees.Select(employee => new EmployeeScheduleViewModel
         {
-            s.EmployeeId,
-            Date = s.Date.ToString("yyyy-MM-dd"),
-            StartTime = s.StartTime.ToString("HH:mm"),
-            EndTime = s.EndTime.ToString("HH:mm"),
-            Department = s.Department
-        }));
+            EmployeeId = employee.EmployeeId,
+            Name = employee.Name,
+            MainFunction = employee.Position,
+            Schedules = schedules.Where(s => s.EmployeeId == employee.EmployeeId).Select(s => new ScheduleViewModel
+            {
+                EmployeeId = s.EmployeeId,
+                Date = s.Date.ToString("yyyy-MM-dd"), // Properly format Date
+                StartTime = s.StartTime.ToString("HH:mm"), // Properly format StartTime
+                EndTime = s.EndTime.ToString("HH:mm"), // Properly format EndTime
+                Department = s.Department
+            }).ToList(),
+            DailySummaries = Enum.GetValues(typeof(DayNameOfWeek)).Cast<DayNameOfWeek>()
+                .ToDictionary(day => day, day =>
+                {
+                    var currentDate = startDate.AddDays((int)day); // Ensure correct mapping based on the enum value
+                    var dailySchedules = schedules.Where(s => s.EmployeeId == employee.EmployeeId && s.Date == DateOnly.FromDateTime(currentDate));
+                    var dailyForecast = forecasts.FirstOrDefault(f => f.Date == DateOnly.FromDateTime(currentDate));
+
+                    return new DaySummary
+                    {
+                        ForecastHours = dailyForecast?.ManHours ?? 0,
+                        ScheduledHours = dailySchedules.Sum(s => (s.EndTime - s.StartTime).TotalHours)
+                    };
+                })
+        }).ToList();
+
+        return Json(viewModel);
     }
 
     [HttpPost]

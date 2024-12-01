@@ -1,4 +1,5 @@
 ﻿@using Bumbo.App.Web.Models.ViewModels;
+@using Bumbo.App.Web.Models.ViewModels.Schedule;
 @using BumboApp.Models.Models;
 @using Bumbo.Domain.Enums;
 @model IEnumerable<EmployeeScheduleViewModel>
@@ -24,38 +25,49 @@
     </div>
 </div>
 
-<table class="table table-bordered">
+
+
+<table class="schedule-table">
     <thead>
         <tr>
-            <th>Medewerker</th>
+            <th>Employee</th>
             @foreach (var day in Enum.GetValues(typeof(DayNameOfWeek)).Cast<DayNameOfWeek>())
             {
-                <th>@day</th>
+                <th>
+                    @day
+                    <div class="summary-info">
+                        @if (Model.FirstOrDefault()?.DailySummaries.TryGetValue(day, out var summary) ?? false)
+                        {
+                            <div>Forecast: <span class="forecast-hours">@summary.ForecastHours</span> hrs</div>
+                            <div>Scheduled: <span class="scheduled-hours">@summary.ScheduledHours</span> hrs</div>
+                            <div>Remaining: <span class="remaining-hours">@summary.RemainingHours</span> hrs</div>
+                        }
+                        else
+                        {
+                            <div>No data available</div>
+                        }
+                    </div>
+                </th>
             }
         </tr>
     </thead>
-    <tbody id="employeeTableBody">
+    <tbody>
         @foreach (var employee in Model)
         {
-            <tr class="employee-row" data-function="@employee.MainFunction">
-                <td>
-                    <strong>@employee.Name</strong>
-                    <br />
-                    <small>@employee.MainFunction</small>
-                </td>
+            <tr>
+                <td>@employee.Name</td>
                 @foreach (var day in Enum.GetValues(typeof(DayNameOfWeek)).Cast<DayNameOfWeek>())
                 {
                     <td class="schedule-cell" data-employee-id="@employee.EmployeeId">
                         <div id="schedule-container-@employee.EmployeeId-@day"></div>
-                        <button class="btn btn-sm btn-primary" onclick="openScheduleModal(@employee.EmployeeId, '@day')">
-                            +
-                        </button>
+
+                        <button class="btn btn-primary btn-sm" onclick="openScheduleModal(@employee.EmployeeId, '@day')">+</button>
+
                     </td>
                 }
             </tr>
         }
     </tbody>
-    
 </table>
 <div class="pagination-container">
     <button id="vorige" class="btn btn-secondary" onclick="changePage(-1)" disabled>Previous</button>
@@ -109,16 +121,13 @@
 </div>
 @section Scripts {
     <script>
-
-        
         function openScheduleModal(employeeId, day) {
             document.getElementById("modalEmployeeId").value = employeeId;
             document.getElementById("modalDay").value = day;
             document.getElementById("modalStartTime").value = "09:00";
-            document.getElementById("modalEndTime").value = "21:00";  
+            document.getElementById("modalEndTime").value = "21:00";
             document.getElementById("scheduleModal").style.display = "block";
         }
-
         function closeScheduleModal() {
             document.getElementById("scheduleModal").style.display = "none";
         }
@@ -372,6 +381,7 @@
         
 
         document.addEventListener("DOMContentLoaded", function () {
+            
             let currentDate = new Date();
             let currentYear = currentDate.getFullYear();
 
@@ -417,6 +427,7 @@
                     url: `@Url.Action("GetSchedulesForWeek", "Scheduling")?year=${year}&week=${week}`,
                     type: 'GET',
                     success: function (schedules) {
+                        console.log(`fetch functie${schedules}`);
                                 updateScheduleGrid(schedules);        
                     },
                     error: function (xhr, status, error) {
@@ -425,63 +436,81 @@
                 });
             }
 
-            
-            function updateScheduleGrid(schedules) {
-                const dayMapping = { 0: 'Zondag', 1: 'Maandag', 2: 'Dinsdag', 3: 'Woensdag', 4: 'Donderdag', 5: 'Vrijdag', 6: 'Zaterdag' };
 
-                document.querySelectorAll('.schedule-cell div').forEach(cell => (cell.innerHTML = ''));
 
-                schedules.forEach(schedule => {
-                    const dayOfWeek = new Date(schedule.date).getDay();
 
-                    const dayName = dayMapping[dayOfWeek] || "unknown";
+            function updateScheduleGrid(data) {
+                // Iterate over each employee in the data array
+                data.forEach(employee => {
+                    const schedules = employee.schedules || [];  // Default to empty array if schedules is undefined
+                    const forecasts = employee.dailySummaries || {};  // Assuming forecasts are in dailySummaries
 
-                    const containerId = `schedule-container-${schedule.employeeId}-${dayName}`;
-                    const container = document.getElementById(containerId);
-                    console.log(`${schedule.date} deze dag wordt getekent momenteel ----------------`);
+                    console.log(`Schedules for ${employee.name}:`, schedules); // Verify if the schedules are populated here
 
-                    if (container) {
-                        const scheduleElement = document.createElement("div");
-                        scheduleElement.classList.add("schedule-entry");
+                    const dayMapping = {
+                        0: 'Zondag', 1: 'Maandag', 2: 'Dinsdag', 3: 'Woensdag',
+                        4: 'Donderdag', 5: 'Vrijdag', 6: 'Zaterdag'
+                    };
 
-                        const hiddenEmployeeId = document.createElement("input");
-                        hiddenEmployeeId.type = "hidden";
-                        hiddenEmployeeId.name = "employeeId";
-                        hiddenEmployeeId.value = schedule.employeeId;
+                    // Clear existing schedule entries from schedule cells
+                    document.querySelectorAll('.schedule-cell .schedule-entry').forEach(cell => cell.remove());
 
-                        const hiddenDate = document.createElement("input");
-                        hiddenDate.type = "hidden";
-                        hiddenDate.name = "date";
-                        hiddenDate.value = schedule.date;
+                    // Check if there are schedules for the current employee
+                    if (schedules.length === 0) {
+                        console.log(`No schedules available for ${employee.name}`);
+                        return; // Stop further execution for this employee if no schedules
+                    }
 
-                        const startTimeSpan = document.createElement("span");
-                        startTimeSpan.classList.add("startTime");
-                        startTimeSpan.textContent = schedule.startTime;
+                    // Display schedules for the current employee
+                    schedules.forEach(schedule => {
+                        console.log("Processing schedule entry");
 
-                        const endTimeSpan = document.createElement("span");
-                        endTimeSpan.classList.add("endTime");
-                        endTimeSpan.textContent = schedule.endTime;
+                        const scheduleDate = new Date(schedule.date);  // Assuming schedule.date is a valid date string
+                        if (isNaN(scheduleDate)) {
+                            console.error(`Invalid date format for schedule: ${schedule.date}`);
+                            return; // Skip this schedule if the date is invalid
+                        }
 
-                        const departmentSpan = document.createElement("span");
-                        departmentSpan.classList.add("department");
-                        departmentSpan.textContent = schedule.department;
+                        const dayOfWeek = scheduleDate.getDay(); // Get the day of the week (0 to 6)
+                        const dayName = dayMapping[dayOfWeek] || "unknown";
 
-                        scheduleElement.innerHTML = `
-                        <span class="startTime">${schedule.startTime}</span> -
-                        <span class="endTime">${schedule.endTime}</span>
-                        (<span class="department">${schedule.department}</span>)
-                        <button class="btn btn-sm btn-danger" onclick="removeSchedule(this)">X</button>
+                        const containerId = `schedule-container-${schedule.employeeId}-${dayName}`;
+                        console.log(`Looking for container with ID: ${containerId}`);
+                        const container = document.getElementById(containerId);
+
+                        if (container) {
+                            console.log(`Adding schedule entry`);
+
+                            const scheduleElement = document.createElement("div");
+                            scheduleElement.classList.add("schedule-entry");
+
+                            scheduleElement.innerHTML = `
+                            <span class="startTime">${schedule.startTime}</span> -
+                            <span class="endTime">${schedule.endTime}</span>
+                            (<span class="department">${schedule.department}</span>)
+                            <button class="btn btn-sm btn-danger" onclick="removeSchedule(this)">X</button>
                         `;
+                            container.appendChild(scheduleElement);
+                        } else {
+                            console.log(`Container with ID ${containerId} not found.`);
+                        }
+                    });
 
-                        scheduleElement.appendChild(hiddenEmployeeId);
-                        scheduleElement.appendChild(hiddenDate);
-                        container.appendChild(scheduleElement);
-                    } else {
-                        console.log("hij is empty");
+                    // Display forecasts for the current employee (if applicable)
+                    for (const [dayName, summary] of Object.entries(forecasts)) {
+                        const forecastCell = document.querySelector(`td.schedule-cell[data-day="${dayName}"]`);
+                        if (forecastCell) {
+                            forecastCell.insertAdjacentHTML('beforeend', `
+                            <div class="forecast-data">
+                                Forecast: ${summary.forecastHours} hours
+                            </div>
+                        `);
+                        }
                     }
                 });
-
             }
+
+
 
             document.getElementById("previousWeek").addEventListener("click", () => changeWeek(-1));
             document.getElementById("nextWeek").addEventListener("click", () => changeWeek(1));
@@ -509,6 +538,7 @@
             const employeeRows = Array.from(document.querySelectorAll('.employee-row'));
 
             function renderPage(page) {
+                return;
                 const totalRows = employeeRows.length;
                 const totalPages = Math.ceil(totalRows / rowsPerPage);
 
@@ -536,6 +566,8 @@
             };
 
             renderPage(currentPage);
+
+            
         });
 
     </script>

@@ -67,7 +67,7 @@ public class Scheduling
             }
             else 
             {
-                icss.ValidateSchedule(schedule);
+                return icss.ValidateSchedule(schedule);
             }
 
         }
@@ -83,7 +83,7 @@ public class Scheduling
             }
             else
             {
-                icss.ValidateSchedule(checker);
+                return icss.ValidateSchedule(checker);
             }
             
         }
