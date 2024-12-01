@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bumbo.App.Web.Controllers;
 
 [Authorize]
-public class AccountController_3 : Controller
+public class AccountController : Controller
 {
     private readonly BumboDbContext _context;
     private readonly SignInManager<IdentityUser<int>> _signInManager;
 
-    public AccountController_3(BumboDbContext context, SignInManager<IdentityUser<int>> signInManager)
+    public AccountController(BumboDbContext context, SignInManager<IdentityUser<int>> signInManager)
     {
         _context = context;
         _signInManager = signInManager;

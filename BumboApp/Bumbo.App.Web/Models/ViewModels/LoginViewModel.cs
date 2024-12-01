@@ -5,7 +5,7 @@ namespace Bumbo.App.Web.Models.ViewModels.Forecast;
 public class LoginViewModel
 {
     [Required]
-    [EmailAddress]
+    // [EmailAddress]
     public string Email { get; set; }
     
     [Required]
