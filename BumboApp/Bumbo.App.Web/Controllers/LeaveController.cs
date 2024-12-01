@@ -62,5 +62,25 @@ namespace Bumbo.App.Web.Controllers
 
             return View(viewModel);
         }
+
+        public IActionResult LeaveManagement() 
+        {
+            MyLeaveRequestsModel viewModel = new MyLeaveRequestsModel();
+            viewModel.myRequests = new List<LeaveRequestModel>();
+
+            var requests = repo.getAllRequests();
+
+            foreach (var request in requests)
+            {
+                LeaveRequestModel model = new LeaveRequestModel();
+                model.employeeId = request.EmployeeId;
+                model.start = request.StartDate;
+                model.end = request.EndDate;
+                model.status = request.LeaveStatus;
+                viewModel.myRequests.Add(model);
+            }
+
+            return View(viewModel);
+        }
     }
 }

@@ -29,6 +29,8 @@ namespace Bumbo.Data.SqlRepository
 
         public List<Leave> getAllRequestsOfEmployee(int id) => ctx.Leaves.Where(n => n.EmployeeId == id).ToList();
 
+        public List<Leave>getAllRequests() => ctx.Leaves.Where(n => n.LeaveStatus == "Requested").OrderBy(n => n.EmployeeId).ToList();
+
         
     }
 }

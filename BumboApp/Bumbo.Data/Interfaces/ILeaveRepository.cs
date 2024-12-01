@@ -14,5 +14,7 @@ namespace Bumbo.Data.Interfaces
         public List<string> GetLeaveStatuses();
 
         public List<Leave> getAllRequestsOfEmployee(int id);
+
+        public List<Leave> getAllRequests();
     }
 }
