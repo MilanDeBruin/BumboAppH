@@ -9,12 +9,10 @@ namespace Bumbo.App.Web.Controllers;
 [Authorize]
 public class AccountController : Controller
 {
-    private readonly BumboDbContext _context;
     private readonly SignInManager<IdentityUser<int>> _signInManager;
 
-    public AccountController(BumboDbContext context, SignInManager<IdentityUser<int>> signInManager)
+    public AccountController(SignInManager<IdentityUser<int>> signInManager)
     {
-        _context = context;
         _signInManager = signInManager;
     }
 
