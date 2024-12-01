@@ -35,5 +35,12 @@ namespace Bumbo.App.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult Error404()
+        {
+            Response.StatusCode = 404;
+            return View("404");
+        }
+
     }
 }

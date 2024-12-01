@@ -60,7 +60,9 @@ namespace Bumbo.App.Web
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            
+
+            app.UseStatusCodePagesWithReExecute("/Home/Error404");
+
             app.MapControllerRoute(
                 name: "login",
                 pattern: "{controller=Account}/{action=Login}/{id?}");
