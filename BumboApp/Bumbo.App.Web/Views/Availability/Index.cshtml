@@ -1,0 +1,130 @@
+﻿@using Bumbo.Domain.Models;
+@using Bumbo.App.Web.Models.ViewModels.Availability;
+
+@model WeekAvailabilityViewModel;
+
+<h1 class="text-center mb-4">Beschikbaarheid</h1>
+
+<div class="container mt-5">
+
+    <div style="display: flex; gap: 20px;">
+        <!-- Personen Tabel -->
+        <div>
+            <table class="table table-bordered table-striped text-center">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Personeel</th>
+                        <th>Dag</th>
+                        <th>Beschikbaarheid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var dayAvailability in Model.DayAvailabilities)
+                    {
+                        foreach (var employeeAvailability in dayAvailability.EmployeeAvailabilities)
+                        {
+                            <tr>
+                                <td>@employeeAvailability.Employee.first_name @employeeAvailability.Employee.last_name</td>
+                                <td>@dayAvailability.WeekDay</td>
+                                <td>
+                                    @employeeAvailability.StartTime?.ToString(@"hh\:mm") - @employeeAvailability.EndTime?.ToString(@"hh\:mm")
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Weekoverzicht Tabel -->
+        <div style="flex-grow: 1;">
+            <form method="post" asp-action="Availability">
+                <table class="table table-bordered table-striped text-center week-overview">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Dag</th>
+                            <th>Openingstijd - Sluitingstijd</th>
+                            <th class="planning-column">Planning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < 7; i++)
+                        {
+                            var currentDay = Model.DayAvailabilities.FirstOrDefault(d => d.WeekDay == Model.FirstDayOfWeek.AddDays(i));
+                            var openingTime = Model.OpeningDurations.OpeningTimes.FirstOrDefault(o => o.BranchId == Model.BranchId && o.StartTime.HasValue && o.EndTime.HasValue && o.Day == currentDay?.WeekDay);
+
+                            <tr>
+                                <td>@Model.FirstDayOfWeek.AddDays(i)</td>
+                                <td>@openingTime?.StartTime?.ToString(@"HH:mm") - @openingTime?.EndTime?.ToString(@"HH:mm")</td>
+                                <td>
+                                    <div class="time-slot">
+                                        @if (currentDay != null)
+                                        {
+                                            @foreach (var employeeAvailability in currentDay.EmployeeAvailabilities)
+                                            {
+                                                var startLeft = 0;
+                                                var width = 0;
+
+                                                if (employeeAvailability.StartTime.HasValue && employeeAvailability.EndTime.HasValue && openingTime?.StartTime.HasValue == true)
+                                                {
+                                                    // Omzetten naar TimeSpan en de minuten berekenen
+                                                    var startTimeSpan = employeeAvailability.StartTime.Value.ToTimeSpan();
+                                                    var endTimeSpan = employeeAvailability.EndTime.Value.ToTimeSpan();
+                                                    var branchStartTimeSpan = openingTime.StartTime.Value.ToTimeSpan();
+                                                    var branchEndTimeSpan = openingTime.EndTime.Value.ToTimeSpan();
+
+                                                    var totalDayDuration = (branchEndTimeSpan - branchStartTimeSpan).TotalMinutes;
+
+                                                    startLeft = (int)((startTimeSpan - branchStartTimeSpan).TotalMinutes / totalDayDuration * 100);
+
+                                                    var workDuration = (endTimeSpan - startTimeSpan).TotalMinutes;
+                                                    width = (int)((workDuration) / totalDayDuration * 100);
+                                                }
+
+
+                                                <div class="work-block" style="left: @startLeft%; width: @width%; z-index: 1;">
+                                                    @employeeAvailability.Employee.first_name @employeeAvailability.Employee.last_name
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .week-overview {
+        width: 100%;
+    }
+
+    .time-slot {
+        position: relative;
+        height: 60px;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+    }
+
+    .work-block {
+        position: absolute;
+        height: 100%;
+        border: 1px solid black;
+        background-color: #ccc;
+        color: black;
+        font-weight: bold;
+        text-align: center;
+        line-height: 60px;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    /* Nieuwe stijl voor de Planning kolom */
+    .planning-column {
+        width: 300px; /* Pas de breedte aan zoals gewenst */
+    }
+</style>
