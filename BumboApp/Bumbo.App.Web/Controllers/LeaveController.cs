@@ -2,6 +2,7 @@
 using Bumbo.App.Web.Models.ViewModels.LeaveRequest;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
+using Bumbo.Domain.Services.Leaves;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bumbo.App.Web.Controllers
@@ -9,10 +10,12 @@ namespace Bumbo.App.Web.Controllers
     public class LeaveController : Controller
     {
         private readonly ILeaveRepository repo;
+        private readonly ILeaveChecker lRepo;
 
-        public LeaveController(ILeaveRepository repo)
+        public LeaveController(ILeaveRepository repo, ILeaveChecker leaveRepository)
         {
             this.repo = repo;
+            this.lRepo = leaveRepository;
         }
         public IActionResult Index()
         {
@@ -29,23 +32,31 @@ namespace Bumbo.App.Web.Controllers
         [HttpPost]
         public IActionResult Index(LeaveRequestModel viewModel)
         {
-
+            int employeeID = 1;
             Leave newRequest = new Leave();
             newRequest.EmployeeId = viewModel.employeeId;
             newRequest.StartDate = viewModel.start;
             newRequest.EndDate = viewModel.end;
             newRequest.LeaveStatus = viewModel.status;
 
+            if (lRepo.startDateHigherThanEndDate(newRequest) && lRepo.checkForOverlap(repo.getAllRequestsOfEmployee(employeeID) , newRequest))
+            {
+                repo.SetLeaveRequest(newRequest);
+                TempData["SuccessMessage"] = $"Verlof is aangevraagd!";
+            }
+            else
+            {
+                TempData["FailedMessage"] = $"Verlof is niet aangevraagd!";
 
-            repo.SetLeaveRequest(newRequest);
-            TempData["SuccessMessage"] = $"Verlof is aangevraagd!";
+            }
+
             return RedirectToAction("Index");
         }
 
         public IActionResult MyRequest()
         {
             int employeeID = 1;
-            MyLeaveRequestsModel viewModel = new MyLeaveRequestsModel();
+            AllLeaveRequestsModel viewModel = new AllLeaveRequestsModel();
             viewModel.myRequests = new List<LeaveRequestModel>(); 
 
             var requests = repo.getAllRequestsOfEmployee(employeeID);
