@@ -2,7 +2,7 @@
 using Bumbo.App.Web.Models.ViewModels;
 using Bumbo.Domain.Enums;
 
-namespace Bumbo.App.Web.Models.ViewModels
+namespace Bumbo.App.Web.Models.ViewModels.Schedule
 {
     public class Schedule
     {

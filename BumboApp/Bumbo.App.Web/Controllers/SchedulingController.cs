@@ -128,14 +128,36 @@ public class SchedulingController : Controller
                 Department = s.Department.ToString()
             })
             .ToList();
-        return Json(schedules.Select(s => new
+
+        var forecastData = _context.Forecasts
+        .Where(f => f.Date >= DateOnly.FromDateTime(startDate) && f.Date <= DateOnly.FromDateTime(endDate) && f.BranchId == 1)
+        .GroupBy(f => new { f.Date, f.Department })
+        .Select(g => new
         {
-            s.EmployeeId,
-            Date = s.Date.ToString("yyyy-MM-dd"),
-            StartTime = s.StartTime.ToString("HH:mm"),
-            EndTime = s.EndTime.ToString("HH:mm"),
-            Department = s.Department
-        }));
+            Date = g.Key.Date,
+            Department = g.Key.Department,
+            ManHours = g.Sum(f => f.ManHours) 
+        })
+        .ToList();
+
+        return Json(new
+        {
+            Schedules = schedules.Select(s => new
+            {
+                s.EmployeeId,
+                Date = s.Date.ToString("yyyy-MM-dd"),
+                StartTime = s.StartTime.ToString("HH:mm"),
+                EndTime = s.EndTime.ToString("HH:mm"),
+                Department = s.Department
+            }),
+            Forecasts = forecastData.Select(f => new
+            {
+                Date = f.Date.ToString("yyyy-MM-dd"),
+                Department = f.Department,
+                ManHours = f.ManHours
+            })
+        });
+
     }
 
     [HttpPost]

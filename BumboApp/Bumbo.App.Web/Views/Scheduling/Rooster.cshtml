@@ -30,7 +30,13 @@
             <th>Medewerker</th>
             @foreach (var day in Enum.GetValues(typeof(DayNameOfWeek)).Cast<DayNameOfWeek>())
             {
-                <th>@day</th>
+                <th>
+                    <div>
+                        <span>@day</span>
+                        <br />
+                        <small id="forecast-@day" class="text-muted"></small> <!-- Placeholder for forecast -->
+                    </div>
+                </th>
             }
         </tr>
     </thead>
@@ -416,8 +422,14 @@
                 $.ajax({
                     url: `@Url.Action("GetSchedulesForWeek", "Scheduling")?year=${year}&week=${week}`,
                     type: 'GET',
-                    success: function (schedules) {
-                                updateScheduleGrid(schedules);        
+                    success: function (response) {
+
+                        const schedules = response.schedules; 
+                        const forecastData = response.forecasts;
+
+                        updateScheduleGrid(schedules);
+                        updateForecastGrid(forecastData);
+                        
                     },
                     error: function (xhr, status, error) {
                         alert("Failed to fetch schedules. Please try again.");
@@ -425,12 +437,13 @@
                 });
             }
 
-            
+
             function updateScheduleGrid(schedules) {
                 const dayMapping = { 0: 'Zondag', 1: 'Maandag', 2: 'Dinsdag', 3: 'Woensdag', 4: 'Donderdag', 5: 'Vrijdag', 6: 'Zaterdag' };
 
                 document.querySelectorAll('.schedule-cell div').forEach(cell => (cell.innerHTML = ''));
 
+                console.log
                 schedules.forEach(schedule => {
                     const dayOfWeek = new Date(schedule.date).getDay();
 
@@ -481,6 +494,17 @@
                     }
                 });
 
+            }
+
+            function updateForecastGrid(forecastData) {
+                console.log
+                forecastData.forEach(forecast => {
+                    const dayName = new Date(forecast.Date).toLocaleDateString('en-US', { weekday: 'long' });
+                    const forecastElement = document.getElementById(`forecast-${dayName}`);
+                    if (forecastElement) {
+                        forecastElement.textContent = `${forecast.ManHours} hours required`;
+                    }
+                });
             }
 
             document.getElementById("previousWeek").addEventListener("click", () => changeWeek(-1));
