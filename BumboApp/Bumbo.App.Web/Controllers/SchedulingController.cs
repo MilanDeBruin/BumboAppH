@@ -72,16 +72,17 @@ public class SchedulingController : Controller
         }
 
 
-        //_logger.LogInformation($"Received data: {schedule.EmployeeId} {schedule.Date} {schedule.StartTime} {schedule.EndTime} {schedule.Department}");
-        // _logger.LogInformation($"-------------------------  {schedule.Date} --------------------------------------------------------------------------");
-        CaoSheduleValidatorEnum result = Scheduling.SendDataToDb(schedule);
-        if (result == CaoSheduleValidatorEnum.Valid)
+        ScheduleSuccesModel result = Scheduling.SendDataToDb(schedule);
+        if (result.Success)
         {
+            _logger.LogInformation($"------------------------- het hoort gelukt te zijn  {schedule.Date} --------------------------------------------------------------------------");
             return Json(new { success = true });
         }
         else 
         {
-            return Json(new { success = false, message = $"Het rooster kon niet opgeslagen worden doordat: {result}" });
+            _logger.LogInformation($"------------------------- het hoort gefaalt te zijn  {schedule.Date} --------------------------------------------------------------------------");
+
+            return Json(new { success = false, message = $"Het rooster kon niet opgeslagen worden doordat: {result.Message}" });
         }
         
     }
@@ -140,6 +141,16 @@ public class SchedulingController : Controller
         })
         .ToList();
 
+        var scheduledHours = schedules
+        .GroupBy(s => new { s.Date, s.Department })
+        .Select(g => new
+        {
+            Date = g.Key.Date,
+            Department = g.Key.Department,
+            ScheduledHours = g.Sum(s => (s.EndTime - s.StartTime).TotalHours) // Calculate hours
+        })
+        .ToList();
+
         return Json(new
         {
             Schedules = schedules.Select(s => new
@@ -155,6 +166,12 @@ public class SchedulingController : Controller
                 Date = f.Date.ToString("yyyy-MM-dd"),
                 Department = f.Department,
                 ManHours = f.ManHours
+            }),
+            ScheduledHours = scheduledHours.Select(sh => new
+            {
+                Date = sh.Date.ToString("yyyy-MM-dd"),
+                Department = sh.Department,
+                ScheduledHours = sh.ScheduledHours
             })
         });
 

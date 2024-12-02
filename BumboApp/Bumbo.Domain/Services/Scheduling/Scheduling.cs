@@ -36,11 +36,20 @@ public class Scheduling
         var firstMonday = jan1.AddDays(daysOffset);
         return firstMonday.AddDays((week - 1) * 7);
     }
-    public CaoSheduleValidatorEnum SendDataToDb(ScheduleModel model)
+    public ScheduleSuccesModel SendDataToDb(ScheduleModel model)
     {
         DateOnly date = DateOnly.FromDateTime(model.Date).AddDays(1);
         TimeOnly startTime = TimeOnly.FromTimeSpan(model.StartTime);
         WorkSchedule checker = Context.WorkSchedules.FirstOrDefault(s => s.EmployeeId == model.EmployeeId && s.Date == date && s.BranchId == 1 && startTime == s.StartTime);
+        List<WorkSchedule> dayWorkSchedules = Context.WorkSchedules.Where(s => s.EmployeeId == model.EmployeeId && s.Date == date && s.BranchId == 1).ToList();
+
+        foreach (WorkSchedule schedule in dayWorkSchedules) 
+        {
+            if (startTime > schedule.StartTime && startTime <= schedule.EndTime) 
+            {
+                return new ScheduleSuccesModel() { Success = false, Message = "Een kan geen dienst worden ingepland tijdens een andere dienst" };
+            }
+        }
         if (checker == null)
         {
 
@@ -57,17 +66,18 @@ public class Scheduling
                 IsSick = false
             };
 
-            if (icss.ValidateSchedule(schedule) == CaoSheduleValidatorEnum.Valid)
+            CaoSheduleValidatorEnum result = icss.ValidateSchedule(schedule);
+            if (result == CaoSheduleValidatorEnum.Valid)
             {
                 _logger.LogInformation($" deze datum wordt naar de db gestuurd: {date} --------------------------------------------------------------------------------------------------------------------------------------------------- key word");
 
                 Context.WorkSchedules.Add(schedule);
                 Context.SaveChanges();
-                return CaoSheduleValidatorEnum.Valid;
+                return new ScheduleSuccesModel() { Success = true, Message = result.ToString() };
             }
             else 
             {
-                return icss.ValidateSchedule(schedule);
+                return new ScheduleSuccesModel() { Success = false, Message = result.ToString() };
             }
 
         }
@@ -75,41 +85,43 @@ public class Scheduling
         {
             checker.EndTime = TimeOnly.FromTimeSpan(model.EndTime);
             checker.Department = model.Department;
+            CaoSheduleValidatorEnum result = icss.ValidateSchedule(checker);
 
-            if (icss.ValidateSchedule(checker) == CaoSheduleValidatorEnum.Valid)
+            if (result == CaoSheduleValidatorEnum.Valid)
             {
                 Context.SaveChanges();
-                return CaoSheduleValidatorEnum.Valid;
+                return new ScheduleSuccesModel() { Success = true, Message = result.ToString() };
             }
             else
             {
-                return icss.ValidateSchedule(checker);
+                return new ScheduleSuccesModel() { Success = false, Message = result.ToString() };
             }
             
         }
     }
 
-    public void DeleteDataFromDb(ScheduleModel model) 
+    public ScheduleSuccesModel DeleteDataFromDb(ScheduleModel model) 
     {
-        try
-        {
-            WorkSchedule schedule = Context.WorkSchedules
-            .FirstOrDefault(s =>
-                s.EmployeeId == model.EmployeeId &&
-                s.Date == DateOnly.FromDateTime(model.Date) &&
-                s.BranchId == 1 &&
-                s.StartTime == TimeOnly.FromTimeSpan(model.StartTime)
-            );
+        WorkSchedule schedule = Context.WorkSchedules
+           .FirstOrDefault(s =>
+               s.EmployeeId == model.EmployeeId &&
+               s.Date == DateOnly.FromDateTime(model.Date) &&
+               s.BranchId == 1 &&
+               s.StartTime == TimeOnly.FromTimeSpan(model.StartTime)
+           );
 
+        if (schedule != null)
+        {
             Context.WorkSchedules.Remove(schedule);
             Context.SaveChanges();
+            return new ScheduleSuccesModel() { Success = true, Message = "Dienst verwijdert" };
         }
-        catch (Exception e)
+        else 
         {
-
-            throw e;
+            return new ScheduleSuccesModel() { Success = false, Message = "Er ging iets miss probeer later opnieuw" };
         }
-        
+
+
     }
 
     public void PublishSchedule(DateOnly StartDate) 

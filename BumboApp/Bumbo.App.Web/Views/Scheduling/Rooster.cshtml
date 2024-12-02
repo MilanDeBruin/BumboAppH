@@ -34,7 +34,13 @@
                     <div>
                         <span>@day</span>
                         <br />
-                        <small id="forecast-@day" class="text-muted"></small> <!-- Placeholder for forecast -->
+                        @foreach (var department in Enum.GetValues(typeof(DepartmentEnum)).Cast<DepartmentEnum>())
+                        {
+                            <small id="forecast-@day-@department" class="text-muted text-smaller">@department: </small>
+                            <small id="scheduled-@day-@department" class="text-muted text-smaller"></small>
+                            <small id="difference-@day-@department" class="text-muted text-smaller"></small>
+                            <br />
+                        }
                     </div>
                 </th>
             }
@@ -104,7 +110,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="saveSchedule()">Opslaan</button>
+                <button id="Opslaan" class="btn btn-primary">Opslaan</button>
                 <button type="button" class="btn btn-secondary" onclick="closeScheduleModal()">Annuleren</button>
             </div>
         </div>
@@ -129,80 +135,7 @@
             document.getElementById("scheduleModal").style.display = "none";
         }
 
-        function saveSchedule() {
-            const dayMapping = { 'Maandag': 0, 'Dinsdag': 1, 'Woensdag': 2, 'Donderdag': 3, 'Vrijdag': 4, 'Zaterdag': 5, 'Zondag': 6 };
-
-            const employeeId = document.getElementById("modalEmployeeId").value;
-            const day = document.getElementById("modalDay").value;
-            
-            const startTime = document.getElementById("modalStartTime").value;
-            const endTime = document.getElementById("modalEndTime").value;
-            const department = document.getElementById("modalDepartment").value;
-
-
-            const start = parseTime(startTime);
-            const end = parseTime(endTime);
-
-            
-            if (start >= end) {
-                alert("Eind tijd moet later zijn dan start tijd.");
-                return;
-            }
-
-            const baseDate = document.getElementById("modalDate").value;
-            const dayOffset = dayMapping[day];
-            const dateObj = new Date(baseDate);
-            dateObj.setDate(dateObj.getDate() + dayOffset);
-
-            updatedDate = dateObj.toISOString().split('T')[0]; 
-
-            console.log(`Base Date: ${baseDate}, Day: ${day}, Updated Date: ${updatedDate}  ---------------------------------------`);
-                
-            
-            console.log(`dag fix voor ding effe keeke wat voor type data hiermee wordt gestuurd zodat ik het als offset kan gebruiken: ${day}`)
-            const scheduleEntry = {
-                EmployeeId: parseInt(employeeId),
-                Day: day,
-                Date: new Date(updatedDate).toISOString(),  
-                StartTime: startTime + ":00",     
-                EndTime: endTime + ":00",
-                Department: department
-            };
-
-            
-            console.log("Schedule Entry:", scheduleEntry);
-
-            $.ajax({
-                url: '@Url.Action("AddSchedule", "Scheduling")',
-                type: 'POST',
-                data: JSON.stringify(scheduleEntry),
-                contentType: 'application/json',
-                success: function (response) {
-                    console.log("Response from server:", response);
-
-                    if (response.success) {
-                        addScheduleToCell({
-                            employeeId: scheduleEntry.EmployeeId,
-                            day: scheduleEntry.Day,
-                            date: scheduleEntry.Date,
-                            startTime: scheduleEntry.StartTime.slice(0, 5),
-                            endTime: scheduleEntry.EndTime.slice(0, 5),
-                            department: scheduleEntry.Department
-                        });
-
-                        closeScheduleModal();
-                    } else {
-
-                        console.error("Failed to save schedule:", response.message);
-                        alert(`Failed to save the schedule: ${response.message}`);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error saving schedule:", status, error);
-                    alert("An unexpected error occurred. Please try again.");
-                }
-            });
-        }
+        
         function parseTime(timeStr) {
             const timeParts = timeStr.split(":");
             const hours = parseInt(timeParts[0], 10);
@@ -239,53 +172,6 @@
                     alert("Failed to publish schedules. Please try again.");
                 }
             });
-        }
-
-        function addScheduleToCell(schedule) {
-            const containerId = `schedule-container-${schedule.employeeId}-${schedule.day}`;
-            console.log("Looking for container with ID:", containerId);
-
-            const container = document.getElementById(containerId);
-            if (!container) {
-                console.error(`Container not found for ID: ${containerId}`);
-                return;
-            }
-
-            const scheduleElement = document.createElement("div");
-            scheduleElement.classList.add("schedule-entry");
-
-            const hiddenEmployeeId = document.createElement("input");
-            hiddenEmployeeId.type = "hidden";
-            hiddenEmployeeId.name = "employeeId";
-            hiddenEmployeeId.value = schedule.employeeId;
-
-            const hiddenDate = document.createElement("input");
-            hiddenDate.type = "hidden";
-            hiddenDate.name = "date";
-            hiddenDate.value = schedule.date;
-
-            const startTimeSpan = document.createElement("span");
-            startTimeSpan.classList.add("startTime");
-            startTimeSpan.textContent = schedule.startTime;
-
-            const endTimeSpan = document.createElement("span");
-            endTimeSpan.classList.add("endTime");
-            endTimeSpan.textContent = schedule.endTime;
-
-            const departmentSpan = document.createElement("span");
-            departmentSpan.classList.add("department");
-            departmentSpan.textContent = schedule.department;
-
-            scheduleElement.innerHTML = `
-                                <span class="startTime">${schedule.startTime}</span> -
-                                <span class="endTime">${schedule.endTime}</span>
-                                (<span class="department">${schedule.department}</span>)
-                                <button class="btn btn-sm btn-danger" onclick="removeSchedule(this)">X</button>
-                                `;
-
-            scheduleElement.appendChild(hiddenEmployeeId);
-            scheduleElement.appendChild(hiddenDate);
-            container.appendChild(scheduleElement);
         }
 
         function removeSchedule(button) {
@@ -381,6 +267,70 @@
             let currentDate = new Date();
             let currentYear = currentDate.getFullYear();
 
+            function saveSchedule() {
+                console.log("balls ------------------------------------------");
+                const dayMapping = { 'Maandag': 0, 'Dinsdag': 1, 'Woensdag': 2, 'Donderdag': 3, 'Vrijdag': 4, 'Zaterdag': 5, 'Zondag': 6 };
+
+                const employeeId = document.getElementById("modalEmployeeId").value;
+                const day = document.getElementById("modalDay").value;
+
+                const startTime = document.getElementById("modalStartTime").value;
+                const endTime = document.getElementById("modalEndTime").value;
+                const department = document.getElementById("modalDepartment").value;
+
+
+                const start = parseTime(startTime);
+                const end = parseTime(endTime);
+
+
+                if (start >= end) {
+                    alert("Eind tijd moet later zijn dan start tijd.");
+                    return;
+                }
+
+                const baseDate = document.getElementById("modalDate").value;
+                const dayOffset = dayMapping[day];
+                const dateObj = new Date(baseDate);
+                dateObj.setDate(dateObj.getDate() + dayOffset);
+
+                updatedDate = dateObj.toISOString().split('T')[0];
+
+                const scheduleEntry = {
+                    EmployeeId: parseInt(employeeId),
+                    Day: day,
+                    Date: new Date(updatedDate).toISOString(),
+                    StartTime: startTime + ":00",
+                    EndTime: endTime + ":00",
+                    Department: department
+                };
+
+
+                console.log("Schedule Entry:", scheduleEntry);
+
+                $.ajax({
+                    url: '@Url.Action("AddSchedule", "Scheduling")',
+                    type: 'POST',
+                    data: JSON.stringify(scheduleEntry),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        console.log("Response from server:", response);
+
+                        if (response.success) {
+                            refreshGrid();
+
+                            closeScheduleModal();
+                        } else {
+
+                            console.error("Failed to save schedule:", response.message);
+                            alert(`Failed to save the schedule: ${response.message}`);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error saving schedule:", status, error);
+                        alert("An unexpected error occurred. Please try again.");
+                    }
+                });
+            }
             function getCurrentWeek(date) {
                 const jan1 = new Date(date.getFullYear(), 0, 1);
                 const days = Math.floor((date - jan1) / (24 * 60 * 60 * 1000));
@@ -389,7 +339,12 @@
 
             let currentWeek = getCurrentWeek(currentDate);
 
-            
+            function refreshGrid() {
+                console.log(`balls ------------------------------------------ part 2${currentYear} ${currentWeek}`);
+
+                fetchSchedulesForWeek(currentYear, currentWeek);
+            }
+
             function updateWeekRange() {
                 const { startDate, endDate } = getWeekDates(currentYear, currentWeek);
 
@@ -400,9 +355,10 @@
 
                 console.log("ik kom hier update week range")
                 console.log(`hier is de start datum: ${startDate.toISOString().split('T')[0]}`)
-                fetchSchedulesForWeek(currentYear, currentWeek);
+                refreshGrid();
             }
 
+            
             function changeWeek(increment) {
                 currentWeek += increment;
 
@@ -426,9 +382,9 @@
 
                         const schedules = response.schedules; 
                         const forecastData = response.forecasts;
-
+                        const scheduledData = response.scheduledHours || [];
                         updateScheduleGrid(schedules);
-                        updateForecastGrid(forecastData);
+                        updateForecastGrid(forecastData, scheduledData);
                         
                     },
                     error: function (xhr, status, error) {
@@ -443,7 +399,6 @@
 
                 document.querySelectorAll('.schedule-cell div').forEach(cell => (cell.innerHTML = ''));
 
-                console.log
                 schedules.forEach(schedule => {
                     const dayOfWeek = new Date(schedule.date).getDay();
 
@@ -451,7 +406,6 @@
 
                     const containerId = `schedule-container-${schedule.employeeId}-${dayName}`;
                     const container = document.getElementById(containerId);
-                    console.log(`${schedule.date} deze dag wordt getekent momenteel ----------------`);
 
                     if (container) {
                         const scheduleElement = document.createElement("div");
@@ -489,26 +443,79 @@
                         scheduleElement.appendChild(hiddenEmployeeId);
                         scheduleElement.appendChild(hiddenDate);
                         container.appendChild(scheduleElement);
-                    } else {
-                        console.log("hij is empty");
                     }
                 });
 
             }
 
-            function updateForecastGrid(forecastData) {
-                console.log
+            function updateForecastGrid(forecastData, scheduledData) {
+
+                const dayMapping = {
+                    0: 'Zondag',
+                    1: 'Maandag',
+                    2: 'Dinsdag',
+                    3: 'Woensdag',
+                    4: 'Donderdag',
+                    5: 'Vrijdag',
+                    6: 'Zaterdag'
+                };
+
+
+                const scheduledMap = scheduledData.reduce((map, schedule) => {
+                    const key = `${schedule.date}-${schedule.department}`;
+                    map[key] = schedule.scheduledHours;
+                    return map;
+                }, {});
+
                 forecastData.forEach(forecast => {
-                    const dayName = new Date(forecast.Date).toLocaleDateString('en-US', { weekday: 'long' });
-                    const forecastElement = document.getElementById(`forecast-${dayName}`);
+                    const dayOfWeek = new Date(forecast.date).getDay();
+                    const dayName = dayMapping[dayOfWeek] || "unknown";
+
+                    const forecastElement = document.getElementById(`forecast-${dayName}-${forecast.department}`);
                     if (forecastElement) {
-                        forecastElement.textContent = `${forecast.ManHours} hours required`;
+                        forecastElement.textContent = `${forecast.department}: ${forecast.manHours} -`;
+                    }
+
+                    const scheduledKey = `${forecast.date}-${forecast.department}`;
+                    const scheduledHours = scheduledMap[scheduledKey] || 0;
+
+                    const scheduledElement = document.getElementById(`scheduled-${dayName}-${forecast.department}`);
+                    if (scheduledElement) {
+                        scheduledElement.textContent = `${scheduledHours} =`;
+                    }
+
+                    const difference = forecast.manHours - scheduledHours;
+                    const differenceElement = document.getElementById(`difference-${dayName}-${forecast.department}`);
+                    if (differenceElement) {
+                        differenceElement.textContent = `${difference}`;
+                    }
+                });
+
+                scheduledData.forEach(schedule => {
+                    const dayOfWeek = new Date(schedule.date).getDay();
+                    const dayName = dayMapping[dayOfWeek] || "unknown";
+
+                    const forecast = forecastData.find(f =>
+                        f.date === schedule.date && f.department === schedule.department);
+
+                    if (!forecast) {
+                        const scheduledElement = document.getElementById(`scheduled-${dayName}-${schedule.department}`);
+                        if (scheduledElement) {
+                            scheduledElement.textContent = ` ${schedule.scheduledHours} =`;
+                        }
+
+                        const difference = -schedule.scheduledHours;
+                        const differenceElement = document.getElementById(`difference-${dayName}-${schedule.department}`);
+                        if (differenceElement) {
+                            differenceElement.textContent = ` ${difference}`;
+                        }
                     }
                 });
             }
 
             document.getElementById("previousWeek").addEventListener("click", () => changeWeek(-1));
             document.getElementById("nextWeek").addEventListener("click", () => changeWeek(1));
+            document.getElementById("Opslaan").addEventListener("click", () => saveSchedule());
 
             updateWeekRange();
 
@@ -528,7 +535,7 @@
 
             document.getElementById('functionFilter').addEventListener('change', filterEmployees);
 
-            const rowsPerPage = 2;
+            const rowsPerPage = 10; // Als je de hoeveelheid rijen van medewerkers wilt veranderen is dat hier
             let currentPage = 1;
             const employeeRows = Array.from(document.querySelectorAll('.employee-row'));
 
@@ -536,9 +543,9 @@
                 const totalRows = employeeRows.length;
                 const totalPages = Math.ceil(totalRows / rowsPerPage);
 
-                
-                document.getElementById("prevPage").disabled = page === 1;
-                document.getElementById("nextPage").disabled = page === totalPages;
+
+                document.getElementById("vorige").disabled = page === 1;
+                document.getElementById("volgende").disabled = page === totalPages;
 
                 
                 document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
@@ -644,6 +651,10 @@
         gap: 10px;
     }
 
+    .text-smaller {
+        font-size: 0.6em; 
+        line-height: 0.0; 
+    }
         .pagination-container button {
             min-width: 100px;
         }
