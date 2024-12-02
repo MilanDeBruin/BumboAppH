@@ -16,6 +16,13 @@ public class AccountController : Controller
         _signInManager = signInManager;
     }
 
+    [HttpGet]
+    [AllowAnonymous]
+    public IActionResult Login()
+    {
+        return View();
+    }
+
     [HttpPost]
     [AllowAnonymous]
     public async Task<IActionResult> Login(LoginViewModel viewModel)
