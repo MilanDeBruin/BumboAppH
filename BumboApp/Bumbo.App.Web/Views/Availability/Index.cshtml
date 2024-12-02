@@ -25,7 +25,7 @@
                         {
                             <tr>
                                 <td>@employeeAvailability.Employee.first_name @employeeAvailability.Employee.last_name</td>
-                                <td>@dayAvailability.WeekDay</td>
+                                <td>@dayAvailability.WeekDay.ToString("dddd")</td>
                                 <td>
                                     @employeeAvailability.StartTime?.ToString(@"hh\:mm") - @employeeAvailability.EndTime?.ToString(@"hh\:mm")
                                 </td>
@@ -54,7 +54,7 @@
                             var openingTime = Model.OpeningDurations.OpeningTimes.FirstOrDefault(o => o.BranchId == Model.BranchId && o.StartTime.HasValue && o.EndTime.HasValue && o.Day == currentDay?.WeekDay);
 
                             <tr>
-                                <td>@Model.FirstDayOfWeek.AddDays(i)</td>
+                                <td>@Model.FirstDayOfWeek.AddDays(i).ToString("dddd")</td>
                                 <td>@openingTime?.StartTime?.ToString(@"HH:mm") - @openingTime?.EndTime?.ToString(@"HH:mm")</td>
                                 <td>
                                     <div class="time-slot">
