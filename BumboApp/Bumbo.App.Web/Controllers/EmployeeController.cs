@@ -25,7 +25,7 @@ namespace BumboApp.Controllers
             var model = employees.Select(employee => new EmployeeModel
             {
                 employee_id = employee.EmployeeId,
-                position = employee.Position,
+                // position = employee.Position, TODO: Implement with identity
                 first_name = employee.FirstName,
                 infix = employee.Infix,
                 last_name = employee.LastName,
@@ -38,8 +38,8 @@ namespace BumboApp.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
-            ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
+            // var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList(); TODO: Implement with identity
+            // ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName"); TODO: Implement with identity
 
             var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
@@ -57,7 +57,7 @@ namespace BumboApp.Controllers
                 {
                     EmployeeId = employeeModel.employee_id,
                     BranchId = employeeModel.branch_id,
-                    Position = employeeModel.position,
+                    // Position = employeeModel.position, TODO: Implement with identity
                     FirstName = employeeModel.first_name,
                     Infix = employeeModel.infix,
                     LastName = employeeModel.last_name,
@@ -85,8 +85,8 @@ namespace BumboApp.Controllers
                 }
             }
 
-            var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
-            ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
+            // var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList(); TODO: Implement with identity
+            // ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName"); TODO: Implement with identity
 
             var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
@@ -104,7 +104,7 @@ namespace BumboApp.Controllers
             {
                 employee_id = employee.EmployeeId,
                 branch_id = employee.BranchId,
-                position = employee.Position,
+                // position = employee.Position, TODO: Implement with identity
                 hiring_date = employee.HiringDate,
                 first_name = employee.FirstName,
                 infix = employee.Infix,
@@ -131,7 +131,7 @@ namespace BumboApp.Controllers
             {
                 employee_id = employee.EmployeeId,
                 branch_id = employee.BranchId,
-                position = employee.Position,
+                // position = employee.Position, TODO: Implement with identity
                 hiring_date = employee.HiringDate,
                 first_name = employee.FirstName,
                 infix = employee.Infix,
@@ -144,8 +144,8 @@ namespace BumboApp.Controllers
                 // password = employee.Password,
             };
 
-            var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
-            ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
+            // var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList(); TODO: Implement with identity
+            // ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName"); TODO: Implement with identity
 
             var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
@@ -163,7 +163,7 @@ namespace BumboApp.Controllers
 
                 employee.EmployeeId = employeeModel.employee_id;
                 employee.BranchId = employeeModel.branch_id;
-                employee.Position = employeeModel.position;
+                // employee.Position = employeeModel.position; TODO: Implement with identity 
                 employee.HiringDate = employeeModel.hiring_date;
                 employee.FirstName = employeeModel.first_name;
                 employee.Infix = employeeModel.infix;
@@ -190,9 +190,9 @@ namespace BumboApp.Controllers
                 }
             }
 
-            var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
-            ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
-
+            // var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList(); TODO: Implement with identity
+            // ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName"); TODO: Implement with identity
+ 
             var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
 

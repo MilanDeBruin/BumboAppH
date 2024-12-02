@@ -13,12 +13,11 @@ public partial class Employee
     [Column("employee_id")]
     public int EmployeeId { get; set; }
 
+    [Column("user_id")]
+    public int UserId { get; set; }
+
     [Column("branch_id")]
     public int BranchId { get; set; }
-
-    [Column("position")]
-    [StringLength(256)]
-    public string Position { get; set; } = null!;
 
     [Column("hiring_date")]
     public DateOnly HiringDate { get; set; }
@@ -66,10 +65,6 @@ public partial class Employee
 
     [InverseProperty("Employee")]
     public virtual ICollection<Leave> Leaves { get; set; } = new List<Leave>();
-
-    [ForeignKey("Position")]
-    [InverseProperty("Employees")]
-    public virtual Position PositionNavigation { get; set; } = null!;
 
     [InverseProperty("Employee")]
     public virtual ICollection<SchoolSchedule> SchoolSchedules { get; set; } = new List<SchoolSchedule>();

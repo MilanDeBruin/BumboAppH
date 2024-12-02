@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Bumbo.Data.Models;
 using Microsoft.AspNetCore.Identity;
@@ -31,8 +31,6 @@ public partial class BumboDbContext : IdentityDbContext<IdentityUser<int>, Ident
     public virtual DbSet<Norm> Norms { get; set; }
 
     public virtual DbSet<OpeningHour> OpeningHours { get; set; }
-
-    public virtual DbSet<Position> Positions { get; set; }
 
     public virtual DbSet<SchoolSchedule> SchoolSchedules { get; set; }
 
@@ -70,10 +68,6 @@ public partial class BumboDbContext : IdentityDbContext<IdentityUser<int>, Ident
             entity.HasOne(d => d.LaborContractNavigation).WithMany(p => p.Employees)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_employee_labor_contract");
-
-            entity.HasOne(d => d.PositionNavigation).WithMany(p => p.Employees)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_employee_position");
 
             entity.HasMany(d => d.Departments).WithMany(p => p.Employees)
                 .UsingEntity<Dictionary<string, object>>(
