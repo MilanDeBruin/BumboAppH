@@ -12,6 +12,10 @@ public partial class Employee
     [Key]
     [Column("employee_id")]
     public int EmployeeId { get; set; }
+    
+    [Column("user_id")]
+    public int UserId { get; set; }
+    public virtual ApplicationUser ApplicationUser { get; set; } = null!;
 
     [Column("branch_id")]
     public int BranchId { get; set; }

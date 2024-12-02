@@ -9,7 +9,6 @@ namespace Bumbo.Data.Context;
 
 public partial class BumboDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<int>, int>
 {
-
     public virtual DbSet<Availability> Availabilities { get; set; }
 
     public virtual DbSet<Branch> Branches { get; set; }
@@ -43,11 +42,11 @@ public partial class BumboDbContext : IdentityDbContext<IdentityUser<int>, Ident
     public virtual DbSet<WorkSchedule> WorkSchedules { get; set; }
 
     public virtual DbSet<WorkStatus> WorkStatuses { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.Entity<Availability>(entity =>
         {
             entity.HasOne(d => d.Employee).WithMany(p => p.Availabilities)
@@ -185,6 +184,10 @@ public partial class BumboDbContext : IdentityDbContext<IdentityUser<int>, Ident
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_work_schedule_work_status");
         });
+
+        // Custom changes
+        modelBuilder.Entity<ApplicationUser>().HasOne(d => d.Employee).WithOne(p => p.ApplicationUser)
+            .HasForeignKey<Employee>(e => e.UserId);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
