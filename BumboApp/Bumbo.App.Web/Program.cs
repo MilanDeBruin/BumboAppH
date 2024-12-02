@@ -64,10 +64,6 @@ namespace Bumbo.App.Web
             app.UseStatusCodePagesWithReExecute("/Home/Error404");
 
             app.MapControllerRoute(
-                name: "login",
-                pattern: "{controller=Account}/{action=Login}/{id?}");
-
-            app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             
