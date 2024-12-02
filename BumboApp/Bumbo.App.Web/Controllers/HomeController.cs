@@ -6,9 +6,11 @@ using Bumbo.Data.Context;
 using Bumbo.Data.Models;
 using Bumbo.Data.SqlRepository;
 using BumboApplicatie.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bumbo.App.Web.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
