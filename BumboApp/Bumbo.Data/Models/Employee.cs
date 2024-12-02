@@ -13,9 +13,6 @@ public partial class Employee
     [Column("employee_id")]
     public int EmployeeId { get; set; }
 
-    [Column("user_id")]
-    public int UserId { get; set; }
-
     [Column("branch_id")]
     public int BranchId { get; set; }
 
