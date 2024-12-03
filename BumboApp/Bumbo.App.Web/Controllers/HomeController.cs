@@ -8,35 +8,47 @@ using BumboApplicatie.Models;
 using Microsoft.VisualBasic;
 using Bumbo.Domain.Models;
 using Bumbo.App.Web.Models.ViewModels.Home;
+using Bumbo.Data.Interfaces;
 
 namespace Bumbo.App.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly BumboDbContext _db;
+        private readonly IHomeRepository _repo;
         public int id_employee = 1;
         
-        public HomeController(ILogger<HomeController> logger, BumboDbContext db)
+        public HomeController(IHomeRepository repo)
         {
-            _logger = logger;
-            _db = db;
+            _repo = repo;
         }
 
         public IActionResult Index()
         {
+            WeekPersonalScheduleViewModel viewModel = new WeekPersonalScheduleViewModel();
+            List<WorkSchedule> schedules = _repo.GetScheduleData(1, DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Today)));
 
-    
+            DayPersonalScheduleViewModel model = new DayPersonalScheduleViewModel();
+
+            model.date = schedules[0].Date; 
+            model.endTime = schedules[0].EndTime;
+            model.StartTime = schedules[0].StartTime;
+            model.Departement = schedules[0].Department;
+            model.Branch_Id = schedules[0].BranchId;
+
+            viewModel. = model;
+
+
+            
+            
+            
+           
+
+
+
             return View();
         }
 
-        public DateOnly FirstDayOfWeek(DateOnly date)
-        {
-            DateOnly firstWeekDay = DateOnlyHelper.GetFirstDayOfWeek(date);
-            Console.WriteLine(firstWeekDay.DayOfWeek);
-            Console.WriteLine(firstWeekDay);
-            return firstWeekDay;
-        }
+        
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

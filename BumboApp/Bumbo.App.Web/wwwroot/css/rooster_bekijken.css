@@ -19,9 +19,10 @@
 .square {
     border: 1px solid #ccc;
     padding: 10px;
-    margin: 10px auto; /* Add spacing between divs */
+    margin: auto; /* Add spacing between divs */
     width: 300px; /* Set a fixed width */
-    background-color: #f9f9f9;
+    height: 100px;
+    background-color: lightgrey;
     border-radius: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 }

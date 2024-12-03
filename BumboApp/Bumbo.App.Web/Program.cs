@@ -1,5 +1,7 @@
 using Bumbo.Data.Context;
+using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
+using Bumbo.Data.SqlRepository;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,8 +21,7 @@ namespace Bumbo.App.Web
             builder.Services.AddTransient<Bumbo.Data.Interfaces.INormRepository, Bumbo.Data.SqlRepository.NormRepository>();
             builder.Services.AddTransient<Bumbo.Data.Interfaces.IForecastRepository, Bumbo.Data.SqlRepository.ForecastRepository>();
             builder.Services.AddTransient<Bumbo.Domain.Services.Forecast.IGenerateForecastService, Bumbo.Domain.Services.Forecast.GenerateForecastService>();
-            builder.Services.AddTransient<Bumbo.Data.Interfaces.IHomeRepository, Bumbo.Data.SqlRepository.HomeRepository>();
-
+            builder.Services.AddTransient<IHomeRepository, HomeRepository>();
 
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

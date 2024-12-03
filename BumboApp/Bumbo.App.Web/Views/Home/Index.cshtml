@@ -1,6 +1,9 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@using Bumbo.Domain.Models;
+@using Bumbo.App.Web.Models.ViewModels.Home;
+
+
+@model WeekPersonalScheduleViewModel
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,30 +12,57 @@
 </head>
 
 <body>
-    <h2>
-        Planning voor deze week:
-    </h2>
-
+    <h2>Rooster Week </h2>
     <div style="display: flex; align-items: center; gap: 20px; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
-         
-        <button class="button">Week vooruit</button>
 
-        <button class="button">Week terug</button>
-       
-
+            <button class="btn btn-secondary">Week terug</button>
+            <button class="btn btn-secondary">Week vooruit</button>
     </div>
-    <div class="flex-container">
-        @foreach (var schedule in Model)
-        {
-            <div class="square">
-                <strong>Datum:</strong> @schedule.Date.ToString("dd-mm-yyyy") <br />
-                <strong>Tijd:</strong> @schedule.StartTime.ToString(@"hh\:mm") - @schedule.EndTime.ToString(@"hh\:mm") <br />
-                <strong>Afdeling:</strong> @schedule.Department <br />
-                <strong>Dag:</strong> @schedule.DayOfWeek <br />
-            </div>
-        }
 
+    <div class="flex-container">
+        <div class="square">
+        Datum:  </br>
+        Tijd: <br />
+        Afdeling <br/>
+        Filiaal <br/>   
+        </div>
+        <div class="square">
+            Datum:  </br>
+            Tijd: <br />
+            Afdeling <br />
+            Filiaal <br />
+        </div>
+        <div class="square">
+            Datum:  </br>
+            Tijd: <br />
+            Afdeling <br />
+            Filiaal <br />
+        </div>
+        <div class="square">
+            Datum:  </br>
+            Tijd: <br />
+            Afdeling <br />
+            Filiaal <br />
+        </div>
+        <div class="square">
+            Datum:  </br>
+            Tijd: <br />
+            Afdeling <br />
+            Filiaal <br />
+        </div>
+        <div class="square">
+            Datum:  </br>
+            Tijd: <br />
+            Afdeling <br />
+            Filiaal <br />
+        </div>
+        <div class="square">
+            Datum:  </br>
+            Tijd: <br />
+            Afdeling <br />
+            Filiaal <br />
         </div>
 
+    </div>
 
-</body> 
+</body>

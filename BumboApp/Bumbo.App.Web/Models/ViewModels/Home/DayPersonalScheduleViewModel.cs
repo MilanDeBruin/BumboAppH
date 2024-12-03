@@ -6,7 +6,7 @@
         public string Departement { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly endTime { get; set;}
-        public int Brand_Id { get; set; }   
+        public int Branch_Id { get; set; }   
 
     }
 }

@@ -5,5 +5,5 @@ namespace Bumbo.Data.Interfaces;
 
 public interface IHomeRepository 
 {
-    public List<WorkSchedule> GetScheduleData();
+    public List<WorkSchedule> GetScheduleData(int employeeId, DateOnly firstDayOfWeek);
 }

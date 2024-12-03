@@ -1,7 +1,8 @@
 using Bumbo.Data.Context;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
-using Microsoft.Identity.Client;
+using Microsoft.Data.SqlClient;
+
 
 namespace Bumbo.Data.SqlRepository;
 
@@ -14,13 +15,12 @@ public class HomeRepository : IHomeRepository
         _db = db;
     }
 
-    public List<WorkSchedule> GetScheduleData()
+    public List<WorkSchedule> GetScheduleData(int employeeId, DateOnly firstDayOfWeek)
     {
-        int id_Employee = 1;
-        List<WorkSchedule> list = _db.WorkSchedules.Where(ws => ws.EmployeeId == id_Employee).ToList();
+
+        List<WorkSchedule> list = _db.WorkSchedules.Where(ws => ws.EmployeeId == employeeId && ws.Date >= firstDayOfWeek && ws.Date <= firstDayOfWeek.AddDays(7)).ToList();
+
         return list;
     }
-    
 
-    
 }
