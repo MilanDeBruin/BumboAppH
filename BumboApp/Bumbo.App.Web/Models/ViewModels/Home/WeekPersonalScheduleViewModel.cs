@@ -2,7 +2,7 @@
 {
     public class WeekPersonalScheduleViewModel
     {
-        List<DayPersonalScheduleViewModel> WorkDays { get; set; }
+       public List<DayPersonalScheduleViewModel> WorkDays { get; set; }
 
     }
 }

@@ -25,30 +25,26 @@ namespace Bumbo.App.Web.Controllers
         public IActionResult Index()
         {
             WeekPersonalScheduleViewModel viewModel = new WeekPersonalScheduleViewModel();
+            viewModel.WorkDays = new List<DayPersonalScheduleViewModel>();
             List<WorkSchedule> schedules = _repo.GetScheduleData(1, DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Today)));
 
-            DayPersonalScheduleViewModel model = new DayPersonalScheduleViewModel();
+            foreach (var schedule in schedules)
+            {
+                DayPersonalScheduleViewModel model = new DayPersonalScheduleViewModel
+                {
+                    date = schedule.Date,
+                    StartTime = schedule.StartTime,
+                    endTime = schedule.EndTime,
+                    Departement = schedule.Department,
+                    Branch_Id = schedule.BranchId
+                };
+                viewModel.WorkDays.Add(model);
 
-            model.date = schedules[0].Date; 
-            model.endTime = schedules[0].EndTime;
-            model.StartTime = schedules[0].StartTime;
-            model.Departement = schedules[0].Department;
-            model.Branch_Id = schedules[0].BranchId;
-
-            viewModel. = model;
-
-
-            
-            
-            
-           
-
-
-
-            return View();
+            }
+            return View(viewModel);
         }
 
-        
+            
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

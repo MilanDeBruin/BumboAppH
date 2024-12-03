@@ -2,7 +2,7 @@
 @using Bumbo.App.Web.Models.ViewModels.Home;
 
 
-@model WeekPersonalScheduleViewModel
+@model Bumbo.App.Web.Models.ViewModels.Home.WeekPersonalScheduleViewModel
 
 <head>
     <meta charset="UTF-8">
@@ -20,49 +20,23 @@
     </div>
 
     <div class="flex-container">
-        <div class="square">
-        Datum:  </br>
-        Tijd: <br />
-        Afdeling <br/>
-        Filiaal <br/>   
-        </div>
-        <div class="square">
-            Datum:  </br>
-            Tijd: <br />
-            Afdeling <br />
-            Filiaal <br />
-        </div>
-        <div class="square">
-            Datum:  </br>
-            Tijd: <br />
-            Afdeling <br />
-            Filiaal <br />
-        </div>
-        <div class="square">
-            Datum:  </br>
-            Tijd: <br />
-            Afdeling <br />
-            Filiaal <br />
-        </div>
-        <div class="square">
-            Datum:  </br>
-            Tijd: <br />
-            Afdeling <br />
-            Filiaal <br />
-        </div>
-        <div class="square">
-            Datum:  </br>
-            Tijd: <br />
-            Afdeling <br />
-            Filiaal <br />
-        </div>
-        <div class="square">
-            Datum:  </br>
-            Tijd: <br />
-            Afdeling <br />
-            Filiaal <br />
-        </div>
+        @{
+            // Ensure we always have 7 blocks, one for each day of the week
+            var daysOfWeek = Enumerable.Range(0, 7).Select(i => DateOnly.FromDateTime(DateTime.Today).AddDays(i)).ToList();
+        }
 
+        @foreach (var day in daysOfWeek)
+        {
+            // Find matching WorkDay for the current day
+            var workDay = Model.WorkDays.FirstOrDefault(w => w.date == day);
+
+            <div class="square">
+                Datum: @day.ToString("yyyy-MM-dd") <br />
+                Tijd: @(workDay != null ? $"{workDay.StartTime:hh\\:mm} - {workDay.endTime:hh\\:mm}" : "") <br />
+                Afdeling: @(workDay?.Departement ?? "") <br />
+                Filiaal: @(workDay?.Branch_Id > 0 ? workDay.Branch_Id.ToString() : "") <br />
+            </div>
+        }
     </div>
 
 </body>
