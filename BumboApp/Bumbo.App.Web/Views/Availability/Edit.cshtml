@@ -38,6 +38,6 @@
         </tbody>
     </table>
 
-    <a asp-action="Details" class="btn btn-secondary">Annuleren</a>
+    <a asp-action="Details" asp-route-employeeId="@Model.EmployeeId" class="btn btn-secondary">Annuleren</a>
     <button type="submit" class="btn btn-success">Opslaan</button>
 </form>

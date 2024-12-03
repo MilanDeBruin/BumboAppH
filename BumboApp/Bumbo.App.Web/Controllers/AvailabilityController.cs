@@ -24,9 +24,9 @@ namespace Bumbo.App.Web.Controllers
         }
 
 
-        public IActionResult Details(int? employeeId)
+        public IActionResult Details(int employeeId)
         {
-            employeeId = 1;
+            Console.WriteLine($"waaaat issss idddeeeeeeeee: {employeeId}"); // or use a logger
 
             var availabilities = _context.Availabilities
                 .Where(a => a.EmployeeId == employeeId)
@@ -43,7 +43,14 @@ namespace Bumbo.App.Web.Controllers
                 })
                 .FirstOrDefault();
 
-            if (availabilities == null) return View(new List<AvailabilityViewModel>());
+            if (availabilities == null)
+            {
+                availabilities = new AvailabilityViewModel
+                {
+                    EmployeeId = employeeId,
+                    DailyAvailabilities = new List<DailyAvailability>()
+                };
+            }
 
             return View(new List<AvailabilityViewModel> { availabilities });
         }
@@ -107,7 +114,7 @@ namespace Bumbo.App.Web.Controllers
                 _context.SaveChanges();
 
                 TempData["SuccessMessage"] = "Beschikbaarheid is bijgewerkt!";
-                return RedirectToAction("Details");
+                return RedirectToAction("Details", new { employeeId = availabilityViewModel.EmployeeId });
             }
 
             return View(availabilityViewModel);
