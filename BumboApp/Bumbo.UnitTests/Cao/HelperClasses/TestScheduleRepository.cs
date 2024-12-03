@@ -55,6 +55,12 @@ public class TestScheduleRepository : IScheduleRepository
             return schedules;
         }
 
+        
+        if (employeeId == 3)
+        {
+            List<WorkSchedule> schedules = new List<WorkSchedule>();
+        }
+
         return new List<WorkSchedule>();
     }
 

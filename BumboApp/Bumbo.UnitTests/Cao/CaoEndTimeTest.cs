@@ -61,4 +61,50 @@ public class CaoEndTimeTest
         CaoSheduleValidatorEnum response = _caoScheduleService.ValidateSchedule(schedule);
         Assert.That(response, Is.EqualTo(CaoSheduleValidatorEnum.TooLateEndTime));
     }
+    
+    [Test]
+    public void EndTimeBeforeMaxEndTimeAdultEmployee()
+    {
+        WorkSchedule schedule = new WorkSchedule()
+        {
+            EmployeeId = 1,
+            Date = new DateOnly(2024, 12, 2),
+            StartTime = new TimeOnly(18, 0, 0),
+            EndTime = new TimeOnly(18, 30, 0)
+        };
+
+        CaoSheduleValidatorEnum response = _caoScheduleService.ValidateSchedule(schedule);
+        Assert.That(response, Is.EqualTo(CaoSheduleValidatorEnum.Valid));
+
+    }
+
+    [Test]
+    public void EndTimeExactlyAtMaxEndTimeAdultEmployee()
+    {
+        WorkSchedule schedule = new WorkSchedule()
+        {
+            EmployeeId = 1,
+            Date = new DateOnly(2024, 12, 2),
+            StartTime = new TimeOnly(18, 0, 0),
+            EndTime = new TimeOnly(19, 0, 0)
+        };
+
+        CaoSheduleValidatorEnum response = _caoScheduleService.ValidateSchedule(schedule);
+        Assert.That(response, Is.EqualTo(CaoSheduleValidatorEnum.Valid));
+    }
+
+    [Test]
+    public void EndTimeAfterMaxEndTimeAdultEmployee()
+    {
+        WorkSchedule schedule = new WorkSchedule()
+        {
+            EmployeeId = 1,
+            Date = new DateOnly(2024, 12, 2),
+            StartTime = new TimeOnly(18, 0, 0),
+            EndTime = new TimeOnly(19, 1, 0)
+        };
+
+        CaoSheduleValidatorEnum response = _caoScheduleService.ValidateSchedule(schedule);
+        Assert.That(response, Is.EqualTo(CaoSheduleValidatorEnum.Valid));
+    }
 }
