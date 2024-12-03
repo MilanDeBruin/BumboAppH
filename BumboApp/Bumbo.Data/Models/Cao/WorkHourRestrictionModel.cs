@@ -7,6 +7,7 @@ public class WorkHourRestrictionModel
     public int? MaxAverageAmountOfTimePerWeeksAmount { get; set; }
     public TimeSpan? MaxAverageAmountOfTimePerAmountOfWeeks { get; set; }
     public TimeSpan? MaxAmountOfTimePerDay { get; set; }
+    public bool? MaxAmountOfTimePerDayIncludesSchool { get; set; }
     public int? MaxAmountOfDaysPerWeek { get; set; }
     public TimeOnly? MaxEndTime { get; set; }
 }

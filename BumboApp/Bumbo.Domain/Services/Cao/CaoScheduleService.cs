@@ -33,9 +33,6 @@ public class CaoScheduleService : ICaoScheduleService
         List<WorkSchedule> dailyWorkSchedule = weeklyWorkSchedule.Where(ws => ws.Date == schedule.Date).ToList();
         Employee employee = _employeeRepository.GetEmployee(schedule.EmployeeId);
         int employeeAge = new DateTime((DateTime.Today - employee.DateOfBirth.ToDateTime(new TimeOnly())).Ticks).Year - 1;
-        SchoolSchedule? schoolSchedule = employeeAge < 18
-            ? _availabilityRepository.GetDailySchoolSchedule(employee.EmployeeId, schedule.Date.DayOfWeek)
-            : null;
 
 
         if (!CheckForConsecutiveHours(breakTimeModel.MaxConsecutiveWorkTime, schedule))
@@ -66,7 +63,10 @@ public class CaoScheduleService : ICaoScheduleService
                 return CaoSheduleValidatorEnum.TooManyAverageWeeklyHoursPerAmountOfWeeks;
             }
 
-            if (restrictionModel.MaxAmountOfTimePerDay != null && !CheckForDailyHours(schedule, weeklyWorkSchedule, schoolSchedule))
+            SchoolSchedule? schoolSchedule = restrictionModel.MaxAmountOfTimePerDayIncludesSchool == true
+                ? _availabilityRepository.GetDailySchoolSchedule(employee.EmployeeId, schedule.Date.DayOfWeek)
+                : null;
+            if (restrictionModel.MaxAmountOfTimePerDay != null && !CheckForDailyHours(schedule, dailyWorkSchedule, schoolSchedule, restrictionModel.MaxAmountOfTimePerDay))
             {
                 return CaoSheduleValidatorEnum.TooManyDailyHours;
             }
@@ -120,8 +120,34 @@ public class CaoScheduleService : ICaoScheduleService
         return true;
     }
 
-    private bool CheckForDailyHours(WorkSchedule schedule, List<WorkSchedule> weeklySchedule, SchoolSchedule? schoolSchedule)
+    private bool CheckForDailyHours(WorkSchedule schedule, List<WorkSchedule> dailySchedule, SchoolSchedule? schoolSchedule, TimeSpan? maxWorkHours)
     {
+        TimeSpan? workHours = new TimeSpan();
+        workHours += schedule.EndTime - schedule.StartTime;
+
+        if (!dailySchedule.IsNullOrEmpty())
+        {
+
+            for (int i = 0; i < dailySchedule.Count; i++)
+            {
+                workHours += dailySchedule[i].EndTime - dailySchedule[i].StartTime;
+            }
+        }
+
+        if (schoolSchedule != null)
+        {
+            SchoolSchedule newSchedule = schoolSchedule;
+            workHours += newSchedule.EndTime - schoolSchedule.StartTime;
+        }
+        
+        Console.WriteLine(workHours);
+
+        // workHours = new TimeSpan(12, 1, 0);
+        if (workHours > maxWorkHours)
+        {
+            return false;
+        }
+        
         return true;
     }
 
