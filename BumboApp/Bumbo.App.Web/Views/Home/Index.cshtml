@@ -33,21 +33,23 @@
             var shiftsForDay = Model.WorkDays.Where(w => w.date == day).ToList();
 
 
-            <div class="big_square">
+            
             @if (shiftsForDay.Any())
             {
              foreach(var shifts in shiftsForDay)
              {
+                    <div class="big_square">
                     <div class="square">
                     Datum: @day.ToString("yyyy-MM-dd") <br />
                     Tijd: @(workDay != null ? $"{workDay.StartTime:hh\\:mm} - {workDay.endTime:hh\\:mm}" : "") <br />
                     Afdeling: @(workDay?.Departement ?? "") <br />
                     Filiaal: @(workDay?.Branch_Id > 0 ? workDay.Branch_Id.ToString() : "") <br />
                     <hr/>
-                        </div>
+                    </div>
+                    </div>
                     }
                 }
-            </div>
+            
             }
         
     </div>

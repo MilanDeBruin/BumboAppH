@@ -31,7 +31,7 @@
     border: 1px solid #ccc;
     padding: 10px;
     margin: auto; /* Add spacing between divs */
-    width: 310px; /* Set a fixed width */
+    width: auto; /* Set a fixed width */
     height: 115px;
     background-color: lightgrey;
     border-radius: 5px;
