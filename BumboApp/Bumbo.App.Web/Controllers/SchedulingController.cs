@@ -116,8 +116,6 @@ public class SchedulingController : Controller
         var startDate = Scheduling.GetStartOfWeek(year, week);
         var endDate = startDate.AddDays(6);
 
-        
-
         var schedules = _context.WorkSchedules
             .Where(s => s.Date >= DateOnly.FromDateTime(startDate) && s.Date <= DateOnly.FromDateTime(endDate))
             .Select(s => new

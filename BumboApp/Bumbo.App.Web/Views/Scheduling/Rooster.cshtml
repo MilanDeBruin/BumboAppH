@@ -340,7 +340,6 @@
             let currentWeek = getCurrentWeek(currentDate);
 
             function refreshGrid() {
-                console.log(`balls ------------------------------------------ part 2${currentYear} ${currentWeek}`);
 
                 fetchSchedulesForWeek(currentYear, currentWeek);
             }
@@ -449,7 +448,6 @@
             }
 
             function updateForecastGrid(forecastData, scheduledData) {
-
                 const dayMapping = {
                     0: 'Zondag',
                     1: 'Maandag',
@@ -460,6 +458,11 @@
                     6: 'Zaterdag'
                 };
 
+                function convertToHHMM(decimalHours) {
+                    const hours = Math.floor(decimalHours);
+                    const minutes = Math.round((decimalHours - hours) * 60);
+                    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                }
 
                 const scheduledMap = scheduledData.reduce((map, schedule) => {
                     const key = `${schedule.date}-${schedule.department}`;
@@ -471,23 +474,30 @@
                     const dayOfWeek = new Date(forecast.date).getDay();
                     const dayName = dayMapping[dayOfWeek] || "unknown";
 
+                    const manHoursHHMM = convertToHHMM(forecast.manHours);
+
                     const forecastElement = document.getElementById(`forecast-${dayName}-${forecast.department}`);
                     if (forecastElement) {
-                        forecastElement.textContent = `${forecast.department}: ${forecast.manHours} -`;
+                        forecastElement.textContent = `${forecast.department}: ${manHoursHHMM} -`;
                     }
 
                     const scheduledKey = `${forecast.date}-${forecast.department}`;
                     const scheduledHours = scheduledMap[scheduledKey] || 0;
 
+                    const scheduledHoursHHMM = convertToHHMM(scheduledHours);
+
                     const scheduledElement = document.getElementById(`scheduled-${dayName}-${forecast.department}`);
                     if (scheduledElement) {
-                        scheduledElement.textContent = `${scheduledHours} =`;
+                        scheduledElement.textContent = `${scheduledHoursHHMM} =`;
                     }
 
                     const difference = forecast.manHours - scheduledHours;
+
+                    const differenceHHMM = convertToHHMM(difference);
+
                     const differenceElement = document.getElementById(`difference-${dayName}-${forecast.department}`);
                     if (differenceElement) {
-                        differenceElement.textContent = `${difference}`;
+                        differenceElement.textContent = `${differenceHHMM}`;
                     }
                 });
 
@@ -499,19 +509,25 @@
                         f.date === schedule.date && f.department === schedule.department);
 
                     if (!forecast) {
+                        const scheduledHoursHHMM = convertToHHMM(schedule.scheduledHours);
+
                         const scheduledElement = document.getElementById(`scheduled-${dayName}-${schedule.department}`);
                         if (scheduledElement) {
-                            scheduledElement.textContent = ` ${schedule.scheduledHours} =`;
+                            scheduledElement.textContent = ` ${scheduledHoursHHMM} =`;
                         }
 
                         const difference = -schedule.scheduledHours;
+
+                        const differenceHHMM = convertToHHMM(difference);
+
                         const differenceElement = document.getElementById(`difference-${dayName}-${schedule.department}`);
                         if (differenceElement) {
-                            differenceElement.textContent = ` ${difference}`;
+                            differenceElement.textContent = ` ${differenceHHMM}`;
                         }
                     }
                 });
             }
+
 
             document.getElementById("previousWeek").addEventListener("click", () => changeWeek(-1));
             document.getElementById("nextWeek").addEventListener("click", () => changeWeek(1));
@@ -573,89 +589,71 @@
 }
 
 <style>
+    .table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+        .table th, .table td {
+            word-wrap: break-word; 
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: top;
+            padding: 10px;
+            text-align: center; 
+        }
+
+    .schedule-cell {
+        position: relative;
+        height: auto; 
+        min-height: 60px; 
+        overflow-y: auto;
+        text-align: left; 
+    }
+
     .schedule-entry {
-        margin-bottom: 5px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         background-color: #f8f9fa;
-        padding: 5px;
         border: 1px solid #ddd;
         border-radius: 3px;
+        margin-bottom: 5px;
+        padding: 5px;
+        font-size: 0.75em;
+        max-width: 100%;
     }
 
-    .schedule-cell {
-        vertical-align: top;
-        padding: 10px;
+        .schedule-entry button {
+            flex-shrink: 0;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+
+        .schedule-entry span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: calc(100% - 40px);
+        }
+
+    .schedule-cell::-webkit-scrollbar {
+        width: 8px;
     }
 
-    .schedule-cell button {
-        margin-top: 5px;
-    }
-    .schedule-entry button {
-        margin-left: 10px;
-        font-size: 0.8em;
-    }
-
-    .schedule-cell {
-        cursor: pointer;
-        vertical-align: top;
-    }
-
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal-content {
-        background: #fff;
-        padding: 20px;
-        border-radius: 5px;
-        width: 500px;
-    }
-
-    .close {
-        float: right;
-        font-size: 24px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-     .close:hover {
-        color: red;
-     }
-
-    .filters-container {
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .function-filter-container {
-        margin-left: 20px;
-    }
-
-    .pagination-container {
-        margin-top: 20px;
-        display: flex;
-        justify-content: start;
-        align-items: start;
-        gap: 10px;
+    .schedule-cell::-webkit-scrollbar-thumb {
+        background: #bbb;
+        border-radius: 4px;
     }
 
     .text-smaller {
-        font-size: 0.6em; 
-        line-height: 0.0; 
+        font-size: 0.6em;
+        line-height: 0.0;
     }
-        .pagination-container button {
-            min-width: 100px;
+
+        .schedule-cell::-webkit-scrollbar-thumb:hover {
+            background: #999;
         }
 </style>
+
