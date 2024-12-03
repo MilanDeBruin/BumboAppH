@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Bumbo.App.Web.Models.ViewModels.Availability.AvailabilityViewModel>
+
+@{
+    ViewData["Title"] = "Mijn Beschikbaarheid";
+}
+
+<h1>Mijn Beschikbaarheid</h1>
+
+<div>
+    <a asp-action="Edit" asp-route-employeeId="1" class="btn btn-primary mb-3">Beschikbaarheid Wijzigen</a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Dag</th>
+            <th>Starttijd</th>
+            <th>Eindtijd</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var availability in Model)
+            {
+                @foreach (var dailyAvailability in availability.DailyAvailabilities)
+                {
+                    <tr>
+                        <td>@dailyAvailability.Weekday</td>
+                        <td>@dailyAvailability.StartTime</td>
+                        <td>@dailyAvailability.EndTime</td>
+                    </tr>
+                }
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5">Je hebt nog geen beschikbaarheid opgegeven.</td>
+            </tr>
+        }
+    </tbody>
+</table>
