@@ -2,7 +2,7 @@
 
 namespace Bumbo.App.Web.Models.ViewModels.Employee;
 
-public class EmployeeViewModel
+public class EmployeeModel
 {
     [Key]
     public int employee_id { get; set; }

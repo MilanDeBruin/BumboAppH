@@ -71,7 +71,7 @@ namespace BumboApp.Controllers
                 var model = this.repo.Update(norm);
                 return this.RedirectToAction("Index");
             }
-            
+            return this.View(norm);
         }
 
     }
