@@ -1,4 +1,4 @@
-﻿@model Bumbo.App.Web.Models.ViewModels.Leave.MyLeaveRequestsModel;
+﻿@model Bumbo.App.Web.Models.ViewModels.Leave.AllLeaveRequestsModel;
 
 
 @{
@@ -8,9 +8,21 @@
 
 <head>
     <link rel="stylesheet" href="~/css/NormBeheer.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
 
 <h1>@ViewData["Title"]</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["FailedMessage"] != null)
+{
+        <div class="alert alert-warning">@TempData["FailedMessage"]</div>
+}
 
 <body>
     <table style="width: 100%; border-collapse: collapse;">
@@ -26,14 +38,29 @@
         {
             <tr>
                 <td style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="width: 25%; text-align: left;">@Html.DisplayFor(modelItem => item.employeeId)</span>
+                    <span style="width: 25%; text-align: left;">@Html.DisplayFor(modelItem => item.employeeName)</span>
                     <span style="width: 25%; text-align: center;">@Html.DisplayFor(modelItem => item.start)</span>
                     <span style="width: 25%; text-align: center;">@Html.DisplayFor(modelItem => item.end)</span>
                     <span style="width: 25%; text-align: right;">
-                        <span style="width: 12.5%; text-align: right;">hey</span>
-                        <span style="width: 12.5%;  text-align: right;">hey</span>
+                        <span style="width: 12.5%; text-align: right;">
+                              <form asp-action="Approve" asp-controller="Leave" method="post">
+                                <input type="hidden" name="employeeId" value="@item.employeeId" />
+                                <input type="hidden" name="start" value="@item.start" />
+                                 <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-check"></i>
+                                 </button>
+                              </form>
+                        </span>
+                        <span style="width: 12.5%; text-align: right;">
+                             <form asp-action="Reject" asp-controller="Leave" method="post">
+                                <input type="hidden" name="employeeId" value="@item.employeeId" />
+                                <input type="hidden" name="start" value="@item.start" />
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                             </form>
+                        </span>
                     </span>
-                   
                 </td>
             </tr>
         }
@@ -46,4 +73,3 @@
 
     </div>
 </body>
-

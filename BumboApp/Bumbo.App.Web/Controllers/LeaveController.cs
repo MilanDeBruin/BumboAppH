@@ -10,12 +10,14 @@ namespace Bumbo.App.Web.Controllers
     public class LeaveController : Controller
     {
         private readonly ILeaveRepository repo;
-        private readonly ILeaveChecker lRepo;
+        private readonly ILeaveChecker LeaveChecker;
+        private readonly IEmployeeRepository empRepo;
 
-        public LeaveController(ILeaveRepository repo, ILeaveChecker leaveRepository)
+        public LeaveController(ILeaveRepository repo, ILeaveChecker lRepo, IEmployeeRepository empRepo)
         {
             this.repo = repo;
-            this.lRepo = leaveRepository;
+            this.LeaveChecker = lRepo;
+            this.empRepo = empRepo;
         }
         public IActionResult Index()
         {
@@ -39,7 +41,7 @@ namespace Bumbo.App.Web.Controllers
             newRequest.EndDate = viewModel.end;
             newRequest.LeaveStatus = viewModel.status;
 
-            if (lRepo.startDateHigherThanEndDate(newRequest) && lRepo.checkForOverlap(repo.getAllRequestsOfEmployee(employeeID) , newRequest))
+            if (LeaveChecker.startDateHigherThanEndDate(newRequest) && LeaveChecker.checkForOverlap(repo.getAllRequestsOfEmployee(employeeID) , newRequest))
             {
                 repo.SetLeaveRequest(newRequest);
                 TempData["SuccessMessage"] = $"Verlof is aangevraagd!";
@@ -76,15 +78,15 @@ namespace Bumbo.App.Web.Controllers
 
         public IActionResult LeaveManagement() 
         {
-            MyLeaveRequestsModel viewModel = new MyLeaveRequestsModel();
+            AllLeaveRequestsModel viewModel = new AllLeaveRequestsModel();
             viewModel.myRequests = new List<LeaveRequestModel>();
 
             var requests = repo.getAllRequests();
-
             foreach (var request in requests)
             {
                 LeaveRequestModel model = new LeaveRequestModel();
                 model.employeeId = request.EmployeeId;
+                model.employeeName = empRepo.FindNameFromId(request.EmployeeId);
                 model.start = request.StartDate;
                 model.end = request.EndDate;
                 model.status = request.LeaveStatus;
@@ -92,6 +94,27 @@ namespace Bumbo.App.Web.Controllers
             }
 
             return View(viewModel);
+        }
+
+        [HttpPost]
+        public IActionResult Approve(int employeeId, DateOnly start)
+        {
+            TempData["SuccessMessage"] = $"Verlof is goed gekeurd!";
+            Leave leave = repo.getLeaveRequest(employeeId,start);
+            leave.LeaveStatus = "Accepted";
+            repo.updateLeaveStatus(leave);
+
+            return RedirectToAction("LeaveManagement");
+        }
+
+        [HttpPost]
+        public IActionResult Reject(int employeeId, DateOnly start)
+        {
+            TempData["FailedMessage"] = $"Verlof is geweigerd!";
+            Leave leave = repo.getLeaveRequest(employeeId, start);
+            leave.LeaveStatus = "Denied";
+            repo.updateLeaveStatus(leave);
+            return RedirectToAction("LeaveManagement");
         }
     }
 }

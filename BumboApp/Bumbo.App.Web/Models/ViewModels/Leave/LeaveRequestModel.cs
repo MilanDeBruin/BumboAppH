@@ -4,6 +4,7 @@
     {
 
         public int employeeId { get; set; }
+        public string employeeName { get; set; }
         public DateOnly start { get; set; }
         public DateOnly end { get; set; }
         public string status { get; set; }
