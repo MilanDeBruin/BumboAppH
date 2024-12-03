@@ -49,7 +49,8 @@ public class AccountController : Controller
             {
                 new Claim(ClaimTypes.Name, viewModel.Email),
                 new Claim("position", employee.Position),
-                new Claim("branch_id", employee.BranchId.ToString())
+                new Claim("branch_id", employee.BranchId.ToString()),
+                new Claim("employee_id", employee.EmployeeId.ToString())
             };
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
