@@ -18,6 +18,7 @@ namespace Bumbo.App.Web
             
             builder.Services.AddTransient<Bumbo.Data.Interfaces.INormRepository, Bumbo.Data.SqlRepository.NormRepository>();
             builder.Services.AddTransient<Bumbo.Data.Interfaces.IForecastRepository, Bumbo.Data.SqlRepository.ForecastRepository>();
+            builder.Services.AddTransient<Bumbo.Data.Interfaces.IAvailabilityRepository, Bumbo.Data.SqlRepository.AvailabilityRepository>();
             builder.Services.AddTransient<Bumbo.Domain.Services.Forecast.IGenerateForecastService, Bumbo.Domain.Services.Forecast.GenerateForecastService>();
 
 
@@ -56,7 +57,7 @@ namespace Bumbo.App.Web
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-            
+
             app.Run();
         }
     }
