@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Folder Include="Models\Repositorys\" />
+    <Folder Include="Views\ShiftTrade\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
