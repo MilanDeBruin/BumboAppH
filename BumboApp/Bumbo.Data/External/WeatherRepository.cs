@@ -65,11 +65,12 @@ public class WeatherRepository
         try
         {
             json = JsonNode.Parse(jsonString)["daily"];
-            lenght = JsonNode.Parse(json["time"].ToString()).AsArray().Count;
+           
+            lenght = JsonNode.Parse(json != null ? json["time"].ToString() : string.Empty).AsArray().Count;
         }
         catch (Exception e)
         {
-            throw e;
+            throw;
         }
 
         for (int i = 0; i < lenght; i++)
