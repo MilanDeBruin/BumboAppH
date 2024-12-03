@@ -1,5 +1,5 @@
 ﻿@using Bumbo.App.Web.Models.ViewModels.Employee
-@model EmployeeModel
+@model EmployeeViewModel
 
 @{
     ViewData["Title"] = "Medewerkersgegevens Wijzigen";
@@ -8,16 +8,15 @@
 <div class="container">
     <h1 class="text-center mb-4">Medewerkersgegevens Wijzigen</h1>
 
-    <form asp-action="Edit" asp-controller="Employee" method="post">
-        <input type="hidden" asp-for="employee_id" />
-
-        <div class="mb-3">
-            <label asp-for="branch_id" class="form-label">Branch ID</label>
-            <select asp-for="branch_id" class="form-select" asp-items="ViewBag.BranchIDs">
-                <option value="">Selecteer een branch</option>
-            </select>
-            <span asp-validation-for="branch_id" class="text-danger"></span>
-        </div>
+<form asp-action="Edit" asp-controller="Employee" method="post">
+    <input type="hidden" asp-for="employee_id" />
+    <div>
+        <label asp-for="branch_id">Branch ID</label>
+        <select asp-for="branch_id" class="form-control" asp-items="ViewBag.BranchIDs">
+            <option value="">Selecteer een branch</option>
+        </select>
+        <span asp-validation-for="branch_id" class="text-danger"></span>
+    </div>
 
         <div class="mb-3">
             <label asp-for="position" class="form-label">Afdeling</label>
