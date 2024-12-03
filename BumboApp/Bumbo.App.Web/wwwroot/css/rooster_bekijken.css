@@ -27,6 +27,16 @@
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+.big_Square {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: auto; /* Add spacing between divs */
+    width: 310px; /* Set a fixed width */
+    height: 115px;
+    background-color: lightgrey;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
 .button{
     margin-right: 10px;
     background-color:lightgrey;

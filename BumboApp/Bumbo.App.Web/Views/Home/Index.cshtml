@@ -29,21 +29,27 @@
         {
             // Find matching WorkDay for the current day
             var workDay = Model.WorkDays.FirstOrDefault(w => w.date == day);
-            if(workDay != null){
-            <div class="square">
-                Datum: @day.ToString("yyyy-MM-dd") <br />
-                Tijd: @(workDay != null ? $"{workDay.StartTime:hh\\:mm} - {workDay.endTime:hh\\:mm}" : "") <br />
-                Afdeling: @(workDay?.Departement ?? "") <br />
-                Filiaal: @(workDay?.Branch_Id > 0 ? workDay.Branch_Id.ToString() : "") <br />
-                </div>
-            }
-            else
+
+            var shiftsForDay = Model.WorkDays.Where(w => w.date == day).ToList();
+
+
+            <div class="big_square">
+            @if (shiftsForDay.Any())
             {
-                <div class="square">
-                    Geen shift deze dag
-                    </div>
+             foreach(var shifts in shiftsForDay)
+             {
+                    <div class="square">
+                    Datum: @day.ToString("yyyy-MM-dd") <br />
+                    Tijd: @(workDay != null ? $"{workDay.StartTime:hh\\:mm} - {workDay.endTime:hh\\:mm}" : "") <br />
+                    Afdeling: @(workDay?.Departement ?? "") <br />
+                    Filiaal: @(workDay?.Branch_Id > 0 ? workDay.Branch_Id.ToString() : "") <br />
+                    <hr/>
+                        </div>
+                    }
+                }
+            </div>
             }
-        }
+        
     </div>
 
 </body>
