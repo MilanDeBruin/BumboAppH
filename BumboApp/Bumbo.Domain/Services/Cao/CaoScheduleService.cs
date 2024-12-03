@@ -1,8 +1,10 @@
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 using Bumbo.Data.Models.Cao;
+using Bumbo.Data.SqlRepository;
 using Bumbo.Domain.Enums;
 using Bumbo.Domain.Models;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Bumbo.Domain.Services.CAO;
 
@@ -10,11 +12,15 @@ public class CaoScheduleService : ICaoScheduleService
 {
     private readonly ICaoRepository _caoRepository;
     private readonly IScheduleRepository _scheduleRepository;
+    private readonly IEmployeeRepository _employeeRepository;
+    private readonly IAvailabilityRepository _availabilityRepository;
     
-    public CaoScheduleService(ICaoRepository caoRepository, IScheduleRepository scheduleRepository)
+    public CaoScheduleService(ICaoRepository caoRepository, IScheduleRepository scheduleRepository, IEmployeeRepository employeeRepository, IAvailabilityRepository availabilityRepository)
     {
         _caoRepository = caoRepository;
         _scheduleRepository = scheduleRepository;
+        _employeeRepository = employeeRepository;
+        _availabilityRepository = availabilityRepository;
     }
     
     public CaoSheduleValidatorEnum ValidateSchedule(WorkSchedule schedule)
@@ -24,46 +30,124 @@ public class CaoScheduleService : ICaoScheduleService
         List<WorkSchedule> weeklyWorkSchedule =
             _scheduleRepository.GetWeeklyWorkSchedules(DateOnlyHelper.GetFirstDayOfWeek(schedule.Date),
                 schedule.EmployeeId);
-        
-        
-        
-        throw new NotImplementedException();
+        List<WorkSchedule> dailyWorkSchedule = weeklyWorkSchedule.Where(ws => ws.Date == schedule.Date).ToList();
+        Employee employee = _employeeRepository.GetEmployee(schedule.EmployeeId);
+        int employeeAge = new DateTime((DateTime.Today - employee.DateOfBirth.ToDateTime(new TimeOnly())).Ticks).Year - 1;
+        SchoolSchedule? schoolSchedule = employeeAge < 18
+            ? _availabilityRepository.GetDailySchoolSchedule(employee.EmployeeId, schedule.Date.DayOfWeek)
+            : null;
+
+
+        if (!CheckForConsecutiveHours(breakTimeModel.MaxConsecutiveWorkTime, schedule))
+        {
+            return CaoSheduleValidatorEnum.TooManyConsecutiveHours;
+        }
+
+        if (!CheckForBreakTime(schedule, dailyWorkSchedule, breakTimeModel.MinBreakTime))
+        {
+            return CaoSheduleValidatorEnum.NotEnoughBreakTime;
+        }
+
+        foreach (var restrictionModel in workHourRestrictionModels)
+        {
+            if (restrictionModel.MaxAge != null && employeeAge > restrictionModel.MaxAge)
+            {
+                continue;
+            }
+
+            if (restrictionModel.MaxAmountOfTimePerWeek != null && !CheckForAmountOfWeeklyHours(schedule, weeklyWorkSchedule))
+            {
+                return CaoSheduleValidatorEnum.TooManyWeeklyHours;
+            }
+
+            if (restrictionModel.MaxAverageAmountOfTimePerWeeksAmount != null &&
+                restrictionModel.MaxAverageAmountOfTimePerAmountOfWeeks != null && !CheckForAverageAmountOfWeeklyHours(schedule))
+            {
+                return CaoSheduleValidatorEnum.TooManyAverageWeeklyHoursPerAmountOfWeeks;
+            }
+
+            if (restrictionModel.MaxAmountOfTimePerDay != null && !CheckForDailyHours(schedule, weeklyWorkSchedule, schoolSchedule))
+            {
+                return CaoSheduleValidatorEnum.TooManyDailyHours;
+            }
+
+            if (restrictionModel.MaxAmountOfDaysPerWeek != null && !CheckForAmountOfWeeklyWorkdays(schedule, weeklyWorkSchedule))
+            {
+                return CaoSheduleValidatorEnum.TooManyWeeklyWorkDays;
+            }
+
+            if (restrictionModel.MaxEndTime != null && !CheckForEndTime(schedule, restrictionModel.MaxEndTime))
+            {
+                return CaoSheduleValidatorEnum.TooLateEndTime;
+            }
+            
+        }
+
+        return CaoSheduleValidatorEnum.Valid;
     }
 
-    private bool CheckForConsecutiveHours(WorkSchedule schedule)
+    private bool CheckForConsecutiveHours(TimeSpan maxHours, WorkSchedule schedule)
     {
-        throw new NotImplementedException();
+        TimeSpan amountOfWorkHours = schedule.EndTime - schedule.StartTime;
+        if (amountOfWorkHours > maxHours)
+        {
+            return false;
+        }
+
+        return true;
     }
 
-    private bool CheckForBreakTime(WorkSchedule schedule)
+    private bool CheckForBreakTime(WorkSchedule schedule, List<WorkSchedule> dailySchedule, TimeSpan minBreakTime)
     {
-        throw new NotImplementedException();
+        if (dailySchedule.IsNullOrEmpty())
+        {
+            return true;
+        }
+
+        foreach (var subSchedule in dailySchedule)
+        {
+            if (schedule.EndTime < subSchedule.StartTime && (subSchedule.StartTime-schedule.EndTime) < minBreakTime)
+            {
+                return false;
+            }
+
+            if (schedule.StartTime - (subSchedule.EndTime ) < minBreakTime)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    private bool CheckForDailyHours(WorkSchedule schedule)
+    private bool CheckForDailyHours(WorkSchedule schedule, List<WorkSchedule> weeklySchedule, SchoolSchedule? schoolSchedule)
     {
-        throw new NotImplementedException();
+        return true;
     }
 
-    private bool CheckForEndTime(WorkSchedule schedule)
+    private bool CheckForEndTime(WorkSchedule schedule, TimeOnly? maxEndTime)
     {
-        throw new NotImplementedException();
-        
+        if (schedule.EndTime > maxEndTime)
+        {
+            return false;
+        }
+
+        return true;
     }
 
-    private bool CheckForAmountOfWeeklyWorkdays(WorkSchedule schedule)
+    private bool CheckForAmountOfWeeklyWorkdays(WorkSchedule schedule, List<WorkSchedule> weeklySchedule)
     {
-        throw new NotImplementedException();
+        return true;
     }
 
-    private bool CheckForAmountOfWeeklyHours(WorkSchedule schedule)
+    private bool CheckForAmountOfWeeklyHours(WorkSchedule schedule, List<WorkSchedule> weeklySchedule)
     {
-        throw new NotImplementedException();
+        return true;
         
     }
 
     private bool CheckForAverageAmountOfWeeklyHours(WorkSchedule schedule)
     {
-        throw new NotImplementedException();
+        return true;
     }
 }
