@@ -11,7 +11,7 @@ namespace Bumbo.App.Web.Controllers
     {
         private readonly BumboDbContext _context = context;
 
-        public IActionResult Index(int? employeeId)
+        public IActionResult Details(int? employeeId)
         {
             employeeId = 1;
 
