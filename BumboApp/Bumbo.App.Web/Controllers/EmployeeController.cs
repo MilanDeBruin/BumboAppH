@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace BumboApp.Controllers
+namespace Bumbo.App.Web.Controllers
 {
     [Authorize]
     public class EmployeeController(BumboDbContext context) : Controller
@@ -25,6 +25,7 @@ namespace BumboApp.Controllers
                 infix = employee.Infix,
                 last_name = employee.LastName,
                 date_of_birth = employee.DateOfBirth,
+                labor_contract = employee.LaborContract,
             }).ToList();
 
             return View("Index", model);
@@ -36,7 +37,7 @@ namespace BumboApp.Controllers
             var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
             ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
 
-            var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
+            var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
 
             var laborContracts = _context.LaborContracts.Select(lc => new { LaborContract = lc.LaborContract1 }).ToList();
@@ -80,23 +81,12 @@ namespace BumboApp.Controllers
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
                 foreach (var error in errors)
                 {
-                    System.Console.WriteLine(error);
+                    Console.WriteLine(error);
                 }
             }
 
             var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
             ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
-
-            //var positions = _context.Positions
-            //    .Select(p => new PositionViewModel
-            //    {
-            //        position = p.Position1,
-            //    }).ToList();
-
-            //var positionList = new PositionList
-            //{
-            //    Positions = positions,
-            //};
 
             var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
@@ -162,7 +152,7 @@ namespace BumboApp.Controllers
             var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
             ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
 
-            var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
+            var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
 
             var laborContracts = _context.LaborContracts.Select(lc => new { LaborContract = lc.LaborContract1 }).ToList();
@@ -205,14 +195,14 @@ namespace BumboApp.Controllers
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
                 foreach (var error in errors)
                 {
-                    System.Console.WriteLine(error.ErrorMessage);
+                    Console.WriteLine(error.ErrorMessage);
                 }
             }
 
             var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
             ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
 
-            var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
+            var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
 
             var laborContracts = _context.LaborContracts.Select(lc => new { LaborContract = lc.LaborContract1 }).ToList();
@@ -222,7 +212,7 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete (int id)
+        public IActionResult Delete(int id)
         {
             var employee = _context.Employees.Find(id);
             if (employee == null) return NotFound();

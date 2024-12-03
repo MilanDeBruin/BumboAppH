@@ -23,6 +23,7 @@
                 <th>Naam</th>
                 <th>Leeftijd</th>
                 <th>Afdeling</th>
+                <th>Contracttype</th>
                 <th>Acties</th>
             </tr>
         </thead>
@@ -48,6 +49,7 @@
                             }
                         </td>
                         <td class="text-center">@employee.position</td>
+                        <td class="text-center">@employee.labor_contract</td>
                         <td class="text-center">
                             <a asp-action="Details" asp-route-id="@employee.employee_id" class="btn btn-secondary btn-sm">Details</a>
                         </td>
