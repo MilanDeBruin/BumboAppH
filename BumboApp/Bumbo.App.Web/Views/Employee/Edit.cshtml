@@ -1,5 +1,5 @@
 ﻿@using Bumbo.App.Web.Models.ViewModels.Employee
-@model EmployeeModel
+@model EmployeeViewModel
 
 @{
     ViewData["Title"] = "Medewerkersgegevens Wijzigen";
@@ -17,6 +17,14 @@
                 <option value="">Selecteer een branch</option>
             </select>
             <span asp-validation-for="branch_id" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="labor_contract" class="form-label">Contracttype</label>
+            <select asp-for="labor_contract" class="form-select" asp-items="ViewBag.LaborContracts">
+                <option value="">Selecteer een contracttype</option>
+            </select>
+            <span asp-validation-for="labor_contract" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
@@ -39,11 +47,13 @@
                 <input asp-for="first_name" class="form-control" />
                 <span asp-validation-for="first_name" class="text-danger"></span>
             </div>
+
             <div class="col-md-4 mb-3">
                 <label asp-for="infix" class="form-label">Tussenvoegsel</label>
                 <input asp-for="infix" class="form-control" />
                 <span asp-validation-for="infix" class="text-danger"></span>
             </div>
+
             <div class="col-md-4 mb-3">
                 <label asp-for="last_name" class="form-label">Achternaam</label>
                 <input asp-for="last_name" class="form-control" />
@@ -63,6 +73,7 @@
                 <input asp-for="house_number" class="form-control" />
                 <span asp-validation-for="house_number" class="text-danger"></span>
             </div>
+
             <div class="col-md-6 mb-3">
                 <label asp-for="addition" class="form-label">Toevoeging</label>
                 <input asp-for="addition" class="form-control" />
@@ -84,7 +95,7 @@
 
         <div class="mb-3">
             <label asp-for="password" class="form-label">Wachtwoord</label>
-            <input asp-for="password" class="form-control" type="password" />
+            <input asp-for="password" class="form-control" value="@Model.password" />
             <span asp-validation-for="password" class="text-danger"></span>
         </div>
 

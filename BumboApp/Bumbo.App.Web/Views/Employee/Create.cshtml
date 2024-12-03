@@ -1,5 +1,5 @@
 ﻿@using Bumbo.App.Web.Models.ViewModels.Employee
-@model EmployeeModel
+@model EmployeeFormViewModel
 
 @{
     ViewData["Title"] = "Nieuwe Medewerker Toevoegen";
@@ -16,6 +16,14 @@
                     <option value="">Selecteer een branch</option>
                 </select>
                 <span asp-validation-for="branch_id" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="labor_contract" class="form-label">Contracttype</label>
+                <select asp-for="labor_contract" class="form-select" asp-items="ViewBag.LaborContracts">
+                    <option value="">Selecteer een contracttype</option>
+                </select>
+                <span asp-validation-for="labor_contract" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
