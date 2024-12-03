@@ -31,8 +31,10 @@ public class CaoScheduleService : ICaoScheduleService
             _scheduleRepository.GetWeeklyWorkSchedules(DateOnlyHelper.GetFirstDayOfWeek(schedule.Date),
                 schedule.EmployeeId);
         List<WorkSchedule> dailyWorkSchedule = weeklyWorkSchedule.Where(ws => ws.Date == schedule.Date).ToList();
-        Employee employee = _employeeRepository.GetEmployee(schedule.EmployeeId);
-        int employeeAge = new DateTime((DateTime.Today - employee.DateOfBirth.ToDateTime(new TimeOnly())).Ticks).Year - 1;
+        Employee? employee = _employeeRepository.GetEmployee(schedule.EmployeeId);
+        int employeeAge = employee != null
+            ? new DateTime((DateTime.Today - employee.DateOfBirth.ToDateTime(new TimeOnly())).Ticks).Year - 1
+            : 18;
 
 
         if (!CheckForConsecutiveHours(breakTimeModel.MaxConsecutiveWorkTime, schedule))
@@ -64,7 +66,7 @@ public class CaoScheduleService : ICaoScheduleService
             }
 
             SchoolSchedule? schoolSchedule = restrictionModel.MaxAmountOfTimePerDayIncludesSchool == true
-                ? _availabilityRepository.GetDailySchoolSchedule(employee.EmployeeId, schedule.Date.DayOfWeek)
+                ? _availabilityRepository.GetDailySchoolSchedule(schedule.EmployeeId, schedule.Date.DayOfWeek)
                 : null;
             if (restrictionModel.MaxAmountOfTimePerDay != null && !CheckForDailyHours(schedule, dailyWorkSchedule, schoolSchedule, restrictionModel.MaxAmountOfTimePerDay))
             {

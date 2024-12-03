@@ -47,4 +47,9 @@ public class TestEmployeeRepository : IEmployeeRepository
             DateOfBirth = new DateOnly(2000, 1, 1)
         };
     }
+
+    public string FindNameFromId(int id)
+    {
+        throw new NotImplementedException();
+    }
 }

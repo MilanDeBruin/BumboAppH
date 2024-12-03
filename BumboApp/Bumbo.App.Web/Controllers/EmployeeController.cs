@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace BumboApp.Controllers
+namespace Bumbo.App.Web.Controllers
 {
     [Authorize]
     public class EmployeeController : Controller
@@ -22,7 +22,7 @@ namespace BumboApp.Controllers
             var employees = _context.Employees.ToList();
             if (employees.Count == 0) return NotFound();
 
-            var model = employees.Select(employee => new EmployeeModel
+            var model = employees.Select(employee => new EmployeeViewModel
             {
                 employee_id = employee.EmployeeId,
                 position = employee.Position,
@@ -41,14 +41,14 @@ namespace BumboApp.Controllers
             var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
             ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
 
-            var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
+            var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
 
             return View();
         }
 
         [HttpPost]
-        public IActionResult Create(EmployeeModel employeeModel)
+        public IActionResult Create(EmployeeViewModel employeeModel)
         {
 
             if (ModelState.IsValid)
@@ -81,14 +81,14 @@ namespace BumboApp.Controllers
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
                 foreach (var error in errors)
                 {
-                    System.Console.WriteLine(error);
+                    Console.WriteLine(error);
                 }
             }
 
             var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
             ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
 
-            var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
+            var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
 
             return View(employeeModel);
@@ -100,7 +100,7 @@ namespace BumboApp.Controllers
             var employee = _context.Employees.Find(id);
             if (employee == null) return NotFound();
 
-            var employeeModel = new EmployeeModel()
+            var employeeModel = new EmployeeViewModel()
             {
                 employee_id = employee.EmployeeId,
                 branch_id = employee.BranchId,
@@ -127,7 +127,7 @@ namespace BumboApp.Controllers
             var employee = _context.Employees.Find(id);
             if (employee == null) return NotFound();
 
-            var employeeModel = new EmployeeModel()
+            var employeeModel = new EmployeeViewModel()
             {
                 employee_id = employee.EmployeeId,
                 branch_id = employee.BranchId,
@@ -147,14 +147,14 @@ namespace BumboApp.Controllers
             var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
             ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
 
-            var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
+            var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
 
             return View(employeeModel);
         }
 
         [HttpPost]
-        public IActionResult Edit(EmployeeModel employeeModel)
+        public IActionResult Edit(EmployeeViewModel employeeModel)
         {
             if (ModelState.IsValid)
             {
@@ -186,21 +186,21 @@ namespace BumboApp.Controllers
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
                 foreach (var error in errors)
                 {
-                    System.Console.WriteLine(error.ErrorMessage);
+                    Console.WriteLine(error.ErrorMessage);
                 }
             }
 
             var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
             ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
 
-            var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
+            var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
 
             return View(employeeModel);
         }
 
         [HttpPost]
-        public IActionResult Delete (int id)
+        public IActionResult Delete(int id)
         {
             var employee = _context.Employees.Find(id);
             if (employee == null) return NotFound();
