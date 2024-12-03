@@ -29,6 +29,17 @@ public class TestEmployeeRepository : IEmployeeRepository
             };
         }
         
+        // employee aged 15
+        // used in maximum amount of weekly days
+        if (id == 5)
+        {
+            return new Employee()
+            {
+                EmployeeId = id,
+                DateOfBirth = DateOnly.FromDateTime(DateTime.Today.AddYears(-15))
+            };
+        }
+        
         // general adult employee
         return new Employee()
         {

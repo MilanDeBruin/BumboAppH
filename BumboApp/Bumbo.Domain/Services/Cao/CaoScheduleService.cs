@@ -52,13 +52,13 @@ public class CaoScheduleService : ICaoScheduleService
                 continue;
             }
 
-            if (restrictionModel.MaxAmountOfTimePerWeek != null && !CheckForAmountOfWeeklyHours(schedule, weeklyWorkSchedule))
+            if (restrictionModel.MaxAmountOfTimePerWeek != null && !CheckForAmountOfWeeklyHours(schedule, weeklyWorkSchedule, restrictionModel.MaxAmountOfTimePerWeek))
             {
                 return CaoSheduleValidatorEnum.TooManyWeeklyHours;
             }
 
             if (restrictionModel.MaxAverageAmountOfTimePerWeeksAmount != null &&
-                restrictionModel.MaxAverageAmountOfTimePerAmountOfWeeks != null && !CheckForAverageAmountOfWeeklyHours(schedule))
+                restrictionModel.MaxAverageAmountOfTimePerAmountOfWeeks != null && !CheckForAverageAmountOfWeeklyHours(schedule, restrictionModel.MaxAverageAmountOfTimePerAmountOfWeeks, restrictionModel.MaxAverageAmountOfTimePerWeeksAmount))
             {
                 return CaoSheduleValidatorEnum.TooManyAverageWeeklyHoursPerAmountOfWeeks;
             }
@@ -71,7 +71,7 @@ public class CaoScheduleService : ICaoScheduleService
                 return CaoSheduleValidatorEnum.TooManyDailyHours;
             }
 
-            if (restrictionModel.MaxAmountOfDaysPerWeek != null && !CheckForAmountOfWeeklyWorkdays(schedule, weeklyWorkSchedule))
+            if (restrictionModel.MaxAmountOfDaysPerWeek != null && !CheckForAmountOfWeeklyWorkdays(schedule, weeklyWorkSchedule, restrictionModel.MaxAmountOfDaysPerWeek))
             {
                 return CaoSheduleValidatorEnum.TooManyWeeklyWorkDays;
             }
@@ -127,10 +127,9 @@ public class CaoScheduleService : ICaoScheduleService
 
         if (!dailySchedule.IsNullOrEmpty())
         {
-
-            for (int i = 0; i < dailySchedule.Count; i++)
+            foreach (var workSchedule in dailySchedule)
             {
-                workHours += dailySchedule[i].EndTime - dailySchedule[i].StartTime;
+                workHours += workSchedule.EndTime - workSchedule.StartTime;
             }
         }
 
@@ -141,39 +140,65 @@ public class CaoScheduleService : ICaoScheduleService
         }
         
         Console.WriteLine(workHours);
-
-        // workHours = new TimeSpan(12, 1, 0);
-        if (workHours > maxWorkHours)
-        {
-            return false;
-        }
         
-        return true;
+        return !(workHours > maxWorkHours);
     }
 
     private bool CheckForEndTime(WorkSchedule schedule, TimeOnly? maxEndTime)
     {
-        if (schedule.EndTime > maxEndTime)
+        return !(schedule.EndTime > maxEndTime);
+    }
+
+    private bool CheckForAmountOfWeeklyWorkdays(WorkSchedule schedule, List<WorkSchedule> weeklySchedule, int? maxAmountOfWorkDays)
+    {
+        if (weeklySchedule.Exists(ws => ws.Date == schedule.Date))
+        {
+            return true;
+        }
+
+        weeklySchedule = weeklySchedule.GroupBy(ws => ws.Date).Select(s => s.First()).ToList();
+
+        if (maxAmountOfWorkDays != null && weeklySchedule.Count >= maxAmountOfWorkDays)
         {
             return false;
         }
-
         return true;
     }
 
-    private bool CheckForAmountOfWeeklyWorkdays(WorkSchedule schedule, List<WorkSchedule> weeklySchedule)
+    private bool CheckForAmountOfWeeklyHours(WorkSchedule schedule, List<WorkSchedule> weeklySchedule, TimeSpan? maxAmountOfWorkHours)
     {
-        return true;
-    }
+        TimeSpan workTime = schedule.EndTime - schedule.StartTime;
 
-    private bool CheckForAmountOfWeeklyHours(WorkSchedule schedule, List<WorkSchedule> weeklySchedule)
-    {
-        return true;
+        if (!weeklySchedule.IsNullOrEmpty())
+        {
+            foreach (var workSchedule in weeklySchedule)
+            {
+                workTime += workSchedule.EndTime - workSchedule.StartTime;
+            }
+        }
         
+        return !(workTime > maxAmountOfWorkHours);
     }
 
-    private bool CheckForAverageAmountOfWeeklyHours(WorkSchedule schedule)
-    {
+    private bool CheckForAverageAmountOfWeeklyHours(WorkSchedule schedule, TimeSpan? maxAmountOfAverageWorkHours, int? amountOfWeeks)
+    { 
+        DateOnly firstDateOfWeeks = schedule.Date.AddDays(7 * ((int)amountOfWeeks - 1));
+        List<WorkSchedule> totalWorkSchedule =
+            _scheduleRepository.GetAmountOfWeeksWorkSchedule(firstDateOfWeeks, schedule.EmployeeId, (int)amountOfWeeks);
+
+        TimeSpan workTime = schedule.EndTime - schedule.StartTime;
+        
+        foreach (var workSchedule in totalWorkSchedule)
+        {
+            workTime += workSchedule.EndTime - workSchedule.StartTime;
+        }
+
+        workTime = TimeSpan.FromTicks(workTime.Ticks / (int)amountOfWeeks);
+
+        if (workTime > maxAmountOfAverageWorkHours)
+        {
+            return false;
+        }
         return true;
     }
 }

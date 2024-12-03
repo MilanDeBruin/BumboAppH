@@ -82,15 +82,89 @@ public class TestScheduleRepository : IScheduleRepository
                 StartTime = new TimeOnly(10, 0, 0),
                 EndTime = new TimeOnly(14, 0, 0)
             });
-            
+
+            return schedules;
+
         }
+
+        // used in max amount of days
+        // has one day less than maximum amount of days
+        if (employeeId == 5 && firstDayOfWeek == new DateOnly(2024, 12, 02))
+        {
+            List<WorkSchedule> schedules = new List<WorkSchedule>();
+            schedules.Add(new WorkSchedule()
+            {
+                Date = new DateOnly(2024, 12, 2),
+                StartTime = new TimeOnly(10, 0, 0),
+                EndTime = new TimeOnly(11, 0, 0)
+            });
+            schedules.Add(new WorkSchedule()
+            {
+                Date = new DateOnly(2024, 12, 3),
+                StartTime = new TimeOnly(10, 0, 0),
+                EndTime = new TimeOnly(11, 0, 0)
+            });
+            schedules.Add(new WorkSchedule()
+            {
+                Date = new DateOnly(2024, 12, 4),
+                StartTime = new TimeOnly(10, 0, 0),
+                EndTime = new TimeOnly(11, 0, 0)
+            });
+            schedules.Add(new WorkSchedule()
+            {
+                Date = new DateOnly(2024, 12, 5),
+                StartTime = new TimeOnly(10, 0, 0),
+                EndTime = new TimeOnly(11, 0, 0)
+            });
+            return schedules;
+        }
+        
+        // used in max amount of days
+        // has exactly max amount of days
+        if (employeeId == 5 && firstDayOfWeek == new DateOnly(2024, 12, 09))
+        {
+            List<WorkSchedule> schedules = new List<WorkSchedule>();
+            schedules.Add(new WorkSchedule()
+            {
+                Date = new DateOnly(2024, 12, 9),
+                StartTime = new TimeOnly(10, 0, 0),
+                EndTime = new TimeOnly(11, 0, 0)
+            });
+            schedules.Add(new WorkSchedule()
+            {
+                Date = new DateOnly(2024, 12, 10),
+                StartTime = new TimeOnly(10, 0, 0),
+                EndTime = new TimeOnly(11, 0, 0)
+            });
+            schedules.Add(new WorkSchedule()
+            {
+                Date = new DateOnly(2024, 12, 11),
+                StartTime = new TimeOnly(10, 0, 0),
+                EndTime = new TimeOnly(11, 0, 0)
+            });
+            schedules.Add(new WorkSchedule()
+            {
+                Date = new DateOnly(2024, 12, 12),
+                StartTime = new TimeOnly(10, 0, 0),
+                EndTime = new TimeOnly(11, 0, 0)
+            });
+            schedules.Add(new WorkSchedule()
+            {
+                Date = new DateOnly(2024, 12, 13),
+                StartTime = new TimeOnly(10, 0, 0),
+                EndTime = new TimeOnly(11, 0, 0)
+            });
+            return schedules;
+        }
+        
+        
 
         return new List<WorkSchedule>();
     }
 
     public List<WorkSchedule> GetAmountOfWeeksWorkSchedule(DateOnly firstDateOfWeeks, int employeeId, int amountOfWeeks)
     {
-        throw new NotImplementedException();
+        return new List<WorkSchedule>();
     }
     
 }

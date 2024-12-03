@@ -22,7 +22,8 @@ public class ScheduleRepository : IScheduleRepository
 
     public List<WorkSchedule> GetAmountOfWeeksWorkSchedule(DateOnly firstDateOfWeeks, int employeeId, int amountOfWeeks)
     {
-        throw new NotImplementedException();
+        return _dbContext.WorkSchedules.Where(s =>
+            s.EmployeeId == employeeId && s.Date >= firstDateOfWeeks && s.Date < firstDateOfWeeks.AddDays(7*4)).ToList();
     }
     
 }
