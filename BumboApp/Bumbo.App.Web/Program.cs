@@ -23,7 +23,9 @@ namespace Bumbo.App.Web
             builder.Services.AddTransient<Bumbo.Data.Interfaces.IAvailabilityRepository, Bumbo.Data.SqlRepository.AvailabilityRepository>();
             builder.Services.AddTransient<Bumbo.Domain.Services.Forecast.IGenerateForecastService, Bumbo.Domain.Services.Forecast.GenerateForecastService>();
             builder.Services.AddTransient<Bumbo.Domain.Services.Leaves.ILeaveChecker, Bumbo.Domain.Services.Leaves.LeaveChecker>();
-
+            builder.Services
+                .AddTransient<Bumbo.Domain.Services.CAO.ICaoScheduleService,
+                    Bumbo.Domain.Services.CAO.CaoScheduleServiceStandin>();
 
 
 
