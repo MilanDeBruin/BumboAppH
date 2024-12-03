@@ -7,7 +7,7 @@
 <h1>Mijn Beschikbaarheid</h1>
 
 <div>
-    <a asp-action="Edit" asp-route-employeeId="@Model.FirstOrDefault()?.EmployeeId" class="btn btn-primary mb-3">Beschikbaarheid Wijzigen (@Model.FirstOrDefault()?.EmployeeId)</a>
+    <a asp-action="Edit" asp-route-employeeId="@Model.FirstOrDefault()?.EmployeeId" class="btn btn-primary mb-3">Beschikbaarheid Wijzigen</a>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
