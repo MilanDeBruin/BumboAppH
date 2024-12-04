@@ -4,29 +4,52 @@ using System.Diagnostics;
 using Bumbo.Data.Context;
 using Bumbo.Domain.Services.CAO;
 using BumboApplicatie.Models;
+using Microsoft.VisualBasic;
+using Bumbo.Domain.Models;
+using Bumbo.App.Web.Models.ViewModels.Home;
+using Bumbo.Data.Interfaces;
+using Bumbo.Data.Models;
 
 namespace Bumbo.App.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly BumboDbContext _db;
-
-        public HomeController(ILogger<HomeController> logger, BumboDbContext db, ICaoScheduleService service)
+        private readonly IHomeRepository _repo;
+        
+        
+        public HomeController(IHomeRepository repo)
         {
-            _logger = logger;
-            _db = db;
+            _repo = repo;
         }
 
         public IActionResult Index()
         {
-            return View();
+            DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            WeekPersonalScheduleViewModel viewModel = new WeekPersonalScheduleViewModel
+            {
+                FirstDayOfWeek = date
+            };
+            viewModel.WorkDays = new List<DayPersonalScheduleViewModel>();
+            List<WorkSchedule> schedules = _repo.GetScheduleData(1, DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Today)));
+            
+            foreach (var schedule in schedules)
+            {
+                DayPersonalScheduleViewModel model = new DayPersonalScheduleViewModel
+                {
+                    date = schedule.Date,
+                    StartTime = schedule.StartTime,
+                    endTime = schedule.EndTime,
+                    Departement = schedule.Department,
+                    Branch_Id = schedule.BranchId
+                };
+                viewModel.WorkDays.Add(model);
+
+            }
+            return View(viewModel);
         }
-        
-        public IActionResult Prognose()
-        {
-            return View();
-        }
+
+            
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
