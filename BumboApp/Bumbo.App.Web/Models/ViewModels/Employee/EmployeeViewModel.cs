@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bumbo.App.Web.Models.ViewModels.Employee;
 
-public class EmployeeModel
+public class EmployeeViewModel
 {
     [Key]
     public int employee_id { get; set; }
@@ -48,4 +49,5 @@ public class EmployeeModel
     [Required(ErrorMessage = "Wachtwoord is verplicht.")]
     [StringLength(50, ErrorMessage = "Wachtwoord moet korter dan 50 tekens zijn.")]
     public string password { get; set; }
+    public string labor_contract { get; set; }
 }
