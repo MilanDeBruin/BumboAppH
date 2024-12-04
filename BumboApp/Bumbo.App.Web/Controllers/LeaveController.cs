@@ -39,7 +39,9 @@ namespace Bumbo.App.Web.Controllers
             newRequest.EndDate = viewModel.end;
             newRequest.LeaveStatus = viewModel.status;
 
-            if (lRepo.startDateHigherThanEndDate(newRequest) && lRepo.checkForOverlap(repo.getAllRequestsOfEmployee(employeeID) , newRequest))
+            Boolean check = LeaveChecker.startDateHigherThanEndDate(newRequest);
+
+            if (LeaveChecker.startDateHigherThanEndDate(newRequest) || LeaveChecker.checkForOverlap(repo.getAllRequestsOfEmployee(employeeID) , newRequest))
             {
                 repo.SetLeaveRequest(newRequest);
                 TempData["SuccessMessage"] = $"Verlof is aangevraagd!";

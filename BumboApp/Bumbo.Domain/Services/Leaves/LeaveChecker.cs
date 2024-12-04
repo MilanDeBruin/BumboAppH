@@ -8,6 +8,8 @@ namespace Bumbo.Domain.Services.Leaves
             return (request.StartDate < request.EndDate);
         }
 
+
+
         public Boolean checkForOverlap(List<Leave> allRequests, Leave request)
         {
             if (request.StartDate < DateOnly.FromDateTime(DateTime.Now))
