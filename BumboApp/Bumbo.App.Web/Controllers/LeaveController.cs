@@ -10,12 +10,12 @@ namespace Bumbo.App.Web.Controllers
     public class LeaveController : Controller
     {
         private readonly ILeaveRepository repo;
-        private readonly ILeaveChecker lRepo;
+        private readonly ILeaveChecker LeaveChecker;
 
         public LeaveController(ILeaveRepository repo, ILeaveChecker leaveRepository)
         {
             this.repo = repo;
-            this.lRepo = leaveRepository;
+            this.LeaveChecker = leaveRepository;
         }
         public IActionResult Index()
         {
