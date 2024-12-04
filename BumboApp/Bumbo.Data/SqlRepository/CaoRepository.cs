@@ -71,8 +71,9 @@ public class CaoRepository : ICaoRepository
             MaxAge = 15,
             MaxAmountOfDaysPerWeek = 5,
             MaxAmountOfTimePerDay = new TimeSpan(8, 0, 0),
+            MaxAmountOfTimePerDayIncludesSchool = true,
             MaxAmountOfTimePerWeek = new TimeSpan(12, 0, 0),
-            MaxWorkTime = new TimeOnly(19, 0)
+            MaxEndTime = new TimeOnly(19, 0)
         });
         
         //minors 16,17
@@ -80,6 +81,7 @@ public class CaoRepository : ICaoRepository
         {
             MaxAge = 17,
             MaxAmountOfTimePerDay = new TimeSpan(9, 0, 0),
+            MaxAmountOfTimePerDayIncludesSchool = true,
             MaxAverageAmountOfTimePerWeeksAmount = 4,
             MaxAverageAmountOfTimePerAmountOfWeeks = new TimeSpan(40, 0, 0)
         });

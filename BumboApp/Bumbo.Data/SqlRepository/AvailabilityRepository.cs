@@ -13,6 +13,33 @@ public class AvailabilityRepository : IAvailabilityRepository
     {
         _dbContext = dbContext;
     }
+
+    public SchoolSchedule? GetDailySchoolSchedule(int employeeId, DayOfWeek dayOfWeek)
+    {
+        string weekDay;
+
+        switch (dayOfWeek)
+        {
+            case DayOfWeek.Monday: weekDay = "Maandag";
+                break;
+            case DayOfWeek.Tuesday: weekDay = "Dinsdag";
+                break;
+            case DayOfWeek.Wednesday: weekDay = "Woensdag";
+                break;
+            case DayOfWeek.Thursday: weekDay = "Donderdag";
+                break;
+            case DayOfWeek.Friday: weekDay = "Vrijdag";
+                break;
+            case DayOfWeek.Saturday: weekDay = "Zaterdag";
+                break;
+            default: weekDay = "Zondag";
+                break;
+        }
+
+        return _dbContext.SchoolSchedules.FirstOrDefault(s => s.EmployeeId == employeeId && s.Weekday == weekDay);
+        
+    }
+
     public TimeOnly GetStoreOpeningHour(int branchId, DateOnly dayOfWeek)
     {
         string weekdayName = dayOfWeek.ToString("dddd", new System.Globalization.CultureInfo("nl-NL"));

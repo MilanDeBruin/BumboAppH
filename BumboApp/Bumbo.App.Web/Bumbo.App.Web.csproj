@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Repositorys\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
