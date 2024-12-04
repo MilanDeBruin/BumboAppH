@@ -8,14 +8,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Bumbo.App.Web.Controllers
 {
     [Authorize]
-    public class EmployeeController : Controller
+    public class EmployeeController(BumboDbContext context) : Controller
     {
-        private readonly BumboDbContext _context;
-
-        public EmployeeController(BumboDbContext context)
-        {
-            _context = context;
-        }
+        private readonly BumboDbContext _context = context;
 
         public IActionResult Index()
         {
@@ -30,6 +25,7 @@ namespace Bumbo.App.Web.Controllers
                 infix = employee.Infix,
                 last_name = employee.LastName,
                 date_of_birth = employee.DateOfBirth,
+                labor_contract = employee.LaborContract,
             }).ToList();
 
             return View("Index", model);
@@ -43,6 +39,9 @@ namespace Bumbo.App.Web.Controllers
 
             var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
+
+            var laborContracts = _context.LaborContracts.Select(lc => new { LaborContract = lc.LaborContract1 }).ToList();
+            ViewBag.LaborContracts = new SelectList(laborContracts, "LaborContract", "LaborContract");
 
             return View();
         }
@@ -67,6 +66,7 @@ namespace Bumbo.App.Web.Controllers
                     ZipCode = employeeModel.zip_code,
                     EmailAdres = employeeModel.email_adres,
                     Password = employeeModel.password,
+                    LaborContract = employeeModel.labor_contract,
                 };
 
                 _context.Employees.Add(employee);
@@ -88,8 +88,11 @@ namespace Bumbo.App.Web.Controllers
             var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
             ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
 
-            var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
+            var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
+
+            var laborContracts = _context.LaborContracts.Select(lc => new { LaborContract = lc.LaborContract1 }).ToList();
+            ViewBag.LaborContracts = new SelectList(laborContracts, "LaborContract", "LaborContract");
 
             return View(employeeModel);
         }
@@ -115,6 +118,7 @@ namespace Bumbo.App.Web.Controllers
                 zip_code = employee.ZipCode,
                 email_adres = employee.EmailAdres,
                 password = employee.Password,
+                labor_contract = employee.LaborContract,
             };
 
             return View(employeeModel);
@@ -142,6 +146,7 @@ namespace Bumbo.App.Web.Controllers
                 zip_code = employee.ZipCode,
                 email_adres = employee.EmailAdres,
                 password = employee.Password,
+                labor_contract = employee.LaborContract,
             };
 
             var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
@@ -149,6 +154,9 @@ namespace Bumbo.App.Web.Controllers
 
             var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
+
+            var laborContracts = _context.LaborContracts.Select(lc => new { LaborContract = lc.LaborContract1 }).ToList();
+            ViewBag.LaborContracts = new SelectList(laborContracts, "LaborContract", "LaborContract");
 
             return View(employeeModel);
         }
@@ -174,6 +182,7 @@ namespace Bumbo.App.Web.Controllers
                 employee.ZipCode = employeeModel.zip_code;
                 employee.EmailAdres = employeeModel.email_adres;
                 employee.Password = employeeModel.password;
+                employee.LaborContract = employeeModel.labor_contract;
 
                 _context.SaveChanges();
 
@@ -195,6 +204,9 @@ namespace Bumbo.App.Web.Controllers
 
             var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
             ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
+
+            var laborContracts = _context.LaborContracts.Select(lc => new { LaborContract = lc.LaborContract1 }).ToList();
+            ViewBag.LaborContracts = new SelectList(laborContracts, "LaborContract1", "LaborContract1");
 
             return View(employeeModel);
         }

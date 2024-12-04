@@ -21,62 +21,70 @@
 
     <h1 class="mb-4">Medewerkersgegevens</h1>
 
-<div>
-    <label class="fw-bold">Branch ID</label>
-    <p>@Model.branch_id</p>
-</div>
+    <div class="row gy-3">
+        <div class="col-md-6">
+            <label class="fw-bold">Branch ID</label>
+            <p>@Model.branch_id</p>
+        </div>
 
-<div>
-    <label class="fw-bold">Afdeling</label>
-    <p>@Model.position</p>
-</div>
+        <div class="col-md-6">
+            <label class="fw-bold">Contracttype</label>
+            <p>@Model.labor_contract</p>
+        </div>
 
-<div>
-    <label class="fw-bold">Startdatum contract</label>
-    <p>@Model.hiring_date.ToString("dd-MM-yyyy")</p>
-</div>
+        <div class="col-md-6">
+            <label class="fw-bold">Afdeling</label>
+            <p>@Model.position</p>
+        </div>
 
-<div>
-    <label class="fw-bold">Voornaam</label>
-    <p>@Model.first_name</p>
-</div>
+        <div class="col-md-6">
+            <label class="fw-bold">Startdatum contract</label>
+            <p>@Model.hiring_date.ToString("dd-MM-yyyy")</p>
+        </div>
 
-<div>
-    <label class="fw-bold">Tussenvoegsel</label>
-    <p>@Model.infix</p>
-</div>
+        <div class="col-md-6">
+            <label class="fw-bold">Geboortedatum</label>
+            <p>@Model.date_of_birth.ToString("dd-MM-yyyy")</p>
+        </div>
 
-<div>
-    <label class="fw-bold">Achternaam</label>
-    <p>@Model.last_name</p>
-</div>
+        <div class="col-md-6">
+            <label class="fw-bold">Voornaam</label>
+            <p>@Model.first_name</p>
+        </div>
 
-<div>
-    <label class="fw-bold">Geboortedatum</label>
-    <p>@Model.date_of_birth.ToString("dd-MM-yyyy")</p>
-</div>
+        <div class="col-md-6">
+            <label class="fw-bold">Tussenvoegsel</label>
+            <p>@Model.infix ?? "-"</p>
+        </div>
 
-<div>
-    <label class="fw-bold">Huisnummer</label>
-    <p>@Model.house_number</p>
-</div>
+        <div class="col-md-6">
+            <label class="fw-bold">Achternaam</label>
+            <p>@Model.last_name</p>
+        </div>
 
-<div>
-    <label class="fw-bold">Toevoeging</label>
-    <p>@Model.addition</p>
-</div>
+        <div class="col-md-6">
+            <label class="fw-bold">Huisnummer</label>
+            <p>@Model.house_number</p>
+        </div>
 
-<div>
-    <label class="fw-bold">Postcode</label>
-    <p>@Model.zip_code</p>
-</div>
+        <div class="col-md-6">
+            <label class="fw-bold">Toevoeging</label>
+            <p>@Model.addition ?? "-"</p>
+        </div>
 
-<div>
-    <label class="fw-bold">E-mailadres</label>
-    <p>@Model.email_adres</p>
-</div>
+        <div class="col-md-6">
+            <label class="fw-bold">Postcode</label>
+            <p>@Model.zip_code</p>
+        </div>
 
-<div>
-    <label class="fw-bold">Wachtwoord</label>
-    <p>@Model.password</p>
+        <div class="col-md-6">
+            <label class="fw-bold">E-mailadres</label>
+            <p>@Model.email_adres</p>
+        </div>
+
+        <div class="col-md-6">
+            <label class="fw-bold">Wachtwoord</label>
+            <p>@Model.password</p>
+        </div>
+    </div>
 </div>

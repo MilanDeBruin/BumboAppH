@@ -19,6 +19,14 @@
             </div>
 
             <div class="col-md-6">
+                <label asp-for="labor_contract" class="form-label">Contracttype</label>
+                <select asp-for="labor_contract" class="form-select" asp-items="ViewBag.LaborContracts">
+                    <option value="">Selecteer een contracttype</option>
+                </select>
+                <span asp-validation-for="labor_contract" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
                 <label asp-for="position" class="form-label">Afdeling</label>
                 <select asp-for="position" class="form-select" asp-items="ViewBag.Positions">
                     <option value="">Selecteer een afdeling</option>
