@@ -8,13 +8,14 @@ using Microsoft.VisualBasic;
 using Bumbo.Domain.Models;
 using Bumbo.App.Web.Models.ViewModels.Home;
 using Bumbo.Data.Interfaces;
+using Bumbo.Data.Models;
 
 namespace Bumbo.App.Web.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IHomeRepository _repo;
-        public int id_employee = 1;
+        
         
         public HomeController(IHomeRepository repo)
         {
@@ -23,10 +24,14 @@ namespace Bumbo.App.Web.Controllers
 
         public IActionResult Index()
         {
-            WeekPersonalScheduleViewModel viewModel = new WeekPersonalScheduleViewModel();
+            DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            WeekPersonalScheduleViewModel viewModel = new WeekPersonalScheduleViewModel
+            {
+                FirstDayOfWeek = date
+            };
             viewModel.WorkDays = new List<DayPersonalScheduleViewModel>();
             List<WorkSchedule> schedules = _repo.GetScheduleData(1, DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Today)));
-
+            
             foreach (var schedule in schedules)
             {
                 DayPersonalScheduleViewModel model = new DayPersonalScheduleViewModel

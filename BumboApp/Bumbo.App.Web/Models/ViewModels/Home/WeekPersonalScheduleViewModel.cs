@@ -4,5 +4,7 @@
     {
        public List<DayPersonalScheduleViewModel> WorkDays { get; set; }
 
+        public DateOnly FirstDayOfWeek { get; set; }
+
     }
 }

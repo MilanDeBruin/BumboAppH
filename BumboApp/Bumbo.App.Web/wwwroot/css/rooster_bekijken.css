@@ -7,36 +7,35 @@
 
 }
 
-.flex-container {
-    margin-top: auto;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    width: auto; 
-    margin: 0 auto 20px;
+.table-container {
+    margin: 20px auto;
+    width: 100%;
+    max-width: 800px;
 }
 
-.square {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin: auto; /* Add spacing between divs */
-    width: 300px; /* Set a fixed width */
-    height: 110px;
-    background-color: lightgrey;
-    border-radius: 5px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
 }
 
-.big_Square {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin: auto; /* Add spacing between divs */
-    width: auto; /* Set a fixed width */
-    height: 115px;
-    background-color: lightgrey;
-    border-radius: 5px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    .schedule-table th, .schedule-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .schedule-table th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
+
+.no-shifts {
+    text-align: center;
+    font-style: italic;
+    color: #999;
 }
+
 .button{
     margin-right: 10px;
     background-color:lightgrey;
