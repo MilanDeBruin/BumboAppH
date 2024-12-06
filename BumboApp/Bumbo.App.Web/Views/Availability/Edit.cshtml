@@ -22,7 +22,7 @@
             {
                 <tr>
                     <td>
-                        @Model.DailyAvailabilities[i].Weekday
+                        @Model.DailyAvailabilities[i].Weekday.ToString("dddd", new System.Globalization.CultureInfo("nl-NL"))
                         <input type="hidden" asp-for="DailyAvailabilities[@i].Weekday" />
                     </td>
                     <td>
