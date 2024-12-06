@@ -25,6 +25,7 @@ namespace Bumbo.App.Web.Controllers
             LeaveRequestModel viewModel = new LeaveRequestModel();
             viewModel.start = DateOnly.FromDateTime(DateTime.Now);
             viewModel.end = viewModel.start;
+            viewModel.myRequests = repo.getAllRequestsOfEmployee(1);
 
             viewModel.status = "Requested";
 
@@ -41,7 +42,7 @@ namespace Bumbo.App.Web.Controllers
             newRequest.EndDate = viewModel.end;
             newRequest.LeaveStatus = viewModel.status;
 
-            if (LeaveChecker.startDateHigherThanEndDate(newRequest) && LeaveChecker.checkForOverlap(repo.getAllRequestsOfEmployee(employeeID) , newRequest))
+            if (LeaveChecker.startDateHigherThanEndDate(newRequest) && repo.getOverlap(newRequest.StartDate, newRequest.EndDate, newRequest.EmployeeId))
             {
                 repo.SetLeaveRequest(newRequest);
                 TempData["SuccessMessage"] = $"Verlof is aangevraagd!";

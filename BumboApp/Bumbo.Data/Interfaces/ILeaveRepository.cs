@@ -20,5 +20,7 @@ namespace Bumbo.Data.Interfaces
         public List<Leave> getAllRequestsOfEmployee(int id);
 
         public List<Leave> getAllRequests();
+
+        public Boolean getOverlap(DateOnly StartDate, DateOnly endDate, int id);
     }
 }

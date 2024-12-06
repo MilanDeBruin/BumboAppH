@@ -1,4 +1,5 @@
-﻿namespace Bumbo.App.Web.Models.ViewModels.LeaveRequest
+﻿using Bumbo.Data.Models;
+namespace Bumbo.App.Web.Models.ViewModels.LeaveRequest
 {
     public class LeaveRequestModel
     {
@@ -8,7 +9,8 @@
         public DateOnly start { get; set; }
         public DateOnly end { get; set; }
         public string status { get; set; }
-        
+
+        public List<Bumbo.Data.Models.Leave> myRequests { get; set; }
 
 
     }

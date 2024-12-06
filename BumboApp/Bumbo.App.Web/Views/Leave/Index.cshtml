@@ -1,12 +1,10 @@
 ﻿
 @model Bumbo.App.Web.Models.ViewModels.LeaveRequest.LeaveRequestModel;   
-
-
-
-
+@{
+    var branchIds = ViewBag.BranchIds as List<int> ?? new List<int>();
+}
 <h1>Verlof aanvraag</h1>
-
-<hr />
+<hr/>
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -17,51 +15,67 @@
 {
     <div class="alert alert-warning">@TempData["FailedMessage"]</div>
 }
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Index">
-           
-
-            <div class="form-group mb-3">
-                <label class="control-label">employeeId</label>
-                <input asp-for="employeeId" class="form-control" />
-                <span asp-validation-for="employeeId" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="start" class="control-label">start van verlof </label>
-                <input asp-for="start" type="date" class="form-control" />
-                <span asp-validation-for="start" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="end" class="control-label">einde van verlof</label>
-                <input asp-for="end" type ="date" class="form-control" />
-                <span asp-validation-for="end" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3" >
-                <input asp-for="status" type="hidden" class="form-control" />
-                <span asp-validation-for="status" class="text-danger"></span>
-            </div>
-
-            <div class="d-flex gap-2 mt-4">
-               
-                <div class="form-group">
-                    <input type="submit" value="Aanvragen" class="btn btn-primary" />
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Index">
+                <div class="form-group mb-3">
+                    <label class="control-label">employeeId</label>
+                    <input asp-for="employeeId" class="form-control" />
+                    <span asp-validation-for="employeeId" class="text-danger"></span>
                 </div>
-            </div>
-        </form>
+
+                <div class="form-group mb-3">
+                    <label asp-for="start" class="control-label">start van verlof </label>
+                    <input asp-for="start" type="date" class="form-control" />
+                    <span asp-validation-for="start" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="end" class="control-label">einde van verlof</label>
+                    <input asp-for="end" type="date" class="form-control" />
+                    <span asp-validation-for="end" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <input asp-for="status" type="hidden" class="form-control" />
+                    <span asp-validation-for="status" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <div class="form-group">
+                        <input type="submit" value="Aanvragen" class="btn btn-primary" />
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between;">
+                            <span style="width: 33%; text-align: left;">start datum</span>
+                            <span style="width: 33%; text-align: center;">eind datum</span>
+                            <span style="width: 33%; text-align: right;">status</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.myRequests)
+                    {
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="width: 33%; text-align: left;">@Html.DisplayFor(modelItem => item.StartDate)</span>
+                                <span style="width: 33%; text-align: center;">@Html.DisplayFor(modelItem => item.EndDate)</span>
+                                <span style="width: 33%; text-align: right;">@Html.DisplayFor(modelItem => item.LeaveStatus)</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div>
-
-        <div class="d-flex gap-2 mt-4">
-            <div>
-                <a asp-action="MyRequest" class="btn btn-secondary">Mijn aanvragen</a>
-            </div>
-
-    </div>
-
 </div>
 
 @section Scripts {

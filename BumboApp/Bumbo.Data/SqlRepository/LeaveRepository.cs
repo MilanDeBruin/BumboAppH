@@ -37,5 +37,14 @@ namespace Bumbo.Data.SqlRepository
               .Where(n => n.EmployeeId == id && n.StartDate == StartDate)
               .FirstOrDefault();
         }
+        public Boolean getOverlap(DateOnly StartDate, DateOnly endDate , int id)
+        {
+            Boolean result = false;
+
+            result = (0 == ctx.Leaves.Where(n => n.StartDate >= StartDate && n.EndDate <= endDate && n.EmployeeId == id).Count());
+            return result;
+        }
+
+
     }
 }
