@@ -16,7 +16,7 @@ public class DailyAvailability : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (StartTime.HasValue && EndTime.HasValue && EndTime < StartTime)
+        if (StartTime.HasValue && EndTime.HasValue && StartTime > EndTime)
         {
             yield return new ValidationResult(
                 "Starttijd kan niet later zijn dan eindtijd",

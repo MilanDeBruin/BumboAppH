@@ -27,7 +27,6 @@ namespace Bumbo.App.Web.Controllers
         public IActionResult Details(int employeeId, string? firstDayOfWeek)
         {
             DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
-
             if (firstDayOfWeek != null) date = DateOnly.Parse(firstDayOfWeek);
 
             List<Availability> weekAvailability =
@@ -48,7 +47,7 @@ namespace Bumbo.App.Web.Controllers
                 {
                     Weekday = dayDate,
                     StartTime = null,
-                    EndTime = null
+                    EndTime = null,
                 };
 
                 var employeeAvailability = weekAvailability.FirstOrDefault(a =>
@@ -84,6 +83,7 @@ namespace Bumbo.App.Web.Controllers
             for (int i = 0; i < 7; i++)
             {
                 DateOnly dayDate = startDate.AddDays(i);
+
                 var dailyAvailability = new DailyAvailability
                 {
                     Weekday = dayDate,
@@ -122,9 +122,9 @@ namespace Bumbo.App.Web.Controllers
 
                 var availability = _context.Availabilities
                     .FirstOrDefault(a => a.EmployeeId == availabilityViewModel.EmployeeId &&
-                                         a.Weekday.ToLower() == weekdayName);
+                        a.Weekday.ToLower() == weekdayName);
 
-                // Checkt of de desbetreffende werkdag een start- en eindtijd heeft
+                // Checkt of de werkdag al in de database staat
                 if (dailyAvailability.StartTime.HasValue && dailyAvailability.EndTime.HasValue)
                 {
                     if (availability == null)
@@ -143,11 +143,8 @@ namespace Bumbo.App.Web.Controllers
                         availability.EndTime = dailyAvailability.EndTime.Value;
                     }
                 }
-                // Verwijder de desbetreffende werkdag uit de beschikbaarheid indien het geen start- of eindtijd heeft.
-                else if (availability != null)
-                {
-                    _context.Availabilities.Remove(availability);
-                }
+                // Werkdag heeft geen start- of eindtijd
+                else if (availability != null) _context.Availabilities.Remove(availability);
             }
 
             _context.SaveChanges();

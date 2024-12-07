@@ -9,7 +9,7 @@
 
     <div class="mb-3 text-end">
         <a asp-action="Edit" asp-route-employeeId="@Model.EmployeeId" class="btn btn-success">Beschikbaarheid Wijzigen</a>
-        <a asp-action="Edit" asp-route-employeeId="@Model.EmployeeId" class="btn btn-primary">Schoolrooster Bekijken</a>
+        <a asp-controller="SchoolSchedule" asp-action="Details" asp-route-employeeId="@Model.EmployeeId" class="btn btn-primary">Schoolrooster Bekijken</a>
 
     </div>
 
@@ -37,6 +37,12 @@
                         <td>@(dailyAvailability.EndTime.HasValue ? dailyAvailability.EndTime.Value.ToString("HH:mm") : "-")</td>
                     </tr>
                 }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5">Je hebt nog geen beschikbaarheid opgegeven.</td>
+                </tr>
             }
         </tbody>
     </table>
