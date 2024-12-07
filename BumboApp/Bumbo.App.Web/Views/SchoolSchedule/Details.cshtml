@@ -1,0 +1,48 @@
+﻿@model Bumbo.App.Web.Models.ViewModels.SchoolSchedule.SchoolScheduleViewModel;
+
+@{
+    ViewData["Title"] = "Mijn Schoolrooster";
+}
+
+<div class="container">
+    <h1 class="text-center mb-4">Mijn Schoolrooster - Week X</h1>
+
+    <div class="mb-3 text-end">
+        <a asp-action="Edit" asp-route-employeeId="@Model.EmployeeId" class="btn btn-success">Schoolrooster Wijzigen</a>
+        <a asp-controller="Availability" asp-action="Details" asp-route-employeeId="@Model.EmployeeId" class="btn btn-primary">Beschikbaarheid Bekijken</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <table class="table table-bordered table-striped text-center">
+        <thead class="thead-dark">
+            <tr>
+                <th>Dag</th>
+                <th>Starttijd</th>
+                <th>Eindtijd</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.DailySchoolSchedules.Any())
+            {
+                @foreach (var dailySchoolSchedule in Model.DailySchoolSchedules)
+                {
+                    <tr>
+                        <td>@System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(dailySchoolSchedule.Weekday.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")))</td>
+                        <td>@(dailySchoolSchedule.StartTime.HasValue ? dailySchoolSchedule.StartTime.Value.ToString("HH:mm") : "-")</td>
+                        <td>@(dailySchoolSchedule.EndTime.HasValue ? dailySchoolSchedule.EndTime.Value.ToString("HH:mm") : "-")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5">Je hebt nog geen schoolrooster opgegeven.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

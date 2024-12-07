@@ -4,9 +4,10 @@
     ViewData["Title"] = "Beschikbaarheid Wijzigen";
 }
 
-<h1>Beschikbaarheid Wijzigen</h1>
+<h1>Week X Beschikbaarheid Wijzigen</h1>
 
 <form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input asp-for="EmployeeId" type="hidden" />
 
     <table class="table">
@@ -22,7 +23,7 @@
             {
                 <tr>
                     <td>
-                        @Model.DailyAvailabilities[i].Weekday
+                        @System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Model.DailyAvailabilities[i].Weekday.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower())
                         <input type="hidden" asp-for="DailyAvailabilities[@i].Weekday" />
                     </td>
                     <td>
