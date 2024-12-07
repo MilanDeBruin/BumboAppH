@@ -27,13 +27,11 @@ namespace Bumbo.App.Web.Controllers
         public IActionResult Details(int employeeId, string? firstDayOfWeek)
         {
             DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
-            if (firstDayOfWeek != null)
-            {
-                date = DateOnly.Parse(firstDayOfWeek);
-            }
 
-            List<Availability> weekAvailabilities =
-                _availabilityRepository.GetWeekAvailability(employeeId, date).OrderBy(f => f.Weekday).ToList();
+            if (firstDayOfWeek != null) date = DateOnly.Parse(firstDayOfWeek);
+
+            List<Availability> weekAvailability =
+                _availabilityRepository.GetWeekAvailabilityForEmployee(employeeId, date).OrderBy(f => f.Weekday).ToList();
 
             AvailabilityViewModel viewModel = new AvailabilityViewModel
             {
@@ -41,10 +39,7 @@ namespace Bumbo.App.Web.Controllers
                 DailyAvailabilities = new List<DailyAvailability>()
             };
 
-            if (weekAvailabilities.IsNullOrEmpty())
-            {
-                return View(viewModel);
-            }
+            if (weekAvailability.IsNullOrEmpty()) return View(viewModel);
 
             for (int i = 0; i < 7; i++)
             {
@@ -56,7 +51,7 @@ namespace Bumbo.App.Web.Controllers
                     EndTime = null
                 };
 
-                var employeeAvailability = weekAvailabilities.FirstOrDefault(a =>
+                var employeeAvailability = weekAvailability.FirstOrDefault(a =>
                     a.Weekday.ToLower() == dayDate.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower());
 
                 if (employeeAvailability != null)
@@ -116,12 +111,9 @@ namespace Bumbo.App.Web.Controllers
         [HttpPost]
         public IActionResult Edit(AvailabilityViewModel availabilityViewModel)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(availabilityViewModel);
-            }
+            if (!ModelState.IsValid) return View(availabilityViewModel);
 
-            // Process each daily availability
+            // Alle werkdagen één voor één opslaan
             foreach (var dailyAvailability in availabilityViewModel.DailyAvailabilities)
             {
                 string weekdayName = dailyAvailability.Weekday
@@ -132,11 +124,11 @@ namespace Bumbo.App.Web.Controllers
                     .FirstOrDefault(a => a.EmployeeId == availabilityViewModel.EmployeeId &&
                                          a.Weekday.ToLower() == weekdayName);
 
+                // Checkt of de desbetreffende werkdag een start- en eindtijd heeft
                 if (dailyAvailability.StartTime.HasValue && dailyAvailability.EndTime.HasValue)
                 {
                     if (availability == null)
                     {
-                        // Add new availability
                         _context.Availabilities.Add(new Availability
                         {
                             EmployeeId = availabilityViewModel.EmployeeId,
@@ -147,14 +139,13 @@ namespace Bumbo.App.Web.Controllers
                     }
                     else
                     {
-                        // Update existing availability
                         availability.StartTime = dailyAvailability.StartTime.Value;
                         availability.EndTime = dailyAvailability.EndTime.Value;
                     }
                 }
+                // Verwijder de desbetreffende werkdag uit de beschikbaarheid indien het geen start- of eindtijd heeft.
                 else if (availability != null)
                 {
-                    // Remove availability if times are not specified
                     _context.Availabilities.Remove(availability);
                 }
             }
