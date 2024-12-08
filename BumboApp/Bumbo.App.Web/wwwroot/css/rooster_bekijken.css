@@ -30,6 +30,7 @@
         font-weight: bold;
     }
 
+
 .no-shifts {
     text-align: center;
     font-style: italic;
@@ -38,6 +39,13 @@
 
 .button{
     margin-right: 10px;
-    background-color:lightgrey;
+    background-color:red;
 
 }
+
+input[type=button] {
+   background-color: lightgrey;
+   position:absolute;
+   right:8%;
+   }
+

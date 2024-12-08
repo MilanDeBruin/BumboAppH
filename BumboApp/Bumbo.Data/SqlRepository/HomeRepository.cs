@@ -23,4 +23,21 @@ public class HomeRepository : IHomeRepository
         return list;
     }
 
+    public void SetSick(int employeeId, DateOnly firstDayOfWeek)
+    {
+        var workSchedules = _db.WorkSchedules
+         .Where(ws => ws.EmployeeId == employeeId && ws.Date == firstDayOfWeek).ToList();
+
+        if (workSchedules != null)
+        {
+            foreach (var workSchedule in workSchedules)
+            {
+                workSchedule.IsSick = false;
+            }
+        }
+        _db.SaveChanges();
+    }
+
+
+
 }

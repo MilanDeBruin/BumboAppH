@@ -40,7 +40,8 @@ namespace Bumbo.App.Web.Controllers
                     StartTime = schedule.StartTime,
                     endTime = schedule.EndTime,
                     Departement = schedule.Department,
-                    Branch_Id = schedule.BranchId
+                    Branch_Id = schedule.BranchId,
+                    Is_Sick = schedule.IsSick,
                 };
                 viewModel.WorkDays.Add(model);
 
@@ -48,7 +49,15 @@ namespace Bumbo.App.Web.Controllers
             return View(viewModel);
         }
 
-            
+        [HttpGet]
+        public IActionResult Ziekmelden()
+        {
+            DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            _repo.SetSick(1, date); //toevoegen cookies gezijk
+            Console.WriteLine("booooooooooooob");
+
+            return RedirectToAction("Index");
+        }    
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

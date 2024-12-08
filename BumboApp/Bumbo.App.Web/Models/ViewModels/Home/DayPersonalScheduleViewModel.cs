@@ -8,5 +8,7 @@
         public TimeOnly endTime { get; set;}
         public int Branch_Id { get; set; }   
 
+        public Boolean Is_Sick {  get; set; }
+
     }
 }
