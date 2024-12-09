@@ -56,7 +56,7 @@ namespace Bumbo.App.Web.Controllers
         {
             DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
             _repo.SetSick(1, date); //toevoegen cookies gezijk
-
+            TempData["SuccessMessage"] = "Je bent ziekgemeld!";
             return RedirectToAction("Index");
         }    
 
