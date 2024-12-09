@@ -6,85 +6,88 @@
 }
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <a asp-action="Index" class="btn btn-secondary">Terug</a>
-        <div class="d-flex gap-2">
-            <a asp-action="Edit" asp-route-id="@Model.employee_id" class="btn btn-primary">Wijzig</a>
-            <form asp-action="Delete" method="post" class="d-inline">
-                <input type="hidden" name="id" value="@Model.employee_id" />
-                <button type="submit" class="btn btn-danger" onclick="return confirm('Weet je zeker dat je @Model.first_name wil verwijderen?')">
-                    Verwijder
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <h1 class="mb-4">Medewerkersgegevens</h1>
+    <h1 class="text-center mb-4">Medewerkersgegevens</h1>
 
     <div class="row gy-3">
         <div class="col-md-6">
-            <label class="fw-bold">Branch ID</label>
-            <p>@Model.branch_id</p>
+            <label asp-for="EmployeeId" class="form-label">Medewerkercode</label>
+            <input asp-for="EmployeeId" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">Contracttype</label>
-            <p>@Model.labor_contract</p>
+            <label asp-for="BranchId" class="form-label">Vestigingsnummer</label>
+            <input asp-for="BranchId" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">Afdeling</label>
-            <p>@Model.position</p>
+            <label asp-for="LaborContract" class="form-label">Contracttype</label>
+            <input asp-for="LaborContract" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">Startdatum contract</label>
-            <p>@Model.hiring_date.ToString("dd-MM-yyyy")</p>
+            <label asp-for="Position" class="form-label">Afdeling</label>
+            <input asp-for="Position" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">Geboortedatum</label>
-            <p>@Model.date_of_birth.ToString("dd-MM-yyyy")</p>
+            <label asp-for="HiringDate" class="form-label">Startdatum contract</label>
+            <input asp-for="HiringDate" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">Voornaam</label>
-            <p>@Model.first_name</p>
+            <label asp-for="FirstName" class="form-label">Voornaam</label>
+            <input asp-for="FirstName" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">Tussenvoegsel</label>
-            <p>@Model.infix ?? "-"</p>
+            <label asp-for="Infix" class="form-label">Tussenvoegsel</label>
+            <input asp-for="Infix" value="@((Model.Infix ?? " -"))" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">Achternaam</label>
-            <p>@Model.last_name</p>
+            <label asp-for="LastName" class="form-label">Achternaam</label>
+            <input asp-for="LastName" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">Huisnummer</label>
-            <p>@Model.house_number</p>
+            <label asp-for="DateOfBirth" class="form-label">Geboortedatum</label>
+            <input asp-for="DateOfBirth" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">Toevoeging</label>
-            <p>@Model.addition ?? "-"</p>
+            <label asp-for="HouseNumber" class="form-label">Huisnummer</label>
+            <input asp-for="HouseNumber" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">Postcode</label>
-            <p>@Model.zip_code</p>
+            <label asp-for="Addition" class="form-label">Toevoeging</label>
+            <input asp-for="Addition" value="@((Model.Addition ?? " -"))" class="form-control" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">E-mailadres</label>
-            <p>@Model.email_adres</p>
+            <label asp-for="ZipCode" class="form-label">Postcode*</label>
+            <input asp-for="ZipCode" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label class="fw-bold">Wachtwoord</label>
-            <p>@Model.password</p>
+            <label asp-for="EmailAdres" class="form-label">E-mailadres</label>
+            <input asp-for="EmailAdres" class="form-control" readonly />
         </div>
+
+        <div class="col-md-6">
+            <label asp-for="Password" class="form-label">Wachtwoord</label>
+            <input asp-for="Password" class="form-control" readonly />
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex gap-3">
+        <a asp-action="Index" asp-route-branchId="@Model.BranchId" class="btn btn-secondary">Terug</a>
+        <a asp-action="Edit" asp-route-employeeId="@Model.EmployeeId" class="btn btn-primary">Wijzig</a>
+        <form asp-action="Delete" method="post" class="d-inline">
+            <input type="hidden" name="employeeId" value="@Model.EmployeeId" />
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Weet je zeker dat je @Model.FirstName wil verwijderen?')">
+                Verwijder
+            </button>
+        </form>
     </div>
 </div>
