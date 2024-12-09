@@ -24,11 +24,10 @@ namespace Bumbo.App.Web.Controllers
         }
         public IActionResult Index()
         {
-
             LeaveRequestModel viewModel = new LeaveRequestModel();
             viewModel.start = DateOnly.FromDateTime(DateTime.Now);
             viewModel.end = viewModel.start;
-            viewModel.myRequests = repo.getAllRequestsOfEmployee(1);
+            viewModel.myRequests = repo.getAllRequestsOfEmployee(3);
 
             viewModel.status = "Requested";
 

@@ -74,17 +74,15 @@
                     }
                 </tbody>
             </table>
+            @if (Model.myRequests.Count == 0)
+            {
+                <div class="alert alert-warning" style="margin-top:10px">Geen verlof verzoeken gevonden </div>
+            }
         </div>
     </div>
 </div>
 
-<span style="width: 12.5%; text-align: right;">
-    <form asp-action="LeaveOverview" asp-controller="Leave" method="post">
-        <button type="submit" class="btn btn-danger">
-            <i class="fas fa-times"></i>
-        </button>
-    </form>
-</span>
+
 
 @section Scripts {
     @{
