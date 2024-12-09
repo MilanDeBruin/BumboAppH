@@ -1,5 +1,6 @@
 ﻿using Bumbo.App.Web.Models.ViewModels.Employee;
 using Bumbo.Data.Context;
+using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,220 +9,234 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Bumbo.App.Web.Controllers
 {
     [Authorize]
-    public class EmployeeController(BumboDbContext context) : Controller
+    public class EmployeeController(BumboDbContext context, IEmployeeRepository employeeRepository) : Controller
     {
         private readonly BumboDbContext _context = context;
+        private readonly IEmployeeRepository _employeeRepository = employeeRepository;
 
-        public IActionResult Index()
+        public IActionResult Index(int branchId)
         {
-            var employees = _context.Employees.ToList();
-            if (employees.Count == 0) return NotFound();
+            var employees = _employeeRepository.GetEmployees(branchId);
 
             var model = employees.Select(employee => new EmployeeViewModel
             {
-                employee_id = employee.EmployeeId,
-                position = employee.Position,
-                first_name = employee.FirstName,
-                infix = employee.Infix,
-                last_name = employee.LastName,
-                date_of_birth = employee.DateOfBirth,
-                labor_contract = employee.LaborContract,
+                EmployeeId = employee.EmployeeId,
+                Position = employee.Position,
+                FirstName = employee.FirstName,
+                Infix = employee.Infix,
+                LastName = employee.LastName,
+                DateOfBirth = employee.DateOfBirth,
+                LaborContract = employee.LaborContract,
             }).ToList();
 
             return View("Index", model);
         }
 
         [HttpGet]
+        public IActionResult Details(int employeeId, int branchId)
+        {
+            var employee = _employeeRepository.GetEmployee(employeeId);
+            if (employee == null) return NotFound();
+
+            var viewModel = new EmployeeViewModel()
+            {
+                EmployeeId = employee.EmployeeId,
+                BranchId = employee.BranchId,
+                Position = employee.Position,
+                HiringDate = employee.HiringDate,
+                FirstName = employee.FirstName,
+                Infix = employee.Infix,
+                LastName = employee.LastName,
+                DateOfBirth = employee.DateOfBirth,
+                HouseNumber = employee.HouseNumber,
+                Addition = employee.Addition,
+                ZipCode = employee.ZipCode,
+                EmailAdres = employee.EmailAdres,
+                Password = employee.Password,
+                LaborContract = employee.LaborContract,
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
         public IActionResult Create()
         {
-            var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
-            ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
+            // Vul dropdown menus (kan niet gebruikmaken van Repository? Convertion problemen met SelectListItem...)
+            var viewModel = new EmployeeViewModel
+            {
+                Branches = [.. _context.Branches.Select(b => new SelectListItem
+                {
+                    Value = b.BranchId.ToString(),
+                    Text = b.BranchId.ToString(),
+                })],
+                Positions = [.. _context.Positions.Select(p => new SelectListItem
+                {
+                    Value = p.Position1,
+                    Text = p.Position1
+                })],
+                LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
+                {
+                    Value = lc.LaborContract1,
+                    Text = lc.LaborContract1
+                })]
+            };
 
-            var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
-            ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
-
-            var laborContracts = _context.LaborContracts.Select(lc => new { LaborContract = lc.LaborContract1 }).ToList();
-            ViewBag.LaborContracts = new SelectList(laborContracts, "LaborContract", "LaborContract");
-
-            return View();
+            return View(viewModel);
         }
 
         [HttpPost]
-        public IActionResult Create(EmployeeViewModel employeeModel)
+        public IActionResult Create(EmployeeViewModel viewModel)
         {
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var employee = new Employee()
+                // Hervul dropdown menus
+                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem
                 {
-                    EmployeeId = employeeModel.employee_id,
-                    BranchId = employeeModel.branch_id,
-                    Position = employeeModel.position,
-                    FirstName = employeeModel.first_name,
-                    Infix = employeeModel.infix,
-                    LastName = employeeModel.last_name,
-                    DateOfBirth = employeeModel.date_of_birth,
-                    HouseNumber = employeeModel.house_number,
-                    Addition = employeeModel.addition,
-                    ZipCode = employeeModel.zip_code,
-                    EmailAdres = employeeModel.email_adres,
-                    Password = employeeModel.password,
-                    LaborContract = employeeModel.labor_contract,
-                };
-
-                _context.Employees.Add(employee);
-                _context.SaveChanges();
-
-                TempData["SuccessMessage"] = $"Medewerker {employeeModel.first_name} is aangemaakt!";
-
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                foreach (var error in errors)
+                    Value = b.BranchId.ToString(),
+                    Text = b.BranchId.ToString(),
+                })];
+                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem
                 {
-                    Console.WriteLine(error);
-                }
+                    Value = p.Position1,
+                    Text = p.Position1
+                })];
+                viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
+                {
+                    Value = lc.LaborContract1,
+                    Text = lc.LaborContract1
+                })];
+
+                return View(viewModel);
             }
 
-            var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
-            ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
+            var employee = new Employee()
+            {
+                EmployeeId = viewModel.EmployeeId,
+                BranchId = viewModel.BranchId,
+                Position = viewModel.Position,
+                HiringDate = viewModel.HiringDate,
+                FirstName = viewModel.FirstName,
+                Infix = viewModel.Infix,
+                LastName = viewModel.LastName,
+                DateOfBirth = viewModel.DateOfBirth,
+                HouseNumber = viewModel.HouseNumber,
+                Addition = viewModel.Addition,
+                ZipCode = viewModel.ZipCode,
+                EmailAdres = viewModel.EmailAdres,
+                Password = viewModel.Password,
+                LaborContract = viewModel.LaborContract,
+            };
 
-            var branchIDs = _context.Branches.Select(b => new { BranchId = b.BranchId }).ToList();
-            ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
-
-            var laborContracts = _context.LaborContracts.Select(lc => new { LaborContract = lc.LaborContract1 }).ToList();
-            ViewBag.LaborContracts = new SelectList(laborContracts, "LaborContract", "LaborContract");
-
-            return View(employeeModel);
+            _employeeRepository.SaveEmployee(employee);
+            TempData["SuccessMessage"] = "Medewerker is aangemaakt!";
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Details(int id)
+        public IActionResult Edit(int employeeId)
         {
-            var employee = _context.Employees.Find(id);
+            var employee = _context.Employees.Find(employeeId);
             if (employee == null) return NotFound();
 
-            var employeeModel = new EmployeeViewModel()
+            var viewModel = new EmployeeViewModel()
             {
-                employee_id = employee.EmployeeId,
-                branch_id = employee.BranchId,
-                position = employee.Position,
-                hiring_date = employee.HiringDate,
-                first_name = employee.FirstName,
-                infix = employee.Infix,
-                last_name = employee.LastName,
-                date_of_birth = employee.DateOfBirth,
-                house_number = employee.HouseNumber,
-                addition = employee.Addition,
-                zip_code = employee.ZipCode,
-                email_adres = employee.EmailAdres,
-                password = employee.Password,
-                labor_contract = employee.LaborContract,
+                EmployeeId = employee.EmployeeId,
+                BranchId = employee.BranchId,
+                Position = employee.Position,
+                HiringDate = employee.HiringDate,
+                FirstName = employee.FirstName,
+                Infix = employee.Infix,
+                LastName = employee.LastName,
+                DateOfBirth = employee.DateOfBirth,
+                HouseNumber = employee.HouseNumber,
+                Addition = employee.Addition,
+                ZipCode = employee.ZipCode,
+                EmailAdres = employee.EmailAdres,
+                Password = employee.Password,
+                LaborContract = employee.LaborContract,
+                Branches = [.. _context.Branches.Select(b => new SelectListItem
+                {
+                    Value = b.BranchId.ToString(),
+                    Text = b.BranchId.ToString(),
+                })],
+                Positions = [.. _context.Positions.Select(p => new SelectListItem
+                {
+                    Value = p.Position1,
+                    Text = p.Position1
+                })],
+                LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
+                {
+                    Value = lc.LaborContract1,
+                    Text = lc.LaborContract1
+                })]
             };
 
-            return View(employeeModel);
-        }
-
-
-        [HttpGet]
-        public IActionResult Edit(int id)
-        {
-            var employee = _context.Employees.Find(id);
-            if (employee == null) return NotFound();
-
-            var employeeModel = new EmployeeViewModel()
-            {
-                employee_id = employee.EmployeeId,
-                branch_id = employee.BranchId,
-                position = employee.Position,
-                hiring_date = employee.HiringDate,
-                first_name = employee.FirstName,
-                infix = employee.Infix,
-                last_name = employee.LastName,
-                date_of_birth = employee.DateOfBirth,
-                house_number = employee.HouseNumber,
-                addition = employee.Addition,
-                zip_code = employee.ZipCode,
-                email_adres = employee.EmailAdres,
-                password = employee.Password,
-                labor_contract = employee.LaborContract,
-            };
-
-            var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
-            ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
-
-            var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
-            ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
-
-            var laborContracts = _context.LaborContracts.Select(lc => new { LaborContract = lc.LaborContract1 }).ToList();
-            ViewBag.LaborContracts = new SelectList(laborContracts, "LaborContract", "LaborContract");
-
-            return View(employeeModel);
+            return View(viewModel);
         }
 
         [HttpPost]
-        public IActionResult Edit(EmployeeViewModel employeeModel)
+        public IActionResult Edit(EmployeeViewModel viewModel)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var employee = _context.Employees.Find(employeeModel.employee_id);
-                if (employee == null) return NotFound();
+                viewModel.Branches = _context.Branches.Select(b => new SelectListItem
+                {
+                    Value = b.BranchId.ToString(),
+                    Text = b.BranchId.ToString(),
+                }).ToList();
+                viewModel.Positions = _context.Positions.Select(p => new SelectListItem
+                {
+                    Value = p.Position1,
+                    Text = p.Position1
+                }).ToList();
+                viewModel.LaborContracts = _context.LaborContracts.Select(lc => new SelectListItem
+                {
+                    Value = lc.LaborContract1,
+                    Text = lc.LaborContract1
+                }).ToList();
 
-                employee.EmployeeId = employeeModel.employee_id;
-                employee.BranchId = employeeModel.branch_id;
-                employee.Position = employeeModel.position;
-                employee.HiringDate = employeeModel.hiring_date;
-                employee.FirstName = employeeModel.first_name;
-                employee.Infix = employeeModel.infix;
-                employee.LastName = employeeModel.last_name;
-                employee.DateOfBirth = employeeModel.date_of_birth;
-                employee.HouseNumber = employeeModel.house_number;
-                employee.Addition = employeeModel.addition;
-                employee.ZipCode = employeeModel.zip_code;
-                employee.EmailAdres = employeeModel.email_adres;
-                employee.Password = employeeModel.password;
-                employee.LaborContract = employeeModel.labor_contract;
+                return View(viewModel);
+            }
 
-                _context.SaveChanges();
+            var employee = new Employee
+            {
+                EmployeeId = viewModel.EmployeeId,
+                BranchId = viewModel.BranchId,
+                Position = viewModel.Position,
+                HiringDate = viewModel.HiringDate,
+                FirstName = viewModel.FirstName,
+                Infix = viewModel.Infix,
+                LastName = viewModel.LastName,
+                DateOfBirth = viewModel.DateOfBirth,
+                HouseNumber = viewModel.HouseNumber,
+                Addition = viewModel.Addition,
+                ZipCode = viewModel.ZipCode,
+                EmailAdres = viewModel.EmailAdres,
+                Password = viewModel.Password,
+                LaborContract = viewModel.LaborContract
+            };
 
-                TempData["SuccessMessage"] = $"Medewerker {employee.FirstName} is gewijzigd!";
+            if (!_employeeRepository.UpdateEmployee(employee))
+            {
+                TempData["ErrorMessage"] = "Medewerker kon niet worden gewijzigd!";
+                return View(viewModel);
+            }
 
+            TempData["SuccessMessage"] = "Medewerker is gewijzigd!";
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult Delete(int employeeId) // Werkt nog niet als Employee een Availability heeft. EmployeeId wordt op null gezet voor de Availability, maar dat kan niet?
+        {
+            if (!_employeeRepository.DeleteEmployee(employeeId))
+            {
+                TempData["ErrorMessage"] = "Medewerker kan niet worden verwijderd omdat deze nog gekoppeld is aan een rooster of beschikbaarheid!";
                 return RedirectToAction("Index");
             }
-            else
-            {
-                var errors = ModelState.Values.SelectMany(v => v.Errors);
-                foreach (var error in errors)
-                {
-                    Console.WriteLine(error.ErrorMessage);
-                }
-            }
 
-            var positions = _context.Positions.Select(p => new { PositionName = p.Position1 }).ToList();
-            ViewBag.Positions = new SelectList(positions, "PositionName", "PositionName");
-
-            var branchIDs = _context.Branches.Select(b => new { b.BranchId }).ToList();
-            ViewBag.BranchIDs = new SelectList(branchIDs, "BranchId", "BranchId");
-
-            var laborContracts = _context.LaborContracts.Select(lc => new { LaborContract = lc.LaborContract1 }).ToList();
-            ViewBag.LaborContracts = new SelectList(laborContracts, "LaborContract1", "LaborContract1");
-
-            return View(employeeModel);
-        }
-
-        [HttpPost]
-        public IActionResult Delete(int id)
-        {
-            var employee = _context.Employees.Find(id);
-            if (employee == null) return NotFound();
-
-            _context.Employees.Remove(employee);
-            _context.SaveChanges();
-
-            TempData["SuccessMessage"] = $"Medewerker {employee.FirstName} is verwijderd!";
-
+            TempData["SuccessMessage"] = $"Medewerker is verwijderd!";
             return RedirectToAction("Index");
         }
     }

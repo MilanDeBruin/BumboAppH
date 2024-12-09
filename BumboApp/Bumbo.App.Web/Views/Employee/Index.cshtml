@@ -5,7 +5,7 @@
     ViewData["Title"] = "Medewerkers";
 }
 
-<div class="container">
+<div class="container mt-4">
     <h1 class="text-center mb-4">Alle Medewerkers (@Model.Count())</h1>
 
     <div class="mb-3 text-end">
@@ -15,6 +15,10 @@
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success text-center">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["ErrorMessage"]</div>
     }
 
     <table class="table table-bordered table-striped text-center">
@@ -33,11 +37,11 @@
                 foreach (var employee in Model)
                 {
                     <tr>
-                        <td>@employee.first_name @employee.infix @employee.last_name</td>
+                        <td>@employee.FirstName @employee.Infix @employee.LastName</td>
                         <td class="text-center">
-                            @if (employee.date_of_birth != default(DateOnly))
+                            @if (employee.DateOfBirth != default(DateOnly))
                             {
-                                var dob = employee.date_of_birth;
+                                var dob = employee.DateOfBirth;
                                 var today = DateOnly.FromDateTime(DateTime.Now);
                                 var age = today.Year - dob.Year;
                                 if (today < dob.AddYears(age)) { age--; }
@@ -48,10 +52,10 @@
                                 <span>Niet bekend</span>
                             }
                         </td>
-                        <td class="text-center">@employee.position</td>
-                        <td class="text-center">@employee.labor_contract</td>
+                        <td class="text-center">@employee.Position</td>
+                        <td class="text-center">@employee.LaborContract</td>
                         <td class="text-center">
-                            <a asp-action="Details" asp-route-id="@employee.employee_id" class="btn btn-secondary btn-sm">Details</a>
+                            <a asp-action="Details" asp-route-employeeId="@employee.EmployeeId" class="btn btn-secondary btn-sm">Details</a>
                         </td>
                     </tr>
                 }
