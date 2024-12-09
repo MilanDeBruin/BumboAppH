@@ -43,10 +43,12 @@ namespace Bumbo.App.Web.Controllers
                     Branch_Id = schedule.BranchId,
                     Is_Sick = schedule.IsSick,
                 };
-                viewModel.WorkDays.Add(model);
+                viewModel.WorkDays.Add(model);            
 
             }
+            viewModel.isSick = _repo.GetSick(1); //cookies id nog toevoegen
             return View(viewModel);
+           
         }
 
         [HttpGet]
@@ -54,7 +56,6 @@ namespace Bumbo.App.Web.Controllers
         {
             DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
             _repo.SetSick(1, date); //toevoegen cookies gezijk
-            Console.WriteLine("booooooooooooob");
 
             return RedirectToAction("Index");
         }    

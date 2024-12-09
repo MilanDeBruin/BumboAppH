@@ -32,12 +32,21 @@ public class HomeRepository : IHomeRepository
         {
             foreach (var workSchedule in workSchedules)
             {
-                workSchedule.IsSick = false;
+               
+                workSchedule.IsSick = true;
             }
         }
         _db.SaveChanges();
     }
 
+    public Boolean GetSick(int employeeId)
+    {
 
+        var sick = _db.WorkSchedules.Where(ws => ws.EmployeeId == employeeId && ws.Date == DateOnly.FromDateTime(DateTime.Now)).ToList();
+
+        bool isSick = sick.Any(ws => ws.IsSick);
+        Console.WriteLine(isSick);
+        return isSick;
+    }
 
 }

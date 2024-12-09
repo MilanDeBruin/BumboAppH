@@ -13,16 +13,27 @@
 
 <body>
     <div>
-    </br>
-        <div class="sick_button">
-            <a asp-controller="Home" asp-action="Ziekmelden" class="button-link">
-                <input type="button" value="Ziekmelden" />
+        
+        @if (!Model.isSick)
+        {
+            <a asp-controller="Home" asp-action="Ziekmelden">
+                <input type="button" value="Ziekmelden" onclick="showMessage()"/>
             </a>
-        </div>
-    <h2>Rooster Week</h2> 
+        }
+        else
+        {
+            <a asp-controller="Home" asp-action="Ziekmelden">
+                <input type="button" value="Ziekgemeld" disabled="disabled" class="disable_button"/>
+            </a>
+        }
+        <h2>Rooster Week</h2>
     </div>
-  
 
+    <script>
+        function showMessage() {
+            alert("Je bent ziekgemeld!");
+        }
+    </script>
 
     <div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm">
         <a asp-controller="Home"    

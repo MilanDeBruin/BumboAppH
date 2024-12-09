@@ -43,9 +43,28 @@
 
 }
 
-input[type=button] {
-   background-color: lightgrey;
-   position:absolute;
-   right:8%;
-   }
+
+input[type=button]  {
+    background-color: lightgreen;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-top: 5px;
+    position: absolute;
+    right: 8%;
+}
+
+input[type=button]:disabled {
+    background-color: lightgray;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-top: 5px;
+    position: absolute;
+    right: 8%;
+}
+
 
