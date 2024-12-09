@@ -1,5 +1,6 @@
-﻿using Bumbo.Data.Context;
+using Bumbo.Data.Context;
 using Bumbo.Data.Interfaces;
+using Bumbo.Data.Models;
 
 namespace Bumbo.Data.SqlRepository
 {
@@ -13,6 +14,11 @@ namespace Bumbo.Data.SqlRepository
             this.ctx = ctx;
         }
 
+
+        public Employee? GetEmployee(int id)
+        {
+            return ctx.Employees.FirstOrDefault(e => e.EmployeeId == id);
+        }
 
         public string FindNameFromId(int id)
         {

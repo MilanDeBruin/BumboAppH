@@ -14,13 +14,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Repositorys\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Bumbo.Data\Bumbo.Data.csproj" />
     <ProjectReference Include="..\Bumbo.Domain\Bumbo.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\css\rooster_bekijken.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
   
