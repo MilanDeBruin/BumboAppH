@@ -1,6 +1,8 @@
 ﻿using Bumbo.Data.Context;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
+using Bumbo.Data.Models.LeaveModel;
+
 
 namespace Bumbo.Data.SqlRepository
 {
@@ -31,6 +33,28 @@ namespace Bumbo.Data.SqlRepository
 
         public List<Leave> getAllRequests() => ctx.Leaves.Where(n => n.LeaveStatus == "Requested").OrderBy(n => n.EmployeeId).ToList();
 
+        public List<LeaveOverviewDTO> getAllLeaves(DateOnly startDate, DateOnly endDate)
+        {
+            var result = (from leave in ctx.Leaves
+                          join employee in ctx.Employees
+                          on leave.EmployeeId equals employee.EmployeeId
+                          where
+                              leave.LeaveStatus == "Accepted" &&
+                              (leave.StartDate >= startDate && leave.StartDate <= endDate ||
+                               leave.EndDate >= startDate && leave.EndDate <= endDate)
+                          orderby leave.EmployeeId
+                          select new LeaveOverviewDTO
+                          {
+                              FirstName = employee.FirstName,
+                              LastName = employee.LastName,
+                              StartDate = leave.StartDate,
+                              EndDate = leave.EndDate,
+                              BranchId = employee.BranchId
+                          }).ToList();
+            return result;
+        }
+
+
         public Leave getLeaveRequest(int id, DateOnly StartDate)
         {
             return ctx.Leaves
@@ -45,6 +69,6 @@ namespace Bumbo.Data.SqlRepository
             return result;
         }
 
-
+       
     }
 }

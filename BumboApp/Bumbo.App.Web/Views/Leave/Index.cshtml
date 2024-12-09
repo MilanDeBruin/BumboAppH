@@ -78,6 +78,14 @@
     </div>
 </div>
 
+<span style="width: 12.5%; text-align: right;">
+    <form asp-action="LeaveOverview" asp-controller="Leave" method="post">
+        <button type="submit" class="btn btn-danger">
+            <i class="fas fa-times"></i>
+        </button>
+    </form>
+</span>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

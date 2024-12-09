@@ -1,13 +1,11 @@
-﻿using Bumbo.App.Web.Models.ViewModels.Leave;
-using Bumbo.App.Web.Models.ViewModels.LeaveRequest;
+﻿using Bumbo.Data.Models.LeaveModel;
+
 namespace Bumbo.App.Web.Models.ViewModels.Leave
 {
-    public class AllLeaveRequestsModel
+    public class LeaveOverviewModel
     {
 
-        public List<LeaveRequestModel> myRequests { get; set; }
-
-        public DateTime startOfWeek { get; set; }
+        public DateTime startOfWeek {  get; set; }
         public DateTime endOfWeek { get; set; }
 
         public List<DateTime> weekDates { get; set; }
