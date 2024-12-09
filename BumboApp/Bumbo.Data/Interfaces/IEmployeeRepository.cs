@@ -4,7 +4,6 @@ namespace Bumbo.Data.Interfaces
 {
     public interface IEmployeeRepository
     {
-        
         public Employee? GetEmployee(int id);
         public IEnumerable<Employee> GetEmployees(int branchId);
         public void SaveEmployee(Employee employee);

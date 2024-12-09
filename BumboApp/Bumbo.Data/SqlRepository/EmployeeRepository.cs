@@ -2,12 +2,10 @@ using Bumbo.Data.Context;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 
-
 namespace Bumbo.Data.SqlRepository
 {
     public class EmployeeRepository(BumboDbContext ctx) : IEmployeeRepository
     {
-
         readonly BumboDbContext ctx = ctx;
 
         public Employee? GetEmployee(int id)
@@ -48,7 +46,6 @@ namespace Bumbo.Data.SqlRepository
             ctx.SaveChanges();
             return true;
         }
-
         public bool DeleteEmployee(int employeeId)
         {
             var employee = ctx.Employees.Find(employeeId);

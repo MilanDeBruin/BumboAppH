@@ -180,21 +180,21 @@ namespace Bumbo.App.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                viewModel.Branches = _context.Branches.Select(b => new SelectListItem
+                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
-                }).ToList();
-                viewModel.Positions = _context.Positions.Select(p => new SelectListItem
+                })];
+                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem
                 {
                     Value = p.Position1,
                     Text = p.Position1
-                }).ToList();
-                viewModel.LaborContracts = _context.LaborContracts.Select(lc => new SelectListItem
+                })];
+                viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
                     Text = lc.LaborContract1
-                }).ToList();
+                })];
 
                 return View(viewModel);
             }
