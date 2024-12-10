@@ -9,6 +9,7 @@
 <form asp-action="Edit" method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input asp-for="EmployeeId" type="hidden" />
+    <input asp-for="BranchId" type="hidden" />
 
     <table class="table">
         <thead>
@@ -39,6 +40,6 @@
         </tbody>
     </table>
 
-    <a asp-action="Details" asp-route-employeeId="@Model.EmployeeId" class="btn btn-secondary">Annuleren</a>
+    <a asp-action="Details" asp-route-employeeId="@Model.EmployeeId" asp-route-branchId="@Model.BranchId" class="btn btn-secondary">Annuleren</a>
     <button type="submit" class="btn btn-success">Opslaan</button>
 </form>
