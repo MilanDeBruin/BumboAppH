@@ -45,7 +45,6 @@ public class HomeRepository : IHomeRepository
         var sick = _db.WorkSchedules.Where(ws => ws.EmployeeId == employeeId && ws.Date == DateOnly.FromDateTime(DateTime.Now)).ToList();
 
         bool isSick = sick.Any(ws => ws.IsSick);
-        Console.WriteLine(isSick);
         return isSick;
     }
 

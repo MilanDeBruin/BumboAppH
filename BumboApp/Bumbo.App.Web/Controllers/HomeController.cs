@@ -9,6 +9,7 @@ using Bumbo.Domain.Models;
 using Bumbo.App.Web.Models.ViewModels.Home;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Bumbo.App.Web.Controllers
 {
@@ -16,50 +17,79 @@ namespace Bumbo.App.Web.Controllers
     {
         private readonly IHomeRepository _repo;
         
-        
         public HomeController(IHomeRepository repo)
         {
             _repo = repo;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string? date)
         {
-            DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
-            WeekPersonalScheduleViewModel viewModel = new WeekPersonalScheduleViewModel
-            {
-                FirstDayOfWeek = date
-            };
-            viewModel.WorkDays = new List<DayPersonalScheduleViewModel>();
-            List<WorkSchedule> schedules = _repo.GetScheduleData(1, DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Today)));
-            
-            foreach (var schedule in schedules)
-            {
-                DayPersonalScheduleViewModel model = new DayPersonalScheduleViewModel
-                {
-                    date = schedule.Date,
-                    StartTime = schedule.StartTime,
-                    endTime = schedule.EndTime,
-                    Departement = schedule.Department,
-                    Branch_Id = schedule.BranchId,
-                    Is_Sick = schedule.IsSick,
-                };
-                viewModel.WorkDays.Add(model);            
+             DateOnly firstDayOfWeek = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
 
+            if (date != null)
+            {
+                firstDayOfWeek = DateOnly.Parse(date);
             }
-            viewModel.isSick = _repo.GetSick(1); //cookies id nog toevoegen
-            return View(viewModel);
+
+            var viewModel = new WeekPersonalScheduleViewModel
+                {
+                    FirstDayOfWeek = firstDayOfWeek,
+                    WorkDays = new List<DayPersonalScheduleViewModel>()
+                };
+                List<WorkSchedule> schedules = _repo.GetScheduleData(1, firstDayOfWeek); //cookies toevoegen ook
+
+                 var groupedSchedules = schedules
+                .GroupBy(schedule => schedule.Date)
+                .OrderBy(group => group.Key);
+
+                foreach (var group in groupedSchedules)
+                {
+                    var daySchedule = new DayPersonalScheduleViewModel
+                    {
+                        Date = group.Key,
+                        Shifts = group.Select(schedule => new ShiftsViewModel
+                        {
+                            Time = $"{schedule.StartTime:hh\\:mm} - {schedule.EndTime:hh\\:mm}",
+                            Departement = schedule.Department,
+                            Branch_Id = schedule.BranchId
+                        }).ToList()
+                    };
+                    viewModel.WorkDays.Add(daySchedule);
+
+                }
+                viewModel.isSick = _repo.GetSick(1); //cookies id nog toevoegen
+                return View(viewModel);
            
         }
 
         [HttpGet]
         public IActionResult Ziekmelden()
         {
-            DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            DateOnly date = DateOnly.FromDateTime(DateTime.Now);
             _repo.SetSick(1, date); //toevoegen cookies gezijk
             TempData["SuccessMessage"] = "Je bent ziekgemeld!";
             return RedirectToAction("Index");
         }    
 
+        //public IActionResult WeekForward()
+        //{
+        //    Console.WriteLine(firstDayOfWeek);
+        //    firstDayOfWeek = firstDayOfWeek.AddDays(7);
+        //    Console.WriteLine(firstDayOfWeek);
+
+        //    return RedirectToAction("Index");
+
+        //}
+
+        //public IActionResult WeekBackward()
+        //{
+        //    Console.WriteLine(firstDayOfWeek);
+        //    firstDayOfWeek = firstDayOfWeek.AddDays(-7);
+        //    Console.WriteLine(firstDayOfWeek);
+
+        //    return RedirectToAction("Index");
+
+        //}
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
