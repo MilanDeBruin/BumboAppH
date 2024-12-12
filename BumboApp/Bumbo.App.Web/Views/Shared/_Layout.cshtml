@@ -23,7 +23,7 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav me-auto">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Availability" asp-action="Details" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">Beschikbaarheid</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Availability" asp-action="Details" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">Mijn Beschikbaarheid</a>
                             </li>
 
                             @if (User.FindFirst("position")?.Value == "Manager")
@@ -32,7 +32,7 @@
                                     <a class="nav-link" asp-controller="Forecast" asp-action="Index" asp-route-branchId="1">Prognose</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index">Medewerker</a>
+                                    <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Medewerkersoverzicht</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-area="" asp-controller="Norm" asp-action="Index">Norm beheer</a>
