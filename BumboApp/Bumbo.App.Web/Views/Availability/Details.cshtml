@@ -1,48 +1,49 @@
-﻿@model IEnumerable<Bumbo.App.Web.Models.ViewModels.Availability.AvailabilityViewModel>
+﻿@model Bumbo.App.Web.Models.ViewModels.Availability.AvailabilityViewModel;
 
 @{
     ViewData["Title"] = "Mijn Beschikbaarheid";
 }
 
-<h1>Mijn Beschikbaarheid</h1>
+<div class="container">
+    <h1 class="text-center mb-4">Mijn Beschikbaarheid - Week X</h1>
 
-<div>
-    <a asp-action="Edit" asp-route-employeeId="@Model.FirstOrDefault()?.EmployeeId" class="btn btn-primary mb-3">Beschikbaarheid Wijzigen</a>
-</div>
+    <div class="mb-3 text-end">
+        <a asp-action="Edit" asp-route-employeeId="@Model.EmployeeId" class="btn btn-success">Beschikbaarheid Wijzigen</a>
+        <a asp-controller="SchoolSchedule" asp-action="Details" asp-route-employeeId="@Model.EmployeeId" class="btn btn-primary">Schoolrooster Bekijken</a>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
+    </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Dag</th>
-            <th>Starttijd</th>
-            <th>Eindtijd</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            @foreach (var availability in Model)
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <table class="table table-bordered table-striped text-center">
+        <thead class="thead-dark">
+            <tr>
+                <th>Dag</th>
+                <th>Starttijd</th>
+                <th>Eindtijd</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.DailyAvailabilities.Any())
             {
-                @foreach (var dailyAvailability in availability.DailyAvailabilities)
+                @foreach (var dailyAvailability in Model.DailyAvailabilities)
                 {
                     <tr>
-                        <td>@dailyAvailability.Weekday</td>
-                        <td>@dailyAvailability.StartTime</td>
-                        <td>@dailyAvailability.EndTime</td>
+                        <td>@System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(dailyAvailability.Weekday.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")))</td>
+                        <td>@(dailyAvailability.StartTime.HasValue ? dailyAvailability.StartTime.Value.ToString("HH:mm") : "-")</td>
+                        <td>@(dailyAvailability.EndTime.HasValue ? dailyAvailability.EndTime.Value.ToString("HH:mm") : "-")</td>
                     </tr>
                 }
             }
-        }
-        else
-        {
-            <tr>
-                <td colspan="5">Je hebt nog geen beschikbaarheid opgegeven.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+            else
+            {
+                <tr>
+                    <td colspan="5">Je hebt nog geen beschikbaarheid opgegeven.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
