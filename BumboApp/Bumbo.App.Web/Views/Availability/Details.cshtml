@@ -9,7 +9,7 @@
 
     <div class="mb-3 text-end">
         <a asp-action="Edit" asp-route-employeeId="@Model.EmployeeId" asp-route-branchId="@Model.BranchId" class="btn btn-success">Beschikbaarheid Wijzigen</a>
-        <a asp-action="Edit" asp-route-employeeId="@Model.EmployeeId" class="btn btn-primary">Schoolrooster Bekijken</a>
+        <a asp-controller="SchoolSchedule" asp-action="Details" asp-route-employeeId="@Model.EmployeeId" class="btn btn-primary">Schoolrooster Bekijken</a>
 
     </div>
 

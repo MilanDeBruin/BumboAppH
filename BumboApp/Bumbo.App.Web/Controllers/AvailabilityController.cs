@@ -8,26 +8,18 @@ using Bumbo.Data.Interfaces;
 using Bumbo.Domain.Models;
 using Microsoft.IdentityModel.Tokens;
 using Bumbo.App.Web.Models.ViewModels.Employee;
-using Microsoft.VisualBasic;
 
 namespace Bumbo.App.Web.Controllers
 {
     [Authorize]
-    public class AvailabilityController : Controller
+    public class AvailabilityController(BumboDbContext context, IAvailabilityRepository availabilityRepository) : Controller
     {
-        private readonly IAvailabilityRepository _availabilityRepository;
-        private readonly BumboDbContext _context;
-
-        public AvailabilityController(BumboDbContext context, IAvailabilityRepository availabilityRepository)
-        {
-            this._availabilityRepository = availabilityRepository;
-            this._context = context;
-        }
+        private readonly IAvailabilityRepository _availabilityRepository = availabilityRepository;
+        private readonly BumboDbContext _context = context;
 
         public IActionResult Details(int employeeId, int branchId, string? firstDayOfWeek)
         {
             DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
-
             if (firstDayOfWeek != null) date = DateOnly.Parse(firstDayOfWeek);
 
             List<Availability> weekAvailability =
@@ -49,7 +41,7 @@ namespace Bumbo.App.Web.Controllers
                 {
                     Weekday = dayDate,
                     StartTime = null,
-                    EndTime = null
+                    EndTime = null,
                 };
 
                 var employeeAvailability = weekAvailability.FirstOrDefault(a =>
@@ -86,6 +78,7 @@ namespace Bumbo.App.Web.Controllers
             for (int i = 0; i < 7; i++)
             {
                 DateOnly dayDate = startDate.AddDays(i);
+
                 var dailyAvailability = new DailyAvailability
                 {
                     Weekday = dayDate,
@@ -152,10 +145,7 @@ namespace Bumbo.App.Web.Controllers
                         availability.EndTime = dailyAvailability.EndTime.Value;
                     }
                 }
-                else if (availability != null)
-                {
-                    _context.Availabilities.Remove(availability);
-                }
+                else if (availability != null) _context.Availabilities.Remove(availability);
             }
 
             _context.SaveChanges();
