@@ -11,5 +11,5 @@ public interface IAvailabilityRepository
     public TimeOnly GetStoreClosingHour(int branchId, DateOnly dayofWeek);
 
     public List<Availability> GetWeekAvailability(int branchId, DateOnly firstDayOfWeek);
-
+    public List<Availability> GetWeekAvailabilityForEmployee(int employeeId, DateOnly date);
 }
