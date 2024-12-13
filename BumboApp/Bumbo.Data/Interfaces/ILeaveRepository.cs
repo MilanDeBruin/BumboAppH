@@ -26,6 +26,10 @@ namespace Bumbo.Data.Interfaces
 
         public Boolean getOverlap(DateOnly StartDate, DateOnly endDate, int id);
 
+        public Boolean checkStartDateForDuble(int id , DateOnly startDate);
+
+        public List<int> getEmployeesInLeave();
+
      
     }
 }

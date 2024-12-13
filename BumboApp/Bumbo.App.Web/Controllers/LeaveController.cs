@@ -7,6 +7,7 @@ using Bumbo.Domain.Services.Leaves;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.Design;
 using Microsoft.VisualBasic;
+using System.Collections.Generic;
 
 namespace Bumbo.App.Web.Controllers
 {
@@ -27,7 +28,7 @@ namespace Bumbo.App.Web.Controllers
             LeaveRequestModel viewModel = new LeaveRequestModel();
             viewModel.start = DateOnly.FromDateTime(DateTime.Now);
             viewModel.end = viewModel.start;
-            viewModel.myRequests = repo.getAllRequestsOfEmployee(3);
+            viewModel.myRequests = repo.getAllRequestsOfEmployee(1);
 
             viewModel.status = "Requested";
 
@@ -43,7 +44,11 @@ namespace Bumbo.App.Web.Controllers
             newRequest.StartDate = viewModel.start;
             newRequest.EndDate = viewModel.end;
             newRequest.LeaveStatus = viewModel.status;
-
+            if (repo.checkStartDateForDuble(newRequest.EmployeeId, newRequest.StartDate))
+            {
+                TempData["FailedMessage"] = $"Er is al verlof aangevraagd op deze datum!";
+                return RedirectToAction("Index");
+            }
             if (LeaveChecker.startDateHigherThanEndDate(newRequest) && repo.getOverlap(newRequest.StartDate, newRequest.EndDate, newRequest.EmployeeId))
             {
                 repo.SetLeaveRequest(newRequest);
@@ -78,47 +83,33 @@ namespace Bumbo.App.Web.Controllers
 
             return View(viewModel);
         }
-      
-       
 
-        public IActionResult LeaveManagement() 
-        {
-            AllLeaveRequestsModel viewModel = new AllLeaveRequestsModel();
-            viewModel.myRequests = new List<LeaveRequestModel>();
-
-            var requests = repo.getAllRequests();
-            foreach (var request in requests)
-            {
-                LeaveRequestModel model = new LeaveRequestModel();
-                model.employeeId = request.EmployeeId;
-                model.employeeName = empRepo.FindNameFromId(request.EmployeeId);
-                model.start = request.StartDate;
-                model.end = request.EndDate;
-                model.status = request.LeaveStatus;
-                viewModel.myRequests.Add(model);
-            }
-
-            DateTime today = DateTime.Today;
-            DateOnly firstDay = new DateOnly(today.Year, today.Month, today.Day);
-
-            viewModel.startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday);
-            viewModel.weekDates = new List<DateTime>();
-
-            for (int i = 0; i < 7; i++)
-            {
-                viewModel.weekDates.Add(viewModel.startOfWeek.AddDays(i));
-            }
-            viewModel.endOfWeek = viewModel.weekDates[6];
-            DateOnly lastDay = new DateOnly(viewModel.weekDates[6].Year, viewModel.weekDates[6].Month, viewModel.weekDates[6].Day);
-            viewModel.leaves = repo.getAllLeaves(firstDay, lastDay);
-
-            return View(viewModel);
-        }
         [HttpGet]
         public IActionResult LeaveManagement(string? firstDayOfWeek)
         {
             AllLeaveRequestsModel viewModel = new AllLeaveRequestsModel();
             viewModel.myRequests = new List<LeaveRequestModel>();
+            viewModel.myRequestsList = new List<List<Bumbo.Data.Models.LeaveModel.LeaveOverviewDTO>>();
+
+            DateTime today = DateTime.Today; ;
+            if (firstDayOfWeek != null)
+            {
+                today = DateTime.Parse(firstDayOfWeek);
+            }
+
+            viewModel.startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday);
+            viewModel.weekDates = new List<DateTime>();
+
+            for (int i = 0; i < 7; i++)
+            {
+                viewModel.weekDates.Add(viewModel.startOfWeek.AddDays(i));
+            }
+            viewModel.endOfWeek = viewModel.weekDates[6];
+            DateOnly firstDay = new DateOnly(viewModel.weekDates[0].Year, viewModel.weekDates[0].Month, viewModel.weekDates[0].Day);
+            DateOnly lastDay = new DateOnly(viewModel.weekDates[6].Year, viewModel.weekDates[6].Month, viewModel.weekDates[6].Day);
+
+
+            viewModel.leaves = repo.getAllLeaves(firstDay, lastDay);
 
             var requests = repo.getAllRequests();
             foreach (var request in requests)
@@ -131,21 +122,23 @@ namespace Bumbo.App.Web.Controllers
                 model.status = request.LeaveStatus;
                 viewModel.myRequests.Add(model);
             }
-            DateTime today = DateTime.Today; ;
-            if (firstDayOfWeek != null) {
-             today = DateTime.Parse(firstDayOfWeek);
-            }
-            DateOnly firstDay = new DateOnly(today.Year, today.Month, today.Day);
-
-            viewModel.startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday);
-            viewModel.weekDates = new List<DateTime>();
-
-            for (int i = 0; i < 7; i++)
+            List<int> employeeIdList = repo.getEmployeesInLeave();
+            List<Bumbo.Data.Models.LeaveModel.LeaveOverviewDTO> models = new List<LeaveOverviewDTO>();
+            models = viewModel.leaves;
+            foreach ( int id in employeeIdList)
             {
-                viewModel.weekDates.Add(viewModel.startOfWeek.AddDays(i));
+                List< Bumbo.Data.Models.LeaveModel.LeaveOverviewDTO > LRM = new List<Bumbo.Data.Models.LeaveModel.LeaveOverviewDTO>();
+                for(int i = 0; i < models.Count; i++)
+                {
+                    if (id == models[i].Id)
+                    {
+                        LRM.Add(models[i]);
+                       
+                    }
+                }
+                viewModel.myRequestsList.Add(LRM);
             }
-            viewModel.endOfWeek = viewModel.weekDates[6];
-            DateOnly lastDay = new DateOnly(viewModel.weekDates[6].Year, viewModel.weekDates[6].Month, viewModel.weekDates[6].Day);
+
             viewModel.leaves = repo.getAllLeaves(firstDay, lastDay);
             return View(viewModel);
         }

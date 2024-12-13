@@ -8,6 +8,7 @@ namespace Bumbo.Data.Models.LeaveModel
 {
     public class LeaveOverviewDTO
     {
+        public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateOnly StartDate { get; set; }

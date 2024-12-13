@@ -29,7 +29,7 @@ namespace Bumbo.Data.SqlRepository
             ctx.SaveChanges();
         }
 
-        public List<Leave> getAllRequestsOfEmployee(int id) => ctx.Leaves.Where(n => n.EmployeeId == id).OrderBy(n => n.StartDate).ToList();
+        public List<Leave> getAllRequestsOfEmployee(int id) => ctx.Leaves.Where(n => n.EmployeeId == id).OrderByDescending(n => n.StartDate).ToList();
 
         public List<Leave> getAllRequests() => ctx.Leaves.Where(n => n.LeaveStatus == "Requested").OrderBy(n => n.EmployeeId).ToList();
 
@@ -45,6 +45,7 @@ namespace Bumbo.Data.SqlRepository
                           orderby leave.EmployeeId
                           select new LeaveOverviewDTO
                           {
+                              Id = leave.EmployeeId,
                               FirstName = employee.FirstName,
                               LastName = employee.LastName,
                               StartDate = leave.StartDate,
@@ -61,7 +62,7 @@ namespace Bumbo.Data.SqlRepository
               .Where(n => n.EmployeeId == id && n.StartDate == StartDate)
               .FirstOrDefault();
         }
-        public Boolean getOverlap(DateOnly StartDate, DateOnly endDate , int id)
+        public Boolean getOverlap(DateOnly StartDate, DateOnly endDate, int id)
         {
             Boolean result = false;
 
@@ -69,6 +70,17 @@ namespace Bumbo.Data.SqlRepository
             return result;
         }
 
-       
+        public Boolean checkStartDateForDuble(int id, DateOnly startDate)
+        {
+            Boolean check = (0 != ctx.Leaves.Where(n => n.EmployeeId == id && n.StartDate == startDate).Count());
+
+            return check;
+        }
+
+        public List<int> getEmployeesInLeave() => ctx.Leaves
+            .GroupBy(leave => leave.EmployeeId)
+            .Select(group => group.Key)
+            .ToList();
+
     }
 }

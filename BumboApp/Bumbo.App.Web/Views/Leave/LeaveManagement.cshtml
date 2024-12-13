@@ -139,21 +139,35 @@
             </tr>
         </thead>
             <tbody>
-                @foreach (var item in Model.leaves)
+                @foreach (var list in Model.myRequestsList)
                 {
-                    <tr class="text-center">
-                        <td>@item.FirstName @item.LastName</td>
-                        @foreach (var day in Model.weekDates)
+                var nameCount = 0;
+                <tr class="text-center">
+                    @foreach (var day in Model.weekDates)
+                    {
+                        @foreach (var item in list)
                         {
-                            if (item.StartDate.ToDateTime(new TimeOnly(0, 0)) <= day && item.EndDate.ToDateTime(new TimeOnly(0, 0)) >= day)
+                            if (nameCount == 0)
                             {
-                                <td style="background-color:red"></td>
+                                <td>@item.FirstName @item.LastName</td>
+                                nameCount++;
+                            }
+                        }
+                        
+                        bool hasOverlap = list.Any(item =>
+                        item.StartDate.ToDateTime(new TimeOnly(0, 0)) <= day &&
+                        item.EndDate.ToDateTime(new TimeOnly(0, 0)) >= day
+                        );
+                            if (hasOverlap)
+                            {
+                                <td style="background-color:red"></td> <!-- Rode achtergrond voor overlappende dagen -->
                             }
                             else
                             {
-                                <td></td>
+                                <td></td> <!-- Lege cel als er geen overlap is -->
                             }
                         }
+                       
                     </tr>
                 }
             </tbody>
