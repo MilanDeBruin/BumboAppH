@@ -5,6 +5,7 @@ namespace Bumbo.App.Web.Models.ViewModels.Availability;
 public class AvailabilityViewModel
 {
     public int EmployeeId { get; set; }
+    public int BranchId { get; set; }
     public List<DailyAvailability> DailyAvailabilities { get; set; } = new List<DailyAvailability>();
 }
 
