@@ -1,4 +1,5 @@
-﻿using Bumbo.App.Web.Models.ViewModels.Employee;
+﻿using Bumbo.App.Web.Models.ViewModels.Availability;
+using Bumbo.App.Web.Models.ViewModels.Employee;
 using Bumbo.Data.Context;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
@@ -33,7 +34,7 @@ namespace Bumbo.App.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int employeeId, int branchId)
+        public IActionResult Details(int employeeId)
         {
             var employee = _employeeRepository.GetEmployee(employeeId);
             if (employee == null) return NotFound();
@@ -110,6 +111,35 @@ namespace Bumbo.App.Web.Controllers
                 return View(viewModel);
             }
 
+            if (viewModel.HiringDate < viewModel.DateOfBirth)
+            {
+                ModelState.AddModelError(
+                    nameof(viewModel.HiringDate),
+                    "Startdatum contract kan niet eerder zijn dan geboortedatum"
+                );
+                ModelState.AddModelError(
+                    nameof(viewModel.DateOfBirth),
+                    "Geboortedatum kan niet later zijn dan startdatum contract"
+                );
+
+                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem
+                {
+                    Value = b.BranchId.ToString(),
+                    Text = b.BranchId.ToString(),
+                })];
+                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem
+                {
+                    Value = p.Position1,
+                    Text = p.Position1
+                })];
+                viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
+                {
+                    Value = lc.LaborContract1,
+                    Text = lc.LaborContract1
+                })];
+                return View(viewModel);
+            }
+
             var employee = new Employee()
             {
                 EmployeeId = viewModel.EmployeeId,
@@ -130,7 +160,7 @@ namespace Bumbo.App.Web.Controllers
 
             _employeeRepository.SaveEmployee(employee);
             TempData["SuccessMessage"] = "Medewerker is aangemaakt!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { branchId = viewModel.BranchId });
         }
 
         [HttpGet]
@@ -199,6 +229,35 @@ namespace Bumbo.App.Web.Controllers
                 return View(viewModel);
             }
 
+            if (viewModel.HiringDate < viewModel.DateOfBirth)
+            {
+                ModelState.AddModelError(
+                    nameof(viewModel.HiringDate),
+                    "Startdatum contract kan niet eerder zijn dan geboortedatum"
+                );
+                ModelState.AddModelError(
+                    nameof(viewModel.DateOfBirth),
+                    "Geboortedatum kan niet later zijn dan startdatum contract"
+                );
+
+                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem
+                {
+                    Value = b.BranchId.ToString(),
+                    Text = b.BranchId.ToString(),
+                })];
+                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem
+                {
+                    Value = p.Position1,
+                    Text = p.Position1
+                })];
+                viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
+                {
+                    Value = lc.LaborContract1,
+                    Text = lc.LaborContract1
+                })];
+                return View(viewModel);
+            }
+
             var employee = new Employee
             {
                 EmployeeId = viewModel.EmployeeId,
@@ -224,12 +283,16 @@ namespace Bumbo.App.Web.Controllers
             }
 
             TempData["SuccessMessage"] = "Medewerker is gewijzigd!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { branchId = viewModel.BranchId });
         }
 
         [HttpPost]
         public IActionResult Delete(int employeeId) // Werkt nog niet als Employee een Availability heeft. EmployeeId wordt op null gezet voor de Availability, maar dat kan niet?
         {
+            Employee? employee = _employeeRepository.GetEmployee(employeeId);
+            if (employee == null) return NotFound();
+            int branchId = employee.BranchId;
+
             if (!_employeeRepository.DeleteEmployee(employeeId))
             {
                 TempData["ErrorMessage"] = "Medewerker kan niet worden verwijderd omdat deze nog gekoppeld is aan een rooster of beschikbaarheid!";
@@ -237,7 +300,7 @@ namespace Bumbo.App.Web.Controllers
             }
 
             TempData["SuccessMessage"] = $"Medewerker is verwijderd!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { branchId });
         }
     }
 }
