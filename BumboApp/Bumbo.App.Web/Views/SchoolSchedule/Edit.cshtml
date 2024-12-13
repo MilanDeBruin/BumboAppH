@@ -1,0 +1,48 @@
+﻿@model Bumbo.App.Web.Models.ViewModels.SchoolSchedule.SchoolScheduleViewModel;
+
+@{
+    ViewData["Title"] = "Schoolrooster Wijzigen";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Schoolrooster Wijzigen</h1>
+
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input asp-for="EmployeeId" type="hidden" />
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Dag</th>
+                    <th>Starttijd</th>
+                    <th>Eindtijd</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.DailySchoolSchedules.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            @System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Model.DailySchoolSchedules[i].Weekday.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower())
+                            <input type="hidden" asp-for="DailySchoolSchedules[@i].Weekday" />
+                        </td>
+                        <td>
+                            <input asp-for="DailySchoolSchedules[@i].StartTime" type="time" class="form-control" />
+                            <span asp-validation-for="DailySchoolSchedules[@i].StartTime" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <input asp-for="DailySchoolSchedules[@i].EndTime" type="time" class="form-control" />
+                            <span asp-validation-for="DailySchoolSchedules[@i].EndTime" class="text-danger"></span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="mt-4 d-flex gap-3">
+            <a asp-action="Details" asp-route-employeeId="@Model.EmployeeId" class="btn btn-secondary">Annuleren</a>
+            <button type="submit" class="btn btn-success">Opslaan</button>
+        </div>
+    </form>
+</div>

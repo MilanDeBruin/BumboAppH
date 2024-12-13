@@ -1,16 +1,27 @@
-﻿namespace Bumbo.App.Web.Models.ViewModels.Availability
-{
-    public class AvailabilityViewModel
-    {
-        public int EmployeeId { get; set; }
-        public List<DailyAvailability> DailyAvailabilities { get; set; } = new List<DailyAvailability>();
-        public List<string> Weekdays { get; set; } = new List<string>();
-    }
+﻿using System.ComponentModel.DataAnnotations;
 
-    public class DailyAvailability
+namespace Bumbo.App.Web.Models.ViewModels.Availability;
+
+public class AvailabilityViewModel
+{
+    public int EmployeeId { get; set; }
+    public int BranchId { get; set; }
+    public List<DailyAvailability> DailyAvailabilities { get; set; } = new List<DailyAvailability>();
+}
+
+public class DailyAvailability : IValidatableObject
+{
+    public DateOnly Weekday { get; set; }
+    public TimeOnly? StartTime { get; set; }
+    public TimeOnly? EndTime { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        public string Weekday { get; set; } = null!;
-        public TimeOnly? StartTime { get; set; }
-        public TimeOnly? EndTime { get; set; }
+        if (StartTime.HasValue && EndTime.HasValue && StartTime > EndTime)
+        {
+            yield return new ValidationResult(
+                "Starttijd kan niet later zijn dan eindtijd",
+                [nameof(StartTime), nameof(EndTime)]);
+        }
     }
 }

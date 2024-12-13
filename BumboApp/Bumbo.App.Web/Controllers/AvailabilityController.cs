@@ -12,70 +12,91 @@ using Bumbo.App.Web.Models.ViewModels.Employee;
 namespace Bumbo.App.Web.Controllers
 {
     [Authorize]
-    public class AvailabilityController : Controller
+    public class AvailabilityController(BumboDbContext context, IAvailabilityRepository availabilityRepository) : Controller
     {
-        private readonly IAvailabilityRepository _availabilityRepository;
-        private readonly BumboDbContext _context;
+        private readonly IAvailabilityRepository _availabilityRepository = availabilityRepository;
+        private readonly BumboDbContext _context = context;
 
-        public AvailabilityController(BumboDbContext context, IAvailabilityRepository availabilityRepository)
+        public IActionResult Details(int employeeId, int branchId, string? firstDayOfWeek)
         {
-            this._availabilityRepository = availabilityRepository;
-            this._context = context;
-        }
+            DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            if (firstDayOfWeek != null) date = DateOnly.Parse(firstDayOfWeek);
 
+            List<Availability> weekAvailability =
+                _availabilityRepository.GetWeekAvailabilityForEmployee(employeeId, date).OrderBy(f => f.Weekday).ToList();
 
-        public IActionResult Details(int employeeId)
-        {
-            Console.WriteLine($"waaaat issss idddeeeeeeeee: {employeeId}"); // or use a logger
-
-            var availabilities = _context.Availabilities
-                .Where(a => a.EmployeeId == employeeId)
-                .GroupBy(a => a.EmployeeId)
-                .Select(g => new AvailabilityViewModel
-                {
-                    EmployeeId = g.Key,
-                    DailyAvailabilities = g.Select(a => new DailyAvailability
-                    {
-                        Weekday = a.Weekday,
-                        StartTime = a.StartTime,
-                        EndTime = a.EndTime
-                    }).ToList()
-                })
-                .FirstOrDefault();
-
-            if (availabilities == null)
+            AvailabilityViewModel viewModel = new AvailabilityViewModel
             {
-                availabilities = new AvailabilityViewModel
+                EmployeeId = employeeId,
+                BranchId = branchId,
+                DailyAvailabilities = new List<DailyAvailability>()
+            };
+
+            if (weekAvailability.IsNullOrEmpty()) return View(viewModel);
+
+            for (int i = 0; i < 7; i++)
+            {
+                DateOnly dayDate = date.AddDays(i);
+                var dailyAvailability = new DailyAvailability
                 {
-                    EmployeeId = employeeId,
-                    DailyAvailabilities = new List<DailyAvailability>()
+                    Weekday = dayDate,
+                    StartTime = null,
+                    EndTime = null,
                 };
+
+                var employeeAvailability = weekAvailability.FirstOrDefault(a =>
+                    a.Weekday.ToLower() == dayDate.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower());
+
+                if (employeeAvailability != null)
+                {
+                    dailyAvailability.StartTime = employeeAvailability.StartTime;
+                    dailyAvailability.EndTime = employeeAvailability.EndTime;
+                }
+
+                viewModel.DailyAvailabilities.Add(dailyAvailability);
             }
 
-            return View(new List<AvailabilityViewModel> { availabilities });
+            return View(viewModel);
         }
 
         [HttpGet]
-        public IActionResult Edit(int employeeId)
+        public IActionResult Edit(int employeeId, int branchId)
         {
-            var weekdays = _context.Weekdays.Select(w => w.Weekday1).ToList();
-            var existingAvailabilities = _context.Availabilities.Where(a => a.EmployeeId == employeeId).ToList();
+            DateOnly startDate = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+
+            var existingAvailabilities = _context.Availabilities
+                .Where(a => a.EmployeeId == employeeId)
+                .ToList();
 
             var availabilityViewModel = new AvailabilityViewModel
             {
                 EmployeeId = employeeId,
-                DailyAvailabilities = weekdays.Select(day =>
-                {
-                    var availability = existingAvailabilities.FirstOrDefault(a => a.Weekday == day);
-
-                    return new DailyAvailability
-                    {
-                        Weekday = day,
-                        StartTime = availability?.StartTime,
-                        EndTime = availability?.EndTime
-                    };
-                }).ToList()
+                BranchId = branchId,
+                DailyAvailabilities = new List<DailyAvailability>()
             };
+
+            for (int i = 0; i < 7; i++)
+            {
+                DateOnly dayDate = startDate.AddDays(i);
+
+                var dailyAvailability = new DailyAvailability
+                {
+                    Weekday = dayDate,
+                    StartTime = null,
+                    EndTime = null
+                };
+
+                var employeeAvailability = existingAvailabilities.FirstOrDefault(a =>
+                    a.Weekday.ToLower() == dayDate.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower());
+
+                if (employeeAvailability != null)
+                {
+                    dailyAvailability.StartTime = employeeAvailability.StartTime;
+                    dailyAvailability.EndTime = employeeAvailability.EndTime;
+                }
+
+                availabilityViewModel.DailyAvailabilities.Add(dailyAvailability);
+            }
 
             return View(availabilityViewModel);
         }
@@ -83,89 +104,104 @@ namespace Bumbo.App.Web.Controllers
         [HttpPost]
         public IActionResult Edit(AvailabilityViewModel availabilityViewModel)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(availabilityViewModel);
+
+            // Door iedere werkdag van het formulier lopen en de index van de huidige loop bijhouden
+            foreach (var (dailyAvailability, i) in availabilityViewModel.DailyAvailabilities.Select((value, index) => (value, index)))
             {
-                foreach (var dailyAvailability in availabilityViewModel.DailyAvailabilities)
+                string weekdayName = dailyAvailability.Weekday.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower();
+                var availability = _context.Availabilities.FirstOrDefault(a => a.EmployeeId == availabilityViewModel.EmployeeId && a.Weekday.ToLower() == weekdayName);
+                var storeOpeningHour = _availabilityRepository.GetStoreOpeningHour(availabilityViewModel.BranchId, dailyAvailability.Weekday);
+                var storeClosingHour = _availabilityRepository.GetStoreClosingHour(availabilityViewModel.BranchId, dailyAvailability.Weekday);
+
+                if (dailyAvailability.StartTime.HasValue && dailyAvailability.EndTime.HasValue)
                 {
-                    var availability = _context.Availabilities
-                        .FirstOrDefault(a => a.EmployeeId == availabilityViewModel.EmployeeId && a.Weekday == dailyAvailability.Weekday);
-
-                    if (dailyAvailability.StartTime.HasValue && dailyAvailability.EndTime.HasValue)
+                    if (dailyAvailability.StartTime < storeOpeningHour || dailyAvailability.EndTime > storeClosingHour)
                     {
-                        if (availability == null)
-                        {
-                            availability = new Availability
-                            {
-                                EmployeeId = availabilityViewModel.EmployeeId,
-                                Weekday = dailyAvailability.Weekday,
-                                StartTime = dailyAvailability.StartTime,
-                                EndTime = dailyAvailability.EndTime
-                            };
-                            _context.Availabilities.Add(availability);
-                        }
-                        else
-                        {
-                            availability.StartTime = dailyAvailability.StartTime;
-                            availability.EndTime = dailyAvailability.EndTime;
-                        }
+                        ModelState.AddModelError(
+                            $"DailyAvailabilities[{i}].StartTime",
+                            $"Beschikbaarheid moet binnen de openingstijden vallen ({storeOpeningHour} - {storeClosingHour})"
+                        );
+                        ModelState.AddModelError(
+                            $"DailyAvailabilities[{i}].EndTime",
+                            $"Beschikbaarheid moet binnen de openingstijden vallen ({storeOpeningHour} - {storeClosingHour})"
+                        );
+                        return View(availabilityViewModel);
                     }
-                    else if (availability != null) _context.Availabilities.Remove(availability);
-                }
-                _context.SaveChanges();
 
-                TempData["SuccessMessage"] = "Beschikbaarheid is bijgewerkt!";
-                return RedirectToAction("Details", new { employeeId = availabilityViewModel.EmployeeId });
+                    if (availability == null)
+                    {
+                        _context.Availabilities.Add(new Availability
+                        {
+                            EmployeeId = availabilityViewModel.EmployeeId,
+                            Weekday = weekdayName,
+                            StartTime = dailyAvailability.StartTime.Value,
+                            EndTime = dailyAvailability.EndTime.Value
+                        });
+                    }
+                    else
+                    {
+                        availability.StartTime = dailyAvailability.StartTime.Value;
+                        availability.EndTime = dailyAvailability.EndTime.Value;
+                    }
+                }
+                else if (availability != null) _context.Availabilities.Remove(availability);
             }
 
-            return View(availabilityViewModel);
-        } 
-            [HttpGet]
-            public IActionResult Index(int branchId, string? firstDayOfWeek)
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "Beschikbaarheid succesvol bijgewerkt!";
+            return RedirectToAction("Details", new { employeeId = availabilityViewModel.EmployeeId, branchId = availabilityViewModel.BranchId });
+        }
+
+
+
+        [HttpGet]
+        public IActionResult Index(int branchId, string? firstDayOfWeek)
+        {
+            DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            if (firstDayOfWeek != null)
             {
-                DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
-                if (firstDayOfWeek != null)
+                date = DateOnly.Parse(firstDayOfWeek);
+            }
+
+            // Haal de beschikbaarheden voor de week op
+            List<Availability> weekAvailabilities =
+                _availabilityRepository.GetWeekAvailability(branchId, date).OrderBy(f => f.Weekday).ToList();
+
+            // Maak een nieuw viewmodel
+            WeekAvailabilityViewModel viewModel = new WeekAvailabilityViewModel
+            {
+                BranchId = branchId,
+                FirstDayOfWeek = date,
+                DayAvailabilities = new List<DayAvailabilityViewModel>()
+            };
+
+            // Als er geen beschikbaarheden zijn, stuur het lege viewmodel terug
+            if (weekAvailabilities.IsNullOrEmpty())
+            {
+                return View(viewModel);
+            }
+
+            BranchWeekOpeningTimeViewModel branchWeekOpeningClosingTime = new BranchWeekOpeningTimeViewModel();
+            branchWeekOpeningClosingTime.BranchId = branchId;
+
+            // Voeg voor elke dag de beschikbaarheden van medewerkers toe
+            for (int i = 0; i < 7; i++)
+            {
+                DateOnly dayDate = date.AddDays(i);
+                var dayAvailability = new DayAvailabilityViewModel
                 {
-                    date = DateOnly.Parse(firstDayOfWeek);
-                }
-
-                // Haal de beschikbaarheden voor de week op
-                List<Availability> weekAvailabilities =
-                    _availabilityRepository.GetWeekAvailability(branchId, date).OrderBy(f => f.Weekday).ToList();
-
-                // Maak een nieuw viewmodel
-                WeekAvailabilityViewModel viewModel = new WeekAvailabilityViewModel
+                    WeekDay = dayDate,
+                    EmployeeAvailabilities = new List<EmployeeAvailability>()
+                };
+                BranchDayOpeningTimeViewModel branchOpeningClosingTime = new BranchDayOpeningTimeViewModel()
                 {
                     BranchId = branchId,
-                    FirstDayOfWeek = date,
-                    DayAvailabilities = new List<DayAvailabilityViewModel>()
+                    Day = dayDate,
+                    StartTime = _availabilityRepository.GetStoreOpeningHour(branchId, date),
+                    EndTime = _availabilityRepository.GetStoreClosingHour(branchId, date)
                 };
-
-                // Als er geen beschikbaarheden zijn, stuur het lege viewmodel terug
-                if (weekAvailabilities.IsNullOrEmpty())
-                {
-                    return View(viewModel);
-                }
-
-                BranchWeekOpeningTimeViewModel branchWeekOpeningClosingTime = new BranchWeekOpeningTimeViewModel();
-                branchWeekOpeningClosingTime.BranchId = branchId;
-
-                // Voeg voor elke dag de beschikbaarheden van medewerkers toe
-                for (int i = 0; i < 7; i++)
-                {
-                    DateOnly dayDate = date.AddDays(i);
-                    var dayAvailability = new DayAvailabilityViewModel
-                    {
-                        WeekDay = dayDate,
-                        EmployeeAvailabilities = new List<EmployeeAvailability>()
-                    };
-                    BranchDayOpeningTimeViewModel branchOpeningClosingTime = new BranchDayOpeningTimeViewModel()
-                    {
-                        BranchId = branchId,
-                        Day = dayDate,
-                        StartTime = _availabilityRepository.GetStoreOpeningHour(branchId, date),
-                        EndTime = _availabilityRepository.GetStoreClosingHour(branchId, date)
-                    };
-                    branchWeekOpeningClosingTime.OpeningTimes.Add(branchOpeningClosingTime);
+                branchWeekOpeningClosingTime.OpeningTimes.Add(branchOpeningClosingTime);
 
                     // Voeg per dag de medewerkers beschikbaarheden toe (voorbeeld, je zou dit verder moeten aanpassen)
                     foreach (var availability in weekAvailabilities.Where(a => a.Weekday.ToLower() == dayDate.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower()))
@@ -195,10 +231,10 @@ namespace Bumbo.App.Web.Controllers
                         });
                     }
 
-                    viewModel.DayAvailabilities.Add(dayAvailability);
-                }
-                viewModel.OpeningDurations = branchWeekOpeningClosingTime;
-                return View(viewModel);
+                viewModel.DayAvailabilities.Add(dayAvailability);
             }
+            viewModel.OpeningDurations = branchWeekOpeningClosingTime;
+            return View(viewModel);
         }
     }
+}
