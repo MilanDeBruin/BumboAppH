@@ -23,7 +23,13 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav me-auto">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Availability" asp-action="Details" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">Beschikbaarheid</a>
+                                <a class="nav-link text-dark"
+                                    asp-area=""
+                                    asp-controller="Availability"
+                                    asp-action="Details"
+                                    asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
+                                    asp-route-branchId="@User.FindFirst("branch_id")?.Value"
+                                >Mijn Beschikbaarheid</a>
                             </li>
 
                             @if (User.FindFirst("position")?.Value == "Manager")
