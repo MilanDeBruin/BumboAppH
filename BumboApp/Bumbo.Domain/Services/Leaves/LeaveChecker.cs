@@ -5,7 +5,7 @@ namespace Bumbo.Domain.Services.Leaves
     {
         public Boolean startDateHigherThanEndDate(Leave request)
         {
-            return (request.StartDate < request.EndDate);
+            return (request.StartDate <= request.EndDate);
         }
 
         public Boolean checkForOverlap(List<Leave> allRequests, Leave request)
