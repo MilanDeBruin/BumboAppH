@@ -150,7 +150,7 @@ namespace BumboApp.Controllers
                 {
                     BranchId = viewModel.BranchId,
                     Date = dayForecast.Date,
-                    Department = DepartmentEnum.Shelf.ToString(),
+                    Department = DepartmentEnum.Dkw.ToString(),
                     ManHours = dayForecast.ShelfStackerHours
                 });
             }

@@ -35,7 +35,7 @@
                             @if (User.FindFirst("position")?.Value == "Manager")
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Forecast" asp-action="Index" asp-route-branchId="1">Prognose</a>
+                                    <a class="nav-link" asp-controller="Forecast" asp-action="Index" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Prognose</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index">Medewerker</a>
@@ -50,10 +50,10 @@
                                     <a class="nav-link" asp-area="" asp-controller="Leave" asp-action="LeaveManagement">Verlof beheren</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Availability" asp-action="Index" asp-route-branchId="1">Availability</a>
+                                    <a class="nav-link" asp-controller="Availability" asp-action="Index" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Availability</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Scheduling" asp-action="Rooster">Roostering</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Scheduling" asp-action="RoosterRefactored" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Roostering</a>
                                 </li>
                             }
                         </ul>

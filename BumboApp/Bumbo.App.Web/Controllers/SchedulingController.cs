@@ -9,6 +9,8 @@ using System.Diagnostics;
 using Bumbo.Domain.Services.Scheduling;
 using Bumbo.Domain.Models.Schedueling;
 using Bumbo.Domain.Services.CAO;
+using Bumbo.Domain.Models;
+using Bumbo.App.Web.Models.ViewModels.Schedule;
 
 namespace Bumbo.App.Web.Controllers;
 
@@ -29,27 +31,32 @@ public class SchedulingController : Controller
         Scheduling = new Scheduling(_context, _Slogger, _caoScheduleService);
     }
 
-    public IActionResult Rooster()
+    public IActionResult RoosterRefactored(int branchId, string? firstDayOfWeek)
     {
-
-        // test data
-
+        DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+        if (firstDayOfWeek != null) date = DateOnly.Parse(firstDayOfWeek);
 
         List<EmployeeScheduleViewModel> Employees = new List<EmployeeScheduleViewModel>();
-        foreach (Employee employee in _context.Employees) 
+        foreach (Employee employee in _context.Employees.Where(e => e.BranchId == branchId))
         {
             EmployeeScheduleViewModel empData = new EmployeeScheduleViewModel
             {
                 EmployeeId = employee.EmployeeId,
                 Name = employee.FirstName + " " + employee.LastName,
                 MainFunction = employee.Position,
-                //Schedules = employee.WorkSchedules,
+                Schedules = employee.WorkSchedules,
             };
 
             Employees.Add(empData);
         }
+        ScheduleViewModel viewModel = new ScheduleViewModel
+        {
+            BranchId = branchId,
+            FirstDateOfWeek = date,
+            EmployeeSchedules = Employees
+        };
 
-        return View(Employees);
+        return View(viewModel);
     }
 
     [HttpPost]
