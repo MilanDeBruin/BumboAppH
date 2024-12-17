@@ -22,6 +22,7 @@ namespace Bumbo.App.Web.Controllers
             var model = employees.Select(employee => new EmployeeViewModel
             {
                 EmployeeId = employee.EmployeeId,
+                BranchId = employee.BranchId,
                 Position = employee.Position,
                 FirstName = employee.FirstName,
                 Infix = employee.Infix,
@@ -61,11 +62,11 @@ namespace Bumbo.App.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Create(int branchId)
         {
-            // Vul dropdown menus (kan niet gebruikmaken van Repository? Convertion problemen met SelectListItem...)
             var viewModel = new EmployeeViewModel
             {
+                BranchId = branchId,
                 Branches = [.. _context.Branches.Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
@@ -89,9 +90,20 @@ namespace Bumbo.App.Web.Controllers
         [HttpPost]
         public IActionResult Create(EmployeeViewModel viewModel)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || viewModel.HiringDate < viewModel.DateOfBirth)
             {
-                // Hervul dropdown menus
+                if (viewModel.HiringDate < viewModel.DateOfBirth)
+                {
+                    ModelState.AddModelError(
+                        nameof(viewModel.HiringDate),
+                        "Startdatum contract kan niet eerder zijn dan geboortedatum"
+                    );
+                    ModelState.AddModelError(
+                        nameof(viewModel.DateOfBirth),
+                        "Geboortedatum kan niet later zijn dan startdatum contract"
+                    );
+                }
+
                 viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
@@ -108,35 +120,6 @@ namespace Bumbo.App.Web.Controllers
                     Text = lc.LaborContract1
                 })];
 
-                return View(viewModel);
-            }
-
-            if (viewModel.HiringDate < viewModel.DateOfBirth)
-            {
-                ModelState.AddModelError(
-                    nameof(viewModel.HiringDate),
-                    "Startdatum contract kan niet eerder zijn dan geboortedatum"
-                );
-                ModelState.AddModelError(
-                    nameof(viewModel.DateOfBirth),
-                    "Geboortedatum kan niet later zijn dan startdatum contract"
-                );
-
-                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem
-                {
-                    Value = b.BranchId.ToString(),
-                    Text = b.BranchId.ToString(),
-                })];
-                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem
-                {
-                    Value = p.Position1,
-                    Text = p.Position1
-                })];
-                viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
-                {
-                    Value = lc.LaborContract1,
-                    Text = lc.LaborContract1
-                })];
                 return View(viewModel);
             }
 

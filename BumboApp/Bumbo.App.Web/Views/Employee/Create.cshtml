@@ -96,7 +96,7 @@
         </div>
 
         <div class="mt-4 d-flex gap-3">
-            <a asp-action="Index" class="btn btn-secondary">Annuleren</a>
+            <a asp-action="Index" asp-route-branchId="@Model.BranchId" class="btn btn-secondary">Annuleren</a>
             <button type="submit" class="btn btn-success">Opslaan</button>
         </div>
     </form>

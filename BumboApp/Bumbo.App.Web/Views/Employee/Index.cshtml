@@ -9,7 +9,7 @@
     <h1 class="text-center mb-4">Alle Medewerkers (@Model.Count())</h1>
 
     <div class="mb-3 text-end">
-        <a asp-action="Create" asp-controller="Employee" class="btn btn-success">Medewerker Toevoegen</a>
+        <a asp-action="Create" asp-route-branchId="@Model.FirstOrDefault()?.BranchId" class="btn btn-success">Medewerker Toevoegen</a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
