@@ -27,7 +27,7 @@ public class HomeRepository : IHomeRepository
     {
         var workSchedules = _db.WorkSchedules
          .Where(ws => ws.EmployeeId == employeeId && ws.Date == firstDayOfWeek).ToList();
-
+        
         if (workSchedules != null)
         {
             foreach (var workSchedule in workSchedules)

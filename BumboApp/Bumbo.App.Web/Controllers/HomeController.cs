@@ -10,6 +10,7 @@ using Bumbo.App.Web.Models.ViewModels.Home;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace Bumbo.App.Web.Controllers
 {
@@ -24,7 +25,10 @@ namespace Bumbo.App.Web.Controllers
 
         public IActionResult Index(string? date)
         {
-             DateOnly firstDayOfWeek = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            var v = User.FindFirst("employee_id")?.Value;
+            int employeeId = int.Parse(v);
+
+            DateOnly firstDayOfWeek = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
 
             if (date != null)
             {
@@ -36,7 +40,7 @@ namespace Bumbo.App.Web.Controllers
                     FirstDayOfWeek = firstDayOfWeek,
                     WorkDays = new List<DayPersonalScheduleViewModel>()
                 };
-                List<WorkSchedule> schedules = _repo.GetScheduleData(1, firstDayOfWeek); //cookies toevoegen ook
+                List<WorkSchedule> schedules = _repo.GetScheduleData(employeeId, firstDayOfWeek);
 
                  var groupedSchedules = schedules
                 .GroupBy(schedule => schedule.Date)
@@ -57,39 +61,20 @@ namespace Bumbo.App.Web.Controllers
                     viewModel.WorkDays.Add(daySchedule);
 
                 }
-                viewModel.isSick = _repo.GetSick(1); //cookies id nog toevoegen
+                viewModel.isSick = _repo.GetSick(employeeId); 
                 return View(viewModel);
            
         }
 
         [HttpGet]
-        public IActionResult Ziekmelden()
+        public IActionResult Ziekmelden(int employeeId)
         {
+
             DateOnly date = DateOnly.FromDateTime(DateTime.Now);
-            _repo.SetSick(1, date); //toevoegen cookies gezijk
+            _repo.SetSick(employeeId, date);
             TempData["SuccessMessage"] = "Je bent ziekgemeld!";
             return RedirectToAction("Index");
         }    
-
-        //public IActionResult WeekForward()
-        //{
-        //    Console.WriteLine(firstDayOfWeek);
-        //    firstDayOfWeek = firstDayOfWeek.AddDays(7);
-        //    Console.WriteLine(firstDayOfWeek);
-
-        //    return RedirectToAction("Index");
-
-        //}
-
-        //public IActionResult WeekBackward()
-        //{
-        //    Console.WriteLine(firstDayOfWeek);
-        //    firstDayOfWeek = firstDayOfWeek.AddDays(-7);
-        //    Console.WriteLine(firstDayOfWeek);
-
-        //    return RedirectToAction("Index");
-
-        //}
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
