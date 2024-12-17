@@ -10,7 +10,7 @@
 <div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm" style="width:fit-content; margin-bottom:10px">
 <a asp-controller="Leave"
    asp-action="LeaveManagement"
-   class="btn btn-secondary">
+   class="btn btn-primary">
     terug naar beheren
 </a>
 </div>
@@ -35,7 +35,15 @@
                     <span style="width: 33%; text-align: left;">@Html.DisplayFor(modelItem => item.start)</span>
                     <span style="width: 33%; text-align: center;">@Html.DisplayFor(modelItem => item.end)</span>
                     <span style="width: 33%; text-align: right;">@Html.DisplayFor(modelItem => item.status)</span>
-                    <span style="width: 33%; text-align: right;">status aanpassen</span>
+                    <span style="width: 33%; text-align: right;">
+                        <a asp-controller="Leave"
+                           asp-action="Edit"
+                           asp-route-employeeID="@item.employeeId"
+                           asp-route-startdate="@item.start.ToString("yyyy-MM-dd")"
+                           class="btn btn-secondary">
+                            Status aanpassen
+                        </a>
+                    </span>
                 </td>
             </tr>
         }

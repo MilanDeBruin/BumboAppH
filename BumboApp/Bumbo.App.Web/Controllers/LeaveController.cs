@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.Design;
 using Microsoft.VisualBasic;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Bumbo.App.Web.Controllers
 {
@@ -195,6 +196,35 @@ namespace Bumbo.App.Web.Controllers
             return View(viewModel);
         }
 
-      
+        public IActionResult Edit(int employeeID, string startdate)
+        {
+            LeaveRequestModel viewModel = new LeaveRequestModel();
+            DateTime dateTime = DateTime.Parse(startdate);
+            DateOnly startDate = DateOnly.FromDateTime(dateTime);
+
+            viewModel.StatusOptions = repo.GetLeaveStatuses();
+
+
+            viewModel.employeeId = employeeID;
+            viewModel.employeeName = empRepo.FindNameFromId(employeeID);
+            viewModel.start = startDate;
+            Leave leave = repo.getLeaveRequest(employeeID, startDate);
+            viewModel.end = leave.EndDate;
+            viewModel.status = leave.LeaveStatus;
+
+            return View(viewModel);
+        }
+        [HttpPost]
+        public IActionResult Edit(LeaveRequestModel viewModel)
+        {
+            Leave leave = repo.getLeaveRequest(viewModel.employeeId, viewModel.start);
+            leave.LeaveStatus = viewModel.status;
+
+            repo.UpdateLeaveRequest(viewModel.employeeId, viewModel.start, viewModel.status);
+
+            viewModel.end = leave.EndDate;
+
+            return RedirectToAction("AllRequestOverview");
+        }
     }
 }

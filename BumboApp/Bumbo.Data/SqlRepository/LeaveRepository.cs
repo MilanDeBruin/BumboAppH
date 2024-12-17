@@ -32,7 +32,7 @@ namespace Bumbo.Data.SqlRepository
         public List<Leave> getAllRequestsOfEmployee(int id) => ctx.Leaves.Where(n => n.EmployeeId == id).OrderByDescending(n => n.StartDate).ToList();
 
         public List<Leave> getAllPendingRequests() => ctx.Leaves.Where(n => n.LeaveStatus == "Requested").OrderBy(n => n.EmployeeId).ToList();
-        public List<Leave> getAllRequests() => ctx.Leaves.OrderBy(n => n.EmployeeId).ToList();
+        public List<Leave> getAllRequests() => ctx.Leaves.OrderBy(n => n.EmployeeId).ThenByDescending(n => n.StartDate).ToList();
 
         public List<LeaveOverviewDTO> getAllLeaves(DateOnly startDate, DateOnly endDate)
         {
@@ -84,5 +84,12 @@ namespace Bumbo.Data.SqlRepository
             .Select(group => group.Key)
             .ToList();
 
+        public void UpdateLeaveRequest(int employeeId, DateOnly startDate, string status)
+        {
+            var leaveRequest = ctx.Leaves
+                .FirstOrDefault(n => n.EmployeeId == employeeId && n.StartDate == startDate);
+                leaveRequest.LeaveStatus = status;
+                ctx.SaveChanges();
+        }
     }
 }

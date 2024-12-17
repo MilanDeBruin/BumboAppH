@@ -32,6 +32,9 @@ namespace Bumbo.Data.Interfaces
 
         public List<int> getEmployeesInLeave();
 
-     
+        public void UpdateLeaveRequest(int employeeId, DateOnly startDate, string status);
+
+
+
     }
 }
