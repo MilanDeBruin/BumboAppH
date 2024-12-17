@@ -4,6 +4,9 @@
 @{
     ViewData["Title"] = "Verlof beheren";
     var branchIds = ViewBag.BranchIds as List<int> ?? new List<int>();
+
+    var url = Url.Action("AllRequestOverview", "Leave", new { viewModel = "Model" });
+
 }
 
 <head>
@@ -25,15 +28,18 @@
 }
 
 <body>
-    <table style="width: 100%; border-collapse: collapse;">
-        <tr>
-            <th style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between;">
-                <span style="width: 25%; text-align: left;">Medewerker</span>
-                <span style="width: 25%; text-align: center;">start datum</span>
-                <span style="width: 25%; text-align: center;">eind datum</span>
-                <span style="width: 25%; text-align: right;">Beoordeling</span>
-            </th>
-        </tr>
+    <table class="table table-bordered table-striped text-center" >
+        <thead>
+                <tr>
+                    <th style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between;">
+                        <span style="width: 25%; text-align: left;">Medewerker</span>
+                        <span style="width: 25%; text-align: center;">start datum</span>
+                        <span style="width: 25%; text-align: center;">eind datum</span>
+                        <span style="width: 25%; text-align: right;">Beoordeling</span>
+                    </th>
+                </tr>
+        </thead>
+        
             @foreach (var item in Model.myRequests)
             {
                 <tr>
@@ -42,26 +48,24 @@
                         <span style="width: 25%; text-align: center;">@Html.DisplayFor(modelItem => item.start)</span>
                         <span style="width: 25%; text-align: center;">@Html.DisplayFor(modelItem => item.end)</span>
                         <span style="width: 25%; text-align: right;">
-                            <span style="width: 12.5%; text-align: right;">
+                            <div style="display: flex; gap: 10px; justify-content: flex-end;">
                                 <form asp-action="Approve" asp-controller="Leave" method="post">
                                     <input type="hidden" name="employeeId" value="@item.employeeId" />
                                     <input type="hidden" name="start" value="@item.start" />
 
-                                    <button type="submit" class="btn btn-success">
+                                    <button type="submit" class="btn btn-success" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                         <i class="fas fa-check"></i>
                                     </button>
                                 </form>
-                            </span>
-                            <span style="width: 12.5%; text-align: right;">
                                 <form asp-action="Reject" asp-controller="Leave" method="post">
                                     <input type="hidden" name="employeeId" value="@item.employeeId" />
                                     <input type="hidden" name="start" value="@item.start" />
 
-                                    <button type="submit" class="btn btn-danger">
+                                    <button type="submit" class="btn btn-danger" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </form>
-                            </span>
+                            </div>
                         </span>
                     </td>
                 </tr>
@@ -95,6 +99,14 @@
                     Week vooruit
                 </a>
             </div>
+            <div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm">
+                <a asp-controller="Leave"
+                   asp-action="AllRequestOverview"
+                   class="btn btn-secondary">
+                   Alle verzoeken bekijken
+                </a>
+            </div>
+
         </div>
 
     </div>

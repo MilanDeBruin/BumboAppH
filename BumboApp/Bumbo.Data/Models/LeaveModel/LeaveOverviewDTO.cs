@@ -14,5 +14,6 @@ namespace Bumbo.Data.Models.LeaveModel
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         public object BranchId { get; set; }
+        public string Status { get; set; }
     }
 }

@@ -20,7 +20,9 @@ namespace Bumbo.Data.Interfaces
 
         public List<Leave> getAllRequestsOfEmployee(int id);
 
+        public List<Leave> getAllPendingRequests();
         public List<Leave> getAllRequests();
+
 
         public List<LeaveOverviewDTO> getAllLeaves(DateOnly startDate, DateOnly endDate);
 

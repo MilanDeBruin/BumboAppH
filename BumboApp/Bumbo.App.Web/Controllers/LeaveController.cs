@@ -14,21 +14,22 @@ namespace Bumbo.App.Web.Controllers
     public class LeaveController : Controller
     {
         private readonly ILeaveRepository repo;
-        private readonly ILeaveChecker LeaveChecker;
+        private readonly ILeaveChecker lRepo;
         private readonly IEmployeeRepository empRepo;
 
         public LeaveController(ILeaveRepository repo, ILeaveChecker lRepo, IEmployeeRepository empRepo)
         {
             this.repo = repo;
-            this.LeaveChecker = lRepo;
+            this.lRepo = lRepo;
             this.empRepo = empRepo;
         }
-        public IActionResult Index()
+        public IActionResult Index(int employeeId)
         {
             LeaveRequestModel viewModel = new LeaveRequestModel();
             viewModel.start = DateOnly.FromDateTime(DateTime.Now);
             viewModel.end = viewModel.start;
-            viewModel.myRequests = repo.getAllRequestsOfEmployee(1);
+            viewModel.myRequests = repo.getAllRequestsOfEmployee(employeeId);
+            viewModel.employeeId = employeeId; 
 
             viewModel.status = "Requested";
 
@@ -38,18 +39,27 @@ namespace Bumbo.App.Web.Controllers
         [HttpPost]
         public IActionResult Index(LeaveRequestModel viewModel)
         {
-            int employeeID = 1;
-            Leave newRequest = new Leave();
-            newRequest.EmployeeId = viewModel.employeeId;
-            newRequest.StartDate = viewModel.start;
-            newRequest.EndDate = viewModel.end;
-            newRequest.LeaveStatus = viewModel.status;
+            if (viewModel.employeeId == 0)
+            {
+                TempData["FailedMessage"] = "EmployeeId ontbreekt!";
+                return RedirectToAction("Index");
+            }
+
+            Leave newRequest = new Leave
+            {
+                EmployeeId = viewModel.employeeId,
+                StartDate = viewModel.start,
+                EndDate = viewModel.end,
+                LeaveStatus = viewModel.status
+            };
+
             if (repo.checkStartDateForDuble(newRequest.EmployeeId, newRequest.StartDate))
             {
                 TempData["FailedMessage"] = $"Er is al verlof aangevraagd op deze datum!";
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new { employeeId = viewModel.employeeId });
             }
-            if (LeaveChecker.startDateHigherThanEndDate(newRequest) && repo.getOverlap(newRequest.StartDate, newRequest.EndDate, newRequest.EmployeeId))
+
+            if (lRepo.startDateHigherThanEndDate(newRequest) && repo.getOverlap(newRequest.StartDate, newRequest.EndDate, newRequest.EmployeeId))
             {
                 repo.SetLeaveRequest(newRequest);
                 TempData["SuccessMessage"] = $"Verlof is aangevraagd!";
@@ -57,10 +67,9 @@ namespace Bumbo.App.Web.Controllers
             else
             {
                 TempData["FailedMessage"] = $"Verlof is niet aangevraagd!";
-
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { employeeId = viewModel.employeeId });
         }
 
         public IActionResult MyRequest()
@@ -111,7 +120,7 @@ namespace Bumbo.App.Web.Controllers
 
             viewModel.leaves = repo.getAllLeaves(firstDay, lastDay);
 
-            var requests = repo.getAllRequests();
+            var requests = repo.getAllPendingRequests();
             foreach (var request in requests)
             {
                 LeaveRequestModel model = new LeaveRequestModel();
@@ -163,6 +172,27 @@ namespace Bumbo.App.Web.Controllers
             leave.LeaveStatus = "Denied";
             repo.updateLeaveStatus(leave);
             return RedirectToAction("LeaveManagement");
+        }
+
+        public IActionResult AllRequestOverview()
+        {
+           AllLeaveRequestsModel viewModel = new AllLeaveRequestsModel();
+            viewModel.myRequests = new List<LeaveRequestModel>();
+
+            var requests = repo.getAllRequests();
+            foreach (var request in requests)
+            {
+                LeaveRequestModel model = new LeaveRequestModel();
+                model.employeeId = request.EmployeeId;
+                model.employeeName = empRepo.FindNameFromId(request.EmployeeId);
+                model.start = request.StartDate;
+                model.end = request.EndDate;
+                model.status = request.LeaveStatus;
+                viewModel.myRequests.Add(model);
+            }
+
+
+            return View(viewModel);
         }
 
       

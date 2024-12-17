@@ -1,0 +1,48 @@
+﻿@model Bumbo.App.Web.Models.ViewModels.Leave.AllLeaveRequestsModel;
+
+@{
+    ViewData["Title"] = "Alle verlof verzoeken";
+    var branchIds = ViewBag.BranchIds as List<int> ?? new List<int>();
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm" style="width:fit-content; margin-bottom:10px">
+<a asp-controller="Leave"
+   asp-action="LeaveManagement"
+   class="btn btn-secondary">
+    terug naar beheren
+</a>
+</div>
+<table class="table table-bordered table-striped text-center">
+    <thead>
+        <tr>
+            <th style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between;">
+                <span style="width: 33%; text-align: left;">Medewerker</span>
+                <span style="width: 33%; text-align: left;">start datum</span>
+                <span style="width: 33%; text-align: center;">eind datum</span>
+                <span style="width: 33%; text-align: right;">status</span>
+                <span style="width: 33%; text-align: right;">status aanpassen</span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.myRequests)
+        {
+            <tr>
+                <td style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="width: 33%; text-align: left;">@Html.DisplayFor(modelItem => item.employeeName)</span>
+                    <span style="width: 33%; text-align: left;">@Html.DisplayFor(modelItem => item.start)</span>
+                    <span style="width: 33%; text-align: center;">@Html.DisplayFor(modelItem => item.end)</span>
+                    <span style="width: 33%; text-align: right;">@Html.DisplayFor(modelItem => item.status)</span>
+                    <span style="width: 33%; text-align: right;">status aanpassen</span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@if (Model.myRequests.Count == 0)
+{
+    <div class="alert alert-warning" style="margin-top:10px">Geen verlof verzoeken gevonden </div>
+}
+        </div>

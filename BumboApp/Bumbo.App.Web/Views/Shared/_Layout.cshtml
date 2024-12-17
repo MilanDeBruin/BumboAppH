@@ -25,6 +25,9 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Availability" asp-action="Details" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">Beschikbaarheid</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Leave" asp-action="Index" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">Verlof aanvragen</a>
+                            </li>
 
                             @if (User.FindFirst("position")?.Value == "Manager")
                             {
@@ -37,9 +40,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-area="" asp-controller="Norm" asp-action="Index">Norm beheer</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Leave" asp-action="Index">Verlof aanvragen</a>
-                                </li>
+                                
                                 <li class="nav-item">
                                     <a class="nav-link" asp-area="" asp-controller="Leave" asp-action="LeaveManagement">Verlof beheren</a>
                                 </li>

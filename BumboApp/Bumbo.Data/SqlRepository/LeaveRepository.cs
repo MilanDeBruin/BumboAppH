@@ -31,7 +31,8 @@ namespace Bumbo.Data.SqlRepository
 
         public List<Leave> getAllRequestsOfEmployee(int id) => ctx.Leaves.Where(n => n.EmployeeId == id).OrderByDescending(n => n.StartDate).ToList();
 
-        public List<Leave> getAllRequests() => ctx.Leaves.Where(n => n.LeaveStatus == "Requested").OrderBy(n => n.EmployeeId).ToList();
+        public List<Leave> getAllPendingRequests() => ctx.Leaves.Where(n => n.LeaveStatus == "Requested").OrderBy(n => n.EmployeeId).ToList();
+        public List<Leave> getAllRequests() => ctx.Leaves.OrderBy(n => n.EmployeeId).ToList();
 
         public List<LeaveOverviewDTO> getAllLeaves(DateOnly startDate, DateOnly endDate)
         {
@@ -50,7 +51,8 @@ namespace Bumbo.Data.SqlRepository
                               LastName = employee.LastName,
                               StartDate = leave.StartDate,
                               EndDate = leave.EndDate,
-                              BranchId = employee.BranchId
+                              BranchId = employee.BranchId,
+                              Status = leave.LeaveStatus
                           }).ToList();
             return result;
         }
