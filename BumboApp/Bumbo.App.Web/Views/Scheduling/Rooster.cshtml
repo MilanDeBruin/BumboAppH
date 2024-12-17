@@ -60,6 +60,10 @@
                     <strong>@employee.Name</strong>
                     <br />
                     <small>@employee.MainFunction</small>
+                    <br />
+                    <small class="total-hours">
+                        Uren: <span id="total-hours-@employee.EmployeeId">0</span>
+                    </small>
                 </td>
                 @foreach (var day in Enum.GetValues(typeof(DayNameOfWeek)).Cast<DayNameOfWeek>())
                 {
@@ -404,6 +408,8 @@
 
                 document.querySelectorAll('.schedule-cell div').forEach(cell => (cell.innerHTML = ''));
 
+                const totalHoursPerEmployee = {};
+
                 schedules.forEach(schedule => {
                     const dayOfWeek = new Date(schedule.date).getDay();
 
@@ -448,8 +454,29 @@
                         scheduleElement.appendChild(hiddenEmployeeId);
                         scheduleElement.appendChild(hiddenDate);
                         container.appendChild(scheduleElement);
+
+                        const startTime = new Date(`1970-01-01T${schedule.startTime}:00`);
+                        const endTime = new Date(`1970-01-01T${schedule.endTime}:00`);
+                        const hoursWorked = (endTime - startTime) / (1000 * 60 * 60);
+
+                        if (!totalHoursPerEmployee[schedule.employeeId]) {
+                            totalHoursPerEmployee[schedule.employeeId] = 0;
+                        }
+                        totalHoursPerEmployee[schedule.employeeId] += hoursWorked;
                     }
                 });
+
+                document.querySelectorAll("[id^='total-hours-']").forEach(element => {
+                    element.textContent = "00:00"; // Reset all to "00:00"
+                });
+                for (const [employeeId, totalHours] of Object.entries(totalHoursPerEmployee)) {
+                    const totalHoursElement = document.getElementById(`total-hours-${employeeId}`);
+                    if (totalHoursElement) {
+                        const hours = Math.floor(totalHours); // Extract the integer part (hours)
+                        const minutes = Math.round((totalHours - hours) * 60); // Convert the decimal part to minutes
+                        totalHoursElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                    }
+                }
 
             }
 
