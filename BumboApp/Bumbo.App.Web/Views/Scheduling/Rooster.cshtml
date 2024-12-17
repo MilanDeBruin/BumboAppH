@@ -467,13 +467,13 @@
                 });
 
                 document.querySelectorAll("[id^='total-hours-']").forEach(element => {
-                    element.textContent = "00:00"; // Reset all to "00:00"
+                    element.textContent = "00:00"; 
                 });
                 for (const [employeeId, totalHours] of Object.entries(totalHoursPerEmployee)) {
                     const totalHoursElement = document.getElementById(`total-hours-${employeeId}`);
                     if (totalHoursElement) {
-                        const hours = Math.floor(totalHours); // Extract the integer part (hours)
-                        const minutes = Math.round((totalHours - hours) * 60); // Convert the decimal part to minutes
+                        const hours = Math.floor(totalHours);
+                        const minutes = Math.round((totalHours - hours) * 60);
                         totalHoursElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
                     }
                 }
