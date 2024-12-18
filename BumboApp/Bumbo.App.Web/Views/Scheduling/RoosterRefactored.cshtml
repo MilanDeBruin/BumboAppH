@@ -10,6 +10,7 @@
 <head>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="@Url.Content("~/js/Rooster.js")"></script>
 </head>
 <body>
 	<div class="d-flex justify-content-between align-items-center mb-4">
@@ -66,32 +67,63 @@
 			@foreach (var employee in Model.EmployeeSchedules)
 			{
 				<tr class="employee-row">
-					@if (employee.Schedules == null || employee.Schedules.Count > 0)
-					{
+					@if (employee.Schedules != null && employee.Schedules.Count > 0)
+					{ 
+						// Bereken de totale uren voor de werknemer
+						var totalHours = 0.0;
+						foreach (var schedule in employee.Schedules)
+						{
+							var startTime = schedule.StartTime;
+							var endTime = schedule.EndTime;
+							totalHours += (endTime - startTime).TotalHours;
+						}
+						// Extract hours and minutes from the double
+						var hours = (int)Math.Floor(totalHours);
+						var minutes = (int)((totalHours - hours) * 60);
+
+						// Format the time as "HH:mm"
+						var totalTimeFormatted = $"{hours:D2}:{minutes:D2}";
+
 						<td>
 							<strong>@employee.Name</strong>
 							<br />
 							<small>@employee.MainFunction</small>
 							<br />
 							<small class="total-hours">
-								Uren: <span id="total-hours-@employee.EmployeeId">0</span>
+
+								Uren: <span id="total-hours-@employee.EmployeeId">@totalTimeFormatted</span>
 							</small>
 						</td>
+
 						@foreach (var day in Enum.GetValues(typeof(DayNameOfWeek)).Cast<DayNameOfWeek>())
 						{
-							<td class="schedule-cell" data-employee-id="@employee.EmployeeId">
-								<div id="schedule-container-@employee.EmployeeId-@day"></div>
-								<button class="btn btn-sm btn-primary" onclick="openScheduleModal(@employee.EmployeeId, '@day')">
-									+
-								</button>
+							<td class="schedule-cell" data-employee-id="@employee.EmployeeId" data-day="@day">
+								<div id="schedule-container-@employee.EmployeeId-@day">
+									@foreach (var schedule in employee.Schedules.Where(s => s.Date.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower() == day.ToString().ToLower()))
+									{
+										<div class="schedule-entry">
+											<input type="hidden" name="employeeId" value="@employee.EmployeeId" />
+											<input type="hidden" name="date" value="@schedule.Date" />
+
+											<span class="startTime">@schedule.StartTime</span> -
+											<span class="endTime">@schedule.EndTime</span>
+											(<span class="department">@schedule.Department</span>)
+
+											<!-- Verwijderknop -->
+											<form method="post" action="@Url.Action("RemoveSchedule", "Scheduling")">
+												<input type="hidden" name="schedule" value="@schedule" />
+												<button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Weet je zeker dat je deze wilt verwijderen? @schedule.Date van @schedule.StartTime tot @schedule.EndTime?')">X</button>
+											</form>
+										</div>
+									}
+								</div>
 							</td>
 						}
 					}
-
 				</tr>
 			}
-		<td>
 		</tbody>
+
 	</table>
 	<!-- Modal -->
 	<div id="scheduleModal" class="modal" tabindex="-1" role="dialog" style="display: none;">
@@ -99,24 +131,14 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">Voeg een planning toe</h5>
-					<button type="button" class="close" onclick="closeScheduleModal()" aria-label="Close">
+					<button type="button" class="close" id="closeScheduleModal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
 				<div class="modal-body">
 					<form id="scheduleForm">
-						<input type="hidden" id="modalEmployeeId">
-						<input type="hidden" id="modalDay">
-						<input type="hidden" id="modalDate">
+						<div id="addScheduleUrl" data-url="@Url.Action("AddSchedule", "Scheduling")" hidden></div>
 
-						<div class="form-group">
-							<label for="modalStartTime">Start tijd:</label>
-							<input type="time" id="modalStartTime" class="form-control" value="09:00">
-						</div>
-						<div class="form-group">
-							<label for="modalEndTime">Eind tijd:</label>
-							<input type="time" id="modalEndTime" class="form-control" value="21:00">
-						</div>
 						<div class="form-group">
 							<label for="modalDepartment">Afdeling:</label>
 							<select id="modalDepartment" class="form-control">
@@ -126,11 +148,39 @@
 								}
 							</select>
 						</div>
+						<div class="form-group">
+							<label for="employees">Werknemer:</label>
+							<select id="modalEmployees" class="form-control">
+								@foreach (var employee in Model.EmployeeSchedules)
+								{
+									<option value="@employee.EmployeeId">@employee.Name</option>
+								}
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="modalDay">Datum:</label>
+							<select id="modalDay" class="form-control">
+								@for (var i = 0; i < 7; i++)
+								{
+									var day = Model.FirstDateOfWeek.AddDays(i);
+									<option value="@day.ToString("yyyy-MM-dd")">@day.ToString("dd-MM-yyyy", new System.Globalization.CultureInfo("nl-NL")) - @day.ToString("dddd", new System.Globalization.CultureInfo("nl-NL"))</option>
+								}
+
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="modalStartTime">Start tijd:</label>
+							<input type="time" id="modalStartTime" class="form-control" value="09:00">
+						</div>
+						<div class="form-group">
+							<label for="modalEndTime">Eind tijd:</label>
+							<input type="time" id="modalEndTime" class="form-control" value="21:00">
+						</div>
 					</form>
 				</div>
 				<div class="modal-footer">
 					<button id="Opslaan" class="btn btn-primary">Opslaan</button>
-					<button type="button" class="btn btn-secondary" onclick="closeScheduleModal()">Annuleren</button>
+					<button type="button" class="btn btn-secondary" id="cancelScheduleModal">Annuleren</button>
 				</div>
 			</div>
 		</div>

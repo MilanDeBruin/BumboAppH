@@ -34,17 +34,23 @@ public class SchedulingController : Controller
     public IActionResult RoosterRefactored(int branchId, string? firstDayOfWeek)
     {
         DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
-        if (firstDayOfWeek != null) date = DateOnly.Parse(firstDayOfWeek);
+		DateOnly lastDateOfWeek = date.AddDays(6);
+		if (firstDayOfWeek != null) date = DateOnly.Parse(firstDayOfWeek);
 
         List<EmployeeScheduleViewModel> Employees = new List<EmployeeScheduleViewModel>();
-        foreach (Employee employee in _context.Employees.Where(e => e.BranchId == branchId))
+
+        var dbEmployees = _context.Employees.Where(e => e.BranchId == branchId).ToList();
+
+		foreach (Employee employee in dbEmployees)
         {
-            EmployeeScheduleViewModel empData = new EmployeeScheduleViewModel
+            var filteredSchedules = _context.WorkSchedules.Where(e => e.EmployeeId == employee.EmployeeId).Where(ws => ws.Date >= date && ws.Date <= lastDateOfWeek).ToList();
+
+			EmployeeScheduleViewModel empData = new EmployeeScheduleViewModel
             {
                 EmployeeId = employee.EmployeeId,
                 Name = employee.FirstName + " " + employee.LastName,
                 MainFunction = employee.Position,
-                Schedules = employee.WorkSchedules,
+                Schedules = filteredSchedules,
             };
 
             Employees.Add(empData);
@@ -62,7 +68,6 @@ public class SchedulingController : Controller
     [HttpPost]
     public IActionResult AddSchedule([FromBody] ScheduleModel schedule)
     {
-
         if (schedule == null)
         {
             _logger.LogWarning("No schedule data received.");
@@ -94,30 +99,15 @@ public class SchedulingController : Controller
         
     }
 
-    [HttpPost]
-    public IActionResult RemoveSchedule([FromBody] ScheduleModel schedule)
-    {
-        if (schedule == null)
-        {
-            _logger.LogWarning("No schedule data received.");
-            return BadRequest("Invalid schedule data.");
-        }
+	[HttpPost]
+	public IActionResult RemoveSchedule([FromBody] ScheduleModel schedule)
+	{
+        throw new Exception("el" + schedule);
+		Scheduling.DeleteDataFromDb(schedule);
+		return Json(new { success = true });
+	}
 
-
-
-        if (!ModelState.IsValid)
-        {
-            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-            {
-                _logger.LogWarning($"ModelState Error: {error.ErrorMessage}");
-            }
-        }
-
-        Scheduling.DeleteDataFromDb(schedule);
-        return Json(new { success = true });
-    }
-
-    [HttpGet]
+	[HttpGet]
     public IActionResult GetSchedulesForWeek(int year, int week)
     {
         var startDate = Scheduling.GetStartOfWeek(year, week);
