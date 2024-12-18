@@ -1,6 +1,8 @@
 ﻿document.addEventListener("DOMContentLoaded", (event) => {
 
+
     setModalJS();
+    
 });
 
 
@@ -21,3 +23,7 @@ function setModalJS() {
         modal.style.display = "block";
     })
 }
+
+
+
+

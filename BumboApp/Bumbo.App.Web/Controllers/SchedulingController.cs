@@ -56,15 +56,34 @@ public class SchedulingController : Controller
 
             Employees.Add(empData);
         }
+
+
+        var forecasts = _context.Forecasts
+        .Where(f => f.BranchId == branchId && f.Date >= date && f.Date <= lastDateOfWeek).ToList();
+
+
+        List<ForecastData> FD = new List<ForecastData>();
+        foreach (Forecast forecast in forecasts) 
+        {
+            string depart = Scheduling.getCorrectValue(forecast.Department);
+
+			ForecastData data = new ForecastData();
+            data.Date = forecast.Date;
+            data.Department = (DepartmentEnum)Enum.Parse(typeof(DepartmentEnum), depart);
+            data.ManHours = forecast.ManHours;
+            FD.Add(data);
+        }
         ScheduleViewModel viewModel = new ScheduleViewModel
         {
             BranchId = branchId,
             FirstDateOfWeek = date,
-            EmployeeSchedules = Employees
+            EmployeeSchedules = Employees,
+            forecastDatas = FD // Add this property in your view model
         };
 
         return View(viewModel);
     }
+    
 
     [HttpPost]
     public IActionResult AddSchedule(int branchId, int employeeId, string date, string startTime, string endTime, string department)

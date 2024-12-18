@@ -159,4 +159,20 @@ public class Scheduling
         }
         Context.SaveChanges();
     }
+	public string getCorrectValue(string value)
+	{
+		switch (value)
+		{
+			case "Shelf":
+				return "Dkw";
+				break;
+			case "kassa":
+				return "Kassa";
+				break;
+			case "Vers":
+				return "Vers";
+				break;
+		}
+		return "Dkw";
+	}
 }

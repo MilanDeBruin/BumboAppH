@@ -53,7 +53,6 @@
 							{
 								<small id="forecast-@day-@department" class="text-muted text-smaller">@department: </small>
 								<small id="scheduled-@day-@department" class="text-muted text-smaller"></small>
-								<small id="difference-@day-@department" class="text-muted text-smaller"></small>
 								<br />
 							}
 						</div>
@@ -181,6 +180,90 @@
 		</form>
 	</div>
 </body>
+<script>
+	const forecastData = @Html.Raw(Json.Serialize(Model.forecastDatas));
+	const scheduledData = @Html.Raw(Json.Serialize(Model.EmployeeSchedules.SelectMany(emp => emp.Schedules).Select(s => new
+		{
+			date = s.Date.ToString("yyyy-MM-dd"),
+			department = s.Department.ToString(),
+			scheduledHours = (s.EndTime - s.StartTime).TotalHours
+		})));
+	document.addEventListener("DOMContentLoaded", (event) => {
+
+		updateForecastGrid(forecastData, scheduledData);
+		
+
+	});
+	function updateForecastGrid(forecastData, scheduledData) {
+		const dayMapping = {
+			0: 'Zondag',
+			1: 'Maandag',
+			2: 'Dinsdag',
+			3: 'Woensdag',
+			4: 'Donderdag',
+			5: 'Vrijdag',
+			6: 'Zaterdag'
+		};
+
+		function convertToHHMM(decimalHours) {
+			const hours = Math.floor(decimalHours);
+			const minutes = Math.round((decimalHours - hours) * 60);
+			return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+		}
+
+		// Map scheduled data for quick lookup
+		const scheduledMap = scheduledData.reduce((map, schedule) => {
+			const key = `${schedule.date}-${schedule.department}`;
+			map[key] = schedule.scheduledHours;
+			return map;
+		}, {});
+
+		// Clear any existing progress bars
+		document.querySelectorAll('.progress-bar-container').forEach(container => {
+			container.innerHTML = '';
+		});
+
+		// Process forecast data
+		forecastData.forEach(forecast => {
+			const dayOfWeek = new Date(forecast.date).getDay();
+			const dayName = dayMapping[dayOfWeek] || "Unknown";
+			const scheduledKey = `${forecast.date}-${forecast.department}`;
+			const scheduledHours = scheduledMap[scheduledKey] || 0;
+			const progressPercentage = forecast.manHours
+				? Math.min((scheduledHours / forecast.manHours) * 100, 100)
+				: 0;
+
+			const forecastElement = document.getElementById(`forecast-${dayName}-${forecast.department}`);
+			if (forecastElement) {
+				forecastElement.innerHTML = `
+					<div class="progress-bar-container">
+						<div class="department-name">
+							<strong>${forecast.department}:</strong>
+						</div>
+						<div
+							class="progress progress-hover"
+							title="Ingepland: ${convertToHHMM(scheduledHours)} | Prognose: ${convertToHHMM(forecast.manHours)} | Voortgang: ${progressPercentage.toFixed(1)}%"
+							data-bs-toggle="tooltip"
+							data-bs-placement="top">
+							<div
+								class="progress-bar progress-bar-forecast"
+								role="progressbar"
+								style="width: ${progressPercentage}%; background-color: ${progressPercentage === 0 ? 'red' : 'green'};">
+							</div>
+						</div>
+					</div>
+				`;
+			}
+		});
+
+		// Initialize tooltips
+		const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+		tooltips.forEach(tooltip => {
+			new bootstrap.Tooltip(tooltip);
+		});
+	}
+
+</script>
 
 
 <style>
