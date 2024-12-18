@@ -4,29 +4,77 @@ using System.Diagnostics;
 using Bumbo.Data.Context;
 using Bumbo.Domain.Services.CAO;
 using BumboApplicatie.Models;
+using Microsoft.VisualBasic;
+using Bumbo.Domain.Models;
+using Bumbo.App.Web.Models.ViewModels.Home;
+using Bumbo.Data.Interfaces;
+using Bumbo.Data.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace Bumbo.App.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly BumboDbContext _db;
-
-        public HomeController(ILogger<HomeController> logger, BumboDbContext db, ICaoScheduleService service)
-        {
-            _logger = logger;
-            _db = db;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
+        private readonly IHomeRepository _repo;
         
-        public IActionResult Prognose()
+        public HomeController(IHomeRepository repo)
         {
-            return View();
+            _repo = repo;
         }
+
+        public IActionResult Index(string? date)
+        {
+            var v = User.FindFirst("employee_id")?.Value;
+            int employeeId = int.Parse(v);
+
+            DateOnly firstDayOfWeek = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
+
+            if (date != null)
+            {
+                firstDayOfWeek = DateOnly.Parse(date);
+            }
+
+            var viewModel = new WeekPersonalScheduleViewModel
+                {
+                    FirstDayOfWeek = firstDayOfWeek,
+                    WorkDays = new List<DayPersonalScheduleViewModel>()
+                };
+                List<WorkSchedule> schedules = _repo.GetScheduleData(employeeId, firstDayOfWeek);
+
+                 var groupedSchedules = schedules
+                .GroupBy(schedule => schedule.Date)
+                .OrderBy(group => group.Key);
+
+                foreach (var group in groupedSchedules)
+                {
+                    var daySchedule = new DayPersonalScheduleViewModel
+                    {
+                        Date = group.Key,
+                        Shifts = group.Select(schedule => new ShiftsViewModel
+                        {
+                            Time = $"{schedule.StartTime:hh\\:mm} - {schedule.EndTime:hh\\:mm}",
+                            Departement = schedule.Department,
+                            Branch_Id = schedule.BranchId
+                        }).ToList()
+                    };
+                    viewModel.WorkDays.Add(daySchedule);
+
+                }
+                viewModel.isSick = _repo.GetSick(employeeId); 
+                return View(viewModel);
+           
+        }
+
+        [HttpGet]
+        public IActionResult Ziekmelden(int employeeId)
+        {
+
+            DateOnly date = DateOnly.FromDateTime(DateTime.Now);
+            _repo.SetSick(employeeId, date);
+            TempData["SuccessMessage"] = "Je bent ziekgemeld!";
+            return RedirectToAction("Index");
+        }    
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

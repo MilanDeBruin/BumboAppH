@@ -1,7 +1,112 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@using Bumbo.Domain.Models;
+@using Bumbo.App.Web.Models.ViewModels.Home;
 
-<div class="container text-center mt-5">
-    <h1 class="display-4 text-dark">Welkom bij Bumbo</h1>
-</div>
+
+@model Bumbo.App.Web.Models.ViewModels.Home.WeekPersonalScheduleViewModel
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/rooster_bekijken.css">
+</head>
+
+<body>
+    <div>
+        
+        @if (!Model.isSick)
+        {
+            <a asp-controller="Home" asp-action="Ziekmelden" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+                <input type="button" value="Ziekmelden"/>
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Home" asp-action="Ziekmelden">
+                <input type="button" value="Ziekgemeld" disabled="disabled" class="disable_button"/>
+            </a>
+        }
+        <h2>Rooster Week</h2>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center mt-3">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm">
+        <a asp-controller="Home"
+           asp-action="Index"
+           asp-route-date="@Model.FirstDayOfWeek.AddDays(-7).ToString("yyyy-MM-dd")"
+           asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
+           class="btn btn-secondary">
+            Week terug
+        </a>
+
+
+
+        <span class="fw-bold">@Model.FirstDayOfWeek.ToString("dd-MM-yyyy")</span>
+        <span>tot</span>
+        <span class="fw-bold">@Model.FirstDayOfWeek.AddDays(6).ToString("dd-MM-yyyy")</span>
+
+
+        <a asp-controller="Home"
+           asp-action="Index"
+           asp-route-date="@Model.FirstDayOfWeek.AddDays(7).ToString("yyyy-MM-dd")"
+           asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
+           class="btn btn-secondary">
+            Week vooruit
+        </a>
+    </div>
+
+
+    <div class="table-container">
+
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Datum</th>
+                    <th>Tijd</th>
+                    <th>Afdeling</th>
+                    <th>Filiaal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var daysOfWeek = Enumerable.Range(0, 7)
+                    .Select(offset => Model.FirstDayOfWeek.AddDays(offset))
+                    .ToList();
+                }
+
+                @foreach (var date in daysOfWeek)
+                {
+                    var daySchedule = Model.WorkDays.FirstOrDefault(d => d.Date == date);
+                    if (daySchedule != null && daySchedule.Shifts.Any())
+                    {
+                        foreach (var shift in daySchedule.Shifts)
+                        {
+                            <tr>
+                                <td>@date.ToString("dd-MM-yyyy")</td>
+                                <td>@shift.Time</td>
+                                <td>@shift.Departement</td>
+                                <td>@shift.Branch_Id</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>@date.ToString("dd-MM-yyyy")</td>
+                            <td colspan="3">Geen diensten</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+
+</body>

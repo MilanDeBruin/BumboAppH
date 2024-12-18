@@ -41,6 +41,7 @@ namespace BumboApp.Controllers
             WeekForecastViewModel viewModel = new WeekForecastViewModel();
             viewModel.BranchId = branchId;
             viewModel.FirstDayOfWeek = date;
+            
 
             if (weekForecasts.IsNullOrEmpty())
             {
