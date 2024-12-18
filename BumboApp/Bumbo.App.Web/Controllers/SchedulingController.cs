@@ -11,6 +11,7 @@ using Bumbo.Domain.Models.Schedueling;
 using Bumbo.Domain.Services.CAO;
 using Bumbo.Domain.Models;
 using Bumbo.App.Web.Models.ViewModels.Schedule;
+using Microsoft.VisualBasic;
 
 namespace Bumbo.App.Web.Controllers;
 
@@ -34,10 +35,10 @@ public class SchedulingController : Controller
     public IActionResult RoosterRefactored(int branchId, string? firstDayOfWeek)
     {
         DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
-		DateOnly lastDateOfWeek = date.AddDays(6);
 		if (firstDayOfWeek != null) date = DateOnly.Parse(firstDayOfWeek);
+		DateOnly lastDateOfWeek = date.AddDays(6);
 
-        List<EmployeeScheduleViewModel> Employees = new List<EmployeeScheduleViewModel>();
+		List<EmployeeScheduleViewModel> Employees = new List<EmployeeScheduleViewModel>();
 
         var dbEmployees = _context.Employees.Where(e => e.BranchId == branchId).ToList();
 
@@ -66,15 +67,18 @@ public class SchedulingController : Controller
     }
 
     [HttpPost]
-    public IActionResult AddSchedule([FromBody] ScheduleModel schedule)
+    public IActionResult AddSchedule(int branchId, int employeeId, string date, string startTime, string endTime, string department)
     {
-        if (schedule == null)
+        ScheduleModel schedule = new ScheduleModel
         {
-            _logger.LogWarning("No schedule data received.");
-            return BadRequest("Invalid schedule data.");
-        }
+            EmployeeId = employeeId,
+            Date = DateTime.Parse(date),
+            StartTime = TimeSpan.Parse(startTime),
+            EndTime = TimeSpan.Parse(endTime),
+            Department = department,
+        };
 
-       
+
         if (!ModelState.IsValid)
         {
             foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
@@ -83,109 +87,44 @@ public class SchedulingController : Controller
             }
         }
 
-
         ScheduleSuccesModel result = Scheduling.SendDataToDb(schedule);
         if (result.Success)
         {
-            _logger.LogInformation($"------------------------- het hoort gelukt te zijn  {schedule.Date} --------------------------------------------------------------------------");
-            return Json(new { success = true });
+            return RedirectToAction("RoosterRefactored", "Scheduling", new { branchId = branchId });
         }
         else 
         {
-            _logger.LogInformation($"------------------------- het hoort gefaalt te zijn  {schedule.Date} --------------------------------------------------------------------------");
+            return StatusCode(500, new { success = false, message = $"Het rooster kon niet opgeslagen worden doordat: {result.Message}" });
 
-            return Json(new { success = false, message = $"Het rooster kon niet opgeslagen worden doordat: {result.Message}" });
         }
-        
+
     }
 
 	[HttpPost]
-	public IActionResult RemoveSchedule([FromBody] ScheduleModel schedule)
+	public IActionResult RemoveSchedule(int branchId, int employeeId, string date, string startTime, string endTime, string department)
 	{
-        throw new Exception("el" + schedule);
+		ScheduleModel schedule = new ScheduleModel
+		{
+            EmployeeId = employeeId,
+            Date = DateTime.Parse(date),
+            StartTime = TimeSpan.Parse(startTime),
+            EndTime = TimeSpan.Parse(endTime),
+            Department = department,
+		};
+
 		Scheduling.DeleteDataFromDb(schedule);
-		return Json(new { success = true });
+		return RedirectToAction("RoosterRefactored", "Scheduling", new { branchId = branchId });
 	}
 
-	[HttpGet]
-    public IActionResult GetSchedulesForWeek(int year, int week)
-    {
-        var startDate = Scheduling.GetStartOfWeek(year, week);
-        var endDate = startDate.AddDays(6);
-
-        var schedules = _context.WorkSchedules
-            .Where(s => s.Date >= DateOnly.FromDateTime(startDate) && s.Date <= DateOnly.FromDateTime(endDate))
-            .Select(s => new
-            {
-                s.EmployeeId,
-                s.Date,
-                s.StartTime,
-                s.EndTime,
-                Department = s.Department.ToString()
-            })
-            .ToList();
-
-        var forecastData = _context.Forecasts
-        .Where(f => f.Date >= DateOnly.FromDateTime(startDate) && f.Date <= DateOnly.FromDateTime(endDate) && f.BranchId == 1)
-        .GroupBy(f => new { f.Date, f.Department })
-        .Select(g => new
-        {
-            Date = g.Key.Date,
-            Department = g.Key.Department,
-            ManHours = g.Sum(f => f.ManHours) 
-        })
-        .ToList();
-
-        var scheduledHours = schedules
-        .GroupBy(s => new { s.Date, s.Department })
-        .Select(g => new
-        {
-            Date = g.Key.Date,
-            Department = g.Key.Department,
-            ScheduledHours = g.Sum(s => (s.EndTime - s.StartTime).TotalHours) // Calculate hours
-        })
-        .ToList();
-
-        return Json(new
-        {
-            Schedules = schedules.Select(s => new
-            {
-                s.EmployeeId,
-                Date = s.Date.ToString("yyyy-MM-dd"),
-                StartTime = s.StartTime.ToString("HH:mm"),
-                EndTime = s.EndTime.ToString("HH:mm"),
-                Department = s.Department
-            }),
-            Forecasts = forecastData.Select(f => new
-            {
-                Date = f.Date.ToString("yyyy-MM-dd"),
-                Department = f.Department,
-                ManHours = f.ManHours
-            }),
-            ScheduledHours = scheduledHours.Select(sh => new
-            {
-                Date = sh.Date.ToString("yyyy-MM-dd"),
-                Department = sh.Department,
-                ScheduledHours = sh.ScheduledHours
-            })
-        });
-
-    }
-
     [HttpPost]
-    public IActionResult PublishSchedules([FromBody] PublishDataModel data)
+    public IActionResult PublishSchedules(int branchId, string modalDateInput)
     {
-        if (data == null || string.IsNullOrWhiteSpace(data.Date))
-        {
-            return BadRequest(new { success = false, message = "Invalid date provided." });
-        }
-
         try
         {
-            DateOnly publishDate = DateOnly.Parse(data.Date);
+            DateOnly publishDate = DateOnly.Parse(modalDateInput);
             Scheduling.PublishSchedule(publishDate.AddDays(1));
             _logger.LogInformation($"{publishDate}");
-            return Ok(new { success = true, message = "Schedules published successfully." });
+            return RedirectToAction("RoosterRefactored", "Scheduling", new { branchId = branchId, firstDayOfWeek = modalDateInput });
         }
         catch (Exception ex)
         {
