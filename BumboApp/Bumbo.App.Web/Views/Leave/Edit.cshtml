@@ -1,0 +1,49 @@
+﻿@model Bumbo.App.Web.Models.ViewModels.LeaveRequest.LeaveRequestModel
+
+@{
+    ViewData["Title"] = "Edit";
+    
+}
+
+<h1 class="text-center mb-4">Bewerken verzoek voor @Html.DisplayFor(m => m.employeeName)</h1>
+
+<hr />
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert"></div>
+
+                @* Verborgen veld voor de primaire sleutel (BranchId) *@
+                <input asp-for="employeeId" type="hidden" />
+
+                @* Verborgen veld voor SupermarketActivity *@
+               
+                <div class="mb-3" style="margin:10px">
+                    <h2 class="form-label">van @Html.DisplayFor(m => m.start) tot @Html.DisplayFor(m => m.end)</h2>
+                    <input asp-for="start" type="hidden"  />
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label">Bewerken van beoordeling</label>
+                    <select asp-for="status" class="form-control">
+                        @foreach (var status in Model.StatusOptions)
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                    <span asp-validation-for="status" class="text-danger"></span>
+                </div>
+
+
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="AllRequestOverview" class="btn btn-secondary">Terug</a>
+                    <input type="submit" value="Opslaan" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
