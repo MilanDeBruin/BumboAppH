@@ -24,4 +24,9 @@ public class TestAvailabilityRepository : IAvailabilityRepository
     {
         throw new NotImplementedException();
     }
+
+    public List<Availability> GetWeekAvailabilityForEmployee(int employeeId, DateOnly date)
+    {
+        throw new NotImplementedException();
+    }
 }

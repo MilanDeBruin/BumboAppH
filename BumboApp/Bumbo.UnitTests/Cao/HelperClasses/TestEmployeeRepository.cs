@@ -48,7 +48,42 @@ public class TestEmployeeRepository : IEmployeeRepository
         };
     }
 
+    public IEnumerable<Employee> GetEmployees(int branchId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void SaveEmployee(Employee employee)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool UpdateEmployee(Employee employee)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool DeleteEmployee(int employeeId)
+    {
+        throw new NotImplementedException();
+    }
+
     public string FindNameFromId(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<Branch> GetBranches()
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<Position> GetPositions()
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<LaborContract> GetLaborContracts()
     {
         throw new NotImplementedException();
     }
