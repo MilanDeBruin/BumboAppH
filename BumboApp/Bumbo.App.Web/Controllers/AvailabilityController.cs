@@ -153,10 +153,8 @@ namespace Bumbo.App.Web.Controllers
             return RedirectToAction("Details", new { employeeId = availabilityViewModel.EmployeeId, branchId = availabilityViewModel.BranchId });
         }
 
-
-
         [HttpGet]
-        public IActionResult Index(int branchId, string? firstDayOfWeek)
+        public IActionResult Index(int branchId, string? firstDayOfWeek, string? position)
         {
             DateOnly date = DateOnlyHelper.GetFirstDayOfWeek(DateOnly.FromDateTime(DateTime.Now));
             if (firstDayOfWeek != null)
@@ -182,8 +180,10 @@ namespace Bumbo.App.Web.Controllers
                 return View(viewModel);
             }
 
-            BranchWeekOpeningTimeViewModel branchWeekOpeningClosingTime = new BranchWeekOpeningTimeViewModel();
-            branchWeekOpeningClosingTime.BranchId = branchId;
+            BranchWeekOpeningTimeViewModel branchWeekOpeningClosingTime = new BranchWeekOpeningTimeViewModel
+            {
+                BranchId = branchId
+            };
 
             // Voeg voor elke dag de beschikbaarheden van medewerkers toe
             for (int i = 0; i < 7; i++)
@@ -194,47 +194,52 @@ namespace Bumbo.App.Web.Controllers
                     WeekDay = dayDate,
                     EmployeeAvailabilities = new List<EmployeeAvailability>()
                 };
-                BranchDayOpeningTimeViewModel branchOpeningClosingTime = new BranchDayOpeningTimeViewModel()
+                BranchDayOpeningTimeViewModel branchOpeningClosingTime = new BranchDayOpeningTimeViewModel
                 {
                     BranchId = branchId,
                     Day = dayDate,
-                    StartTime = _availabilityRepository.GetStoreOpeningHour(branchId, date),
-                    EndTime = _availabilityRepository.GetStoreClosingHour(branchId, date)
+                    StartTime = _availabilityRepository.GetStoreOpeningHour(branchId, dayDate),
+                    EndTime = _availabilityRepository.GetStoreClosingHour(branchId, dayDate)
                 };
                 branchWeekOpeningClosingTime.OpeningTimes.Add(branchOpeningClosingTime);
 
-                    // Voeg per dag de medewerkers beschikbaarheden toe (voorbeeld, je zou dit verder moeten aanpassen)
-                    foreach (var availability in weekAvailabilities.Where(a => a.Weekday.ToLower() == dayDate.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower()))
+                // Filter beschikbaarheden op de geselecteerde positie, indien aanwezig
+                var filteredAvailabilities = weekAvailabilities.Where(a =>
+                    a.Weekday.ToLower() == dayDate.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower() &&
+                    (string.IsNullOrEmpty(position) || a.Employee.Position == position)).ToList();
+
+                foreach (var availability in filteredAvailabilities)
+                {
+                    var employee = availability.Employee;
+                    dayAvailability.EmployeeAvailabilities.Add(new EmployeeAvailability
                     {
-                        var employee = availability.Employee;
-                        dayAvailability.EmployeeAvailabilities.Add(new EmployeeAvailability
+                        Employee = new EmployeeViewModel
                         {
-                            Employee = new EmployeeViewModel()
-                            {
-                                EmployeeId = employee.EmployeeId,
-                                BranchId = employee.BranchId,
-                                Position = employee.Position,
-                                HiringDate = employee.HiringDate,
-                                FirstName = employee.FirstName,
-                                Infix = employee.Infix,
-                                LastName = employee.LastName,
-                                DateOfBirth = employee.DateOfBirth,
-                                HouseNumber = employee.HouseNumber,
-                                Addition = employee.Addition,
-                                ZipCode = employee.ZipCode,
-                                EmailAdres = employee.EmailAdres,
-                                Password = employee.Password,
-                                LaborContract = employee.LaborContract,
-                            },
-                            StartTime = availability.StartTime,
-                            EndTime = availability.EndTime,
-                        });
-                    }
+                            EmployeeId = employee.EmployeeId,
+                            BranchId = employee.BranchId,
+                            Position = employee.Position,
+                            HiringDate = employee.HiringDate,
+                            FirstName = employee.FirstName,
+                            Infix = employee.Infix,
+                            LastName = employee.LastName,
+                            DateOfBirth = employee.DateOfBirth,
+                            HouseNumber = employee.HouseNumber,
+                            Addition = employee.Addition,
+                            ZipCode = employee.ZipCode,
+                            EmailAdres = employee.EmailAdres,
+                            Password = employee.Password,
+                        },
+                        StartTime = availability.StartTime,
+                        EndTime = availability.EndTime,
+                    });
+                }
 
                 viewModel.DayAvailabilities.Add(dayAvailability);
             }
+
             viewModel.OpeningDurations = branchWeekOpeningClosingTime;
             return View(viewModel);
         }
+
     }
 }
