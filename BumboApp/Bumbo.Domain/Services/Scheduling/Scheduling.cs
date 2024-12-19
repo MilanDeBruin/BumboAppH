@@ -52,8 +52,20 @@ public class Scheduling
         }
         if (checker == null)
         {
+			switch (model.Department)
+			{
+				case "Dkw":
+					model.Department = "Shelf";
+					break;
+				case "kassa":
+					model.Department = "Kassa";
+					break;
+				case "Vers":
+					model.Department = "Vers";
+					break;
+			}
 
-            WorkSchedule schedule = new WorkSchedule()
+			WorkSchedule schedule = new WorkSchedule()
             {
                 EmployeeId = model.EmployeeId,
                 Date = date,
@@ -84,12 +96,25 @@ public class Scheduling
         else 
         {
             checker.EndTime = TimeOnly.FromTimeSpan(model.EndTime);
-            checker.Department = model.Department;
+
+            switch (model.Department)
+            {
+                case "Dkw":
+                    checker.Department = "Shelf";
+					break;
+				case "kassa":
+                    checker.Department = "Kassa";
+					break;
+				case "Vers":
+                    checker.Department = "Vers";
+					break;
+            }
+
             CaoSheduleValidatorEnum result = icss.ValidateSchedule(checker);
 
             if (result == CaoSheduleValidatorEnum.Valid)
-            {
-                Context.SaveChanges();
+			{
+				Context.SaveChanges();
                 return new ScheduleSuccesModel() { Success = true, Message = result.ToString() };
             }
             else
@@ -134,4 +159,20 @@ public class Scheduling
         }
         Context.SaveChanges();
     }
+	public string getCorrectValue(string value)
+	{
+		switch (value)
+		{
+			case "Shelf":
+				return "Dkw";
+
+			case "kassa":
+				return "Kassa";
+
+			case "Vers":
+				return "Vers";
+
+		}
+		return value;
+	}
 }
