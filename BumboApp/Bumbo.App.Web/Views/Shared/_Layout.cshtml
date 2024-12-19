@@ -23,31 +23,38 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav me-auto">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Availability" asp-action="Details" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">Beschikbaarheid</a>
+                                <a class="nav-link text-dark"
+                                    asp-area=""
+                                    asp-controller="Availability"
+                                    asp-action="Details"
+                                    asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
+                                    asp-route-branchId="@User.FindFirst("branch_id")?.Value"
+                                >Mijn Beschikbaarheid</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Leave" asp-action="Index" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">Verlof aanvragen</a>
                             </li>
 
                             @if (User.FindFirst("position")?.Value == "Manager")
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Forecast" asp-action="Index" asp-route-branchId="1">Prognose</a>
+                                    <a class="nav-link" asp-controller="Forecast" asp-action="Index" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Prognose</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index">Medewerker</a>
+                                    <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Personeelslijst</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-area="" asp-controller="Norm" asp-action="Index">Norm beheer</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Leave" asp-action="Index">Verlof aanvragen</a>
-                                </li>
+                                
                                 <li class="nav-item">
                                     <a class="nav-link" asp-area="" asp-controller="Leave" asp-action="LeaveManagement">Verlof beheren</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Availability" asp-action="Index" asp-route-branchId="1">Availability</a>
+                                    <a class="nav-link" asp-controller="Availability" asp-action="Index" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Beschikbaarheid</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Scheduling" asp-action="Rooster">Roostering</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Scheduling" asp-action="RoosterRefactored" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Roostering</a>
                                 </li>
                             }
                         </ul>

@@ -12,7 +12,6 @@ public class ScheduleModel
     [Required]
     public int EmployeeId { get; set; }
 
-    [Required]
     public string Day { get; set; }
 
     [Required]

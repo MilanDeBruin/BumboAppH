@@ -6,97 +6,97 @@
 }
 
 <div class="container mt-4">
-    <h1 class="mb-4">Nieuwe Medewerker Toevoegen</h1>
+    <h1 class="text-center mb-4">Nieuwe Medewerker Toevoegen</h1>
 
-     <form asp-action="Create" method="post" class="needs-validation">
+     <form asp-action="Create" method="post">
         <div class="row gy-3">
             <div class="col-md-6">
-                <label asp-for="branch_id" class="form-label">Branch ID</label>
-                <select asp-for="branch_id" class="form-select" asp-items="ViewBag.BranchIDs">
+                <label asp-for="BranchId" class="form-label">Vestigingsnummer*</label>
+                <select asp-for="BranchId" asp-items="Model.Branches" class="form-select">
                     <option value="">Selecteer een branch</option>
                 </select>
-                <span asp-validation-for="branch_id" class="text-danger"></span>
+                <span asp-validation-for="BranchId" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="labor_contract" class="form-label">Contracttype</label>
-                <select asp-for="labor_contract" class="form-select" asp-items="ViewBag.LaborContracts">
+                <label asp-for="LaborContract" class="form-label">Contracttype*</label>
+                <select asp-for="LaborContract" asp-items="Model.LaborContracts" class="form-select">
                     <option value="">Selecteer een contracttype</option>
                 </select>
-                <span asp-validation-for="labor_contract" class="text-danger"></span>
+                <span asp-validation-for="LaborContract" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="position" class="form-label">Afdeling</label>
-                <select asp-for="position" class="form-select" asp-items="ViewBag.Positions">
+                <label asp-for="Position" class="form-label">Afdeling*</label>
+                <select asp-for="Position" asp-items="Model.Positions" class="form-select">
                     <option value="">Selecteer een afdeling</option>
                 </select>
-                <span asp-validation-for="position" class="text-danger"></span>
+                <span asp-validation-for="Position" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="hiring_date" class="form-label">Startdatum contract</label>
-                <input asp-for="hiring_date" type="date" class="form-control" />
-                <span asp-validation-for="hiring_date" class="text-danger"></span>
+                <label asp-for="HiringDate" class="form-label">Startdatum contract*</label>
+                <input asp-for="HiringDate" type="date" class="form-control" min="1979-10-18" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="HiringDate" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="first_name" class="form-label">Voornaam</label>
-                <input asp-for="first_name" class="form-control" required />
-                <span asp-validation-for="first_name" class="text-danger"></span>
+                <label asp-for="FirstName" class="form-label">Voornaam*</label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="infix" class="form-label">Tussenvoegsel</label>
-                <input asp-for="infix" class="form-control" />
-                <span asp-validation-for="infix" class="text-danger"></span>
+                <label asp-for="Infix" class="form-label">Tussenvoegsel</label>
+                <input asp-for="Infix" class="form-control" />
+                <span asp-validation-for="Infix" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="last_name" class="form-label">Achternaam</label>
-                <input asp-for="last_name" class="form-control" required />
-                <span asp-validation-for="last_name" class="text-danger"></span>
+                <label asp-for="LastName" class="form-label">Achternaam*</label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="date_of_birth" class="form-label">Geboortedatum</label>
-                <input asp-for="date_of_birth" type="date" class="form-control" required />
-                <span asp-validation-for="date_of_birth" class="text-danger"></span>
+                <label asp-for="DateOfBirth" class="form-label">Geboortedatum*</label>
+                <input asp-for="DateOfBirth" type="date" class="form-control" min="@DateTime.Now.AddYears(-100).ToString("yyyy-MM-dd")" max="@DateTime.Now.AddYears(-13).ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="house_number" class="form-label">Huisnummer</label>
-                <input asp-for="house_number" class="form-control" />
-                <span asp-validation-for="house_number" class="text-danger"></span>
+                <label asp-for="HouseNumber" class="form-label">Huisnummer*</label>
+                <input asp-for="HouseNumber" type="number" class="form-control" min="0" max="9999" />
+                <span asp-validation-for="HouseNumber" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="addition" class="form-label">Toevoeging</label>
-                <input asp-for="addition" class="form-control" />
-                <span asp-validation-for="addition" class="text-danger"></span>
+                <label asp-for="Addition" class="form-label">Toevoeging</label>
+                <input asp-for="Addition" class="form-control" />
+                <span asp-validation-for="Addition" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="zip_code" class="form-label">Postcode</label>
-                <input asp-for="zip_code" class="form-control" />
-                <span asp-validation-for="zip_code" class="text-danger"></span>
+                <label asp-for="ZipCode" class="form-label">Postcode*</label>
+                <input asp-for="ZipCode" class="form-control" />
+                <span asp-validation-for="ZipCode" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="email_adres" class="form-label">E-mailadres</label>
-                <input asp-for="email_adres" type="email" class="form-control" />
-                <span asp-validation-for="email_adres" class="text-danger"></span>
+                <label asp-for="EmailAdres" class="form-label">E-mailadres*</label>
+                <input asp-for="EmailAdres" type="email" class="form-control" />
+                <span asp-validation-for="EmailAdres" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
-                <label asp-for="password" class="form-label">Wachtwoord</label>
-                <input asp-for="password" type="password" class="form-control" />
-                <span asp-validation-for="password" class="text-danger"></span>
+                <label asp-for="Password" class="form-label">Wachtwoord*</label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
             </div>
         </div>
 
         <div class="mt-4 d-flex gap-3">
-            <a asp-action="Index" class="btn btn-secondary">Annuleren</a>
+            <a asp-action="Index" asp-route-branchId="@Model.BranchId" class="btn btn-secondary">Annuleren</a>
             <button type="submit" class="btn btn-success">Opslaan</button>
         </div>
     </form>

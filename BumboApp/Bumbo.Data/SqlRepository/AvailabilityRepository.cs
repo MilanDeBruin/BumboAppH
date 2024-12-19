@@ -81,7 +81,7 @@ public class AvailabilityRepository : IAvailabilityRepository
         for (int i = 0; i < 7; i++)
         {
             daysOfWeek.Add(firstDayOfWeek.AddDays(i).ToString("dddd", new System.Globalization.CultureInfo("nl-NL")));
-        }
+        } 
 
         // Haal beschikbaarheden op en koppel de Employee-informatie
         List<Availability> weekAvailability = _dbContext.Availabilities
@@ -103,5 +103,18 @@ public class AvailabilityRepository : IAvailabilityRepository
         return weekAvailability;
     }
 
+    public List<Availability> GetWeekAvailabilityForEmployee(int employeeId, DateOnly firstDayOfWeek)
+    {
+        List<string> daysOfWeek = new List<string>();
+        for (int i = 0; i < 7; i++)
+        {
+            daysOfWeek.Add(firstDayOfWeek.AddDays(i).ToString("dddd", new System.Globalization.CultureInfo("nl-NL")));
+        }
 
+        List<Availability> weekAvailability = _dbContext.Availabilities
+            .Where(a => a.EmployeeId == employeeId && daysOfWeek.Contains(a.Weekday))
+            .ToList();
+
+        return weekAvailability;
+    }
 }

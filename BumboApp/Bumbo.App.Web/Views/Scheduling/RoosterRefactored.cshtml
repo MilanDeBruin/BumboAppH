@@ -1,0 +1,375 @@
+﻿@using Bumbo.App.Web.Models.ViewModels;
+@using BumboApp.Models.Models;
+@using Bumbo.Domain.Enums;
+@using Bumbo.App.Web.Models.ViewModels.Schedule;
+@using Bumbo.Domain.Models;
+
+@model ScheduleViewModel;
+
+<h2>Medewerker Roostering</h2>
+
+<head>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm">
+			<a asp-controller="Scheduling"
+			   asp-action="RoosterRefactored"
+			   asp-route-branchId="@Model.BranchId"
+			   asp-route-firstDayOfWeek="@Model.FirstDateOfWeek.AddDays(-7).ToString("yyyy-MM-dd")"
+			   class="btn btn-secondary">
+				Week terug
+			</a>
+
+			<span class="fw-bold">@Model.FirstDateOfWeek.ToString("dd-MM-yyyy")</span>
+			<span>tot</span>
+			<span class="fw-bold">@Model.FirstDateOfWeek.AddDays(6).ToString("dd-MM-yyyy")</span>
+
+			<a asp-controller="Scheduling"
+			   asp-action="RoosterRefactored"
+			   asp-route-branchId="@Model.BranchId"
+			   asp-route-firstDayOfWeek="@Model.FirstDateOfWeek.AddDays(7).ToString("yyyy-MM-dd")"
+			   class="btn btn-secondary">
+				Week vooruit
+			</a>
+		</div>
+		<button class="btn btn-sm btn-primary" id="openModalBtn" data-bs-toggle="modal" data-bs-target="#scheduleModal">Toevoegen</button>
+	</div>
+
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>Medewerker</th>
+				<div id="forecast-NoForecast" class="text-muted text-smaller"></div>
+				@foreach (var day in Enum.GetValues(typeof(DayNameOfWeek)).Cast<DayNameOfWeek>())
+				{
+					<th>
+						<div>
+							<span>@day</span>
+							<br />
+							@foreach (var department in Enum.GetValues(typeof(DepartmentEnum)).Cast<DepartmentEnum>())
+							{
+								<small id="forecast-@day-@department" class="text-muted text-smaller">@department: </small>
+								<small id="scheduled-@day-@department" class="text-muted text-smaller"></small>
+								<br />
+							}
+						</div>
+					</th>
+				}
+			</tr>
+		</thead>
+		<tbody id="employeeTableBody">
+			@foreach (var employee in Model.EmployeeSchedules)
+			{
+				<tr class="employee-row">
+					@if (employee.Schedules != null && employee.Schedules.Count > 0)
+					{
+						// Bereken de totale uren voor de werknemer
+						var totalHours = 0.0;
+						foreach (var schedule in employee.Schedules)
+						{
+							var startTime = schedule.StartTime;
+							var endTime = schedule.EndTime;
+							totalHours += (endTime - startTime).TotalHours;
+						}
+
+						var hours = (int)Math.Floor(totalHours);
+						var minutes = (int)((totalHours - hours) * 60);
+						var totalTimeFormatted = $"{hours:D2}:{minutes:D2}";
+
+						<td>
+							<strong>@employee.Name</strong>
+							<br />
+							<small>@employee.MainFunction</small>
+							<br />
+							<small class="total-hours">Uren: <span id="total-hours-@employee.EmployeeId">@totalTimeFormatted</span></small>
+						</td>
+
+						@foreach (var day in Enum.GetValues(typeof(DayNameOfWeek)).Cast<DayNameOfWeek>())
+						{
+							<td class="schedule-cell" data-employee-id="@employee.EmployeeId" data-day="@day">
+								<div id="schedule-container-@employee.EmployeeId-@day">
+									@foreach (var schedule in employee.Schedules.Where(s => s.Date.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower() == day.ToString().ToLower()))
+									{
+										<div class="schedule-entry">
+											<form method="post" action="@Url.Action("RemoveSchedule", "Scheduling")">
+												<input type="hidden" name="BranchId" value="@Model.BranchId" />
+												<input type="hidden" name="FirstDateOfWeek" class="form-control" value="@Model.FirstDateOfWeek" />
+												<input type="hidden" name="EmployeeId" value="@employee.EmployeeId" />
+												<input type="hidden" name="Date" value="@schedule.Date.ToString("yyyy-MM-dd")" />
+												<input type="hidden" name="StartTime" value="@schedule.StartTime.ToString("HH:mm")" />
+												<input type="hidden" name="EndTime" value="@schedule.EndTime.ToString("HH:mm")" />
+												<input type="hidden" name="Department" value="@schedule.Department" />
+												<span class="startTime">@schedule.StartTime</span> -
+												<span class="endTime">@schedule.EndTime</span> (<span class="department">@schedule.Department</span>)
+												<button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Weet je zeker dat je deze wilt verwijderen? @schedule.Date van @schedule.StartTime tot @schedule.EndTime?')">X</button>
+											</form>
+										</div>
+									}
+								</div>
+							</td>
+						}
+					}
+				</tr>
+			}
+		</tbody>
+	</table>
+
+	<!-- Modal -->
+	<div id="scheduleModal" class="modal fade" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Voeg een planning toe</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form method="post" action="@Url.Action("AddSchedule", "Scheduling")">
+						<input type="hidden" name="BranchId" value="@Model.BranchId" />
+						<input type="hidden" name="FirstDateOfWeek" class="form-control" value="@Model.FirstDateOfWeek" />
+
+						<div class="form-group">
+							<label for="modalDepartment">Afdeling:</label>
+							<select id="modalDepartment" name="Department" class="form-control">
+								@foreach (var dept in Enum.GetValues(typeof(DepartmentEnum)))
+								{
+									<option value="@dept">@dept</option>
+								}
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="employees">Werknemer:</label>
+							<select id="modalEmployees" name="EmployeeId" class="form-control">
+								@foreach (var employee in Model.EmployeeSchedules)
+								{
+									<option value="@employee.EmployeeId">@employee.Name</option>
+								}
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="modalDay">Datum:</label>
+							<select id="modalDay" name="Date" class="form-control">
+								@for (var i = 0; i < 7; i++)
+								{
+									var day = Model.FirstDateOfWeek.AddDays(i);
+									<option value="@day.AddDays(-1).ToString("yyyy-MM-dd")">@day.ToString("dd-MM-yyyy", new System.Globalization.CultureInfo("nl-NL")) - @day.ToString("dddd", new System.Globalization.CultureInfo("nl-NL"))</option>
+								}
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="modalStartTime">Start tijd:</label>
+							<input type="time" id="modalStartTime" name="StartTime" class="form-control" value="09:00" />
+						</div>
+						<div class="form-group">
+							<label for="modalEndTime">Eind tijd:</label>
+							<input type="time" id="modalEndTime" name="EndTime" class="form-control" value="21:00" />
+						</div>
+						<button type="submit" class="btn btn-primary">Opslaan</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Publish Schedule Form -->
+	<div class="publish-container" style="position: fixed; bottom: 20px; right: 20px;">
+		<form method="post" action="@Url.Action("PublishSchedules", "Scheduling")">
+			<input type="hidden" name="BranchId" value="@Model.BranchId" />
+			<input type="hidden" name="modalDateInput" class="form-control" value="@Model.FirstDateOfWeek" />
+			<button type="submit" class="btn btn-primary">Publiceer Rooster</button>
+		</form>
+	</div>
+</body>
+<script>
+	const forecastData = @Html.Raw(Json.Serialize(Model.forecastDatas));
+	const scheduledData = @Html.Raw(Json.Serialize(Model.EmployeeSchedules.SelectMany(emp => emp.Schedules).Select(s => new
+		{
+			date = s.Date.ToString("yyyy-MM-dd"),
+			department = s.Department.ToString(),
+			scheduledHours = (s.EndTime - s.StartTime).TotalHours
+		})));
+	document.addEventListener("DOMContentLoaded", (event) => {
+
+		updateForecastGrid(forecastData, scheduledData);
+		
+		console.log("Document is ready");
+		console.log("Forecast Data:", forecastData);
+		console.log("Scheduled Data:", scheduledData);
+		function updateForecastGrid(forecastData, scheduledData) {
+			const dayMapping = {
+				0: 'Zondag',
+				1: 'Maandag',
+				2: 'Dinsdag',
+				3: 'Woensdag',
+				4: 'Donderdag',
+				5: 'Vrijdag',
+				6: 'Zaterdag'
+			};
+
+			function convertToHHMM(decimalHours) {
+				const hours = Math.floor(decimalHours);
+				const minutes = Math.round((decimalHours - hours) * 60);
+				return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+			}
+
+			
+			const scheduledMap = scheduledData.reduce((map, schedule) => {
+				const key = `${schedule.date}-${schedule.department}`;
+				map[key] = schedule.scheduledHours;
+				return map;
+			}, {});
+
+			
+			document.querySelectorAll('.progress-bar-container').forEach(container => {
+				container.innerHTML = '';
+			});
+
+			
+			forecastData.forEach(forecast => {
+				const dayOfWeek = new Date(forecast.date).getDay();
+				const dayName = dayMapping[dayOfWeek] || "Unknown";
+				const scheduledKey = `${forecast.date}-${forecast.department}`;
+				const scheduledHours = scheduledMap[scheduledKey] || 0;
+				const progressPercentage = forecast.manHours
+					? Math.min((scheduledHours / forecast.manHours) * 100, 100)
+					: 0;
+				const difference = forecast.manHours - scheduledHours;
+
+				const forecastElement = document.getElementById(`forecast-${dayName}-${forecast.department}`);
+				if (forecastElement) {
+					forecastElement.innerHTML = `
+					<div class="progress-bar-container">
+						<div class="department-name">
+							<strong>${forecast.department}:</strong>
+						</div>
+						<div
+							class="progress progress-hover"
+								title="Ingepland: ${convertToHHMM(scheduledHours)} | Prognose: ${convertToHHMM(forecast.manHours)} | Uren nodig: ${difference}"
+							data-bs-toggle="tooltip"
+							data-bs-placement="top">
+							<div
+								class="progress-bar progress-bar-forecast"
+								role="progressbar"
+								style="width: ${progressPercentage}%; background-color: ${progressPercentage === 0 ? 'red' : 'green'};">
+							</div>
+						</div>
+					</div>
+				`;
+				}
+			});
+
+			
+			const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+			tooltips.forEach(tooltip => {
+				new bootstrap.Tooltip(tooltip);
+			});
+		}
+
+	});
+	
+
+</script>
+
+
+<style>
+	.table {
+		table-layout: fixed;
+		width: 100%;
+	}
+
+		.table th, .table td {
+			word-wrap: break-word;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			vertical-align: top;
+			padding: 10px;
+			text-align: center;
+		}
+
+	.schedule-cell {
+		position: relative;
+		height: auto;
+		min-height: 60px;
+		overflow-y: auto;
+		text-align: left;
+	}
+
+	.schedule-entry {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		background-color: #f8f9fa;
+		border: 1px solid #ddd;
+		border-radius: 3px;
+		margin-bottom: 5px;
+		padding: 5px;
+		font-size: 0.75em;
+		max-width: 100%;
+	}
+
+		.schedule-entry button {
+			flex-shrink: 0;
+			font-size: 0.8em;
+			margin-left: 5px;
+		}
+
+		.schedule-entry span {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			max-width: calc(100% - 40px);
+		}
+
+	.schedule-cell::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.schedule-cell::-webkit-scrollbar-thumb {
+		background: #bbb;
+		border-radius: 4px;
+	}
+
+	.text-smaller {
+		font-size: 0.6em;
+		line-height: 0.0;
+	}
+
+	.schedule-cell::-webkit-scrollbar-thumb:hover {
+		background: #999;
+	}
+
+	.progress {
+		height: 15px;
+		background-color: #f0f0f0;
+		border-radius: 4px;
+		overflow: hidden;
+		margin-bottom: 1px;
+	}
+
+	.progress-bar {
+		height: 100%;
+		text-align: center;
+		line-height: 20px;
+		color: white;
+		transition: width 0.3s ease;
+	}
+
+
+	.progress-bar-forecast {
+		background-color: #007bff;
+	}
+
+
+	.progress-bar-no-forecast {
+		background-color: #dc3545;
+	}
+
+
+	.department-name {
+		margin-bottom: 8px;
+	}
+</style>
+

@@ -4,6 +4,9 @@
 @{
     ViewData["Title"] = "Verlof beheren";
     var branchIds = ViewBag.BranchIds as List<int> ?? new List<int>();
+
+    var url = Url.Action("AllRequestOverview", "Leave", new { viewModel = "Model" });
+
 }
 
 <head>
@@ -25,51 +28,164 @@
 }
 
 <body>
-    <table style="width: 100%; border-collapse: collapse;">
-        <tr>
-            <th style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between;">
-                <span style="width: 25%; text-align: left;">Medewerker</span>
-                <span style="width: 25%; text-align: center;">start datum</span>
-                <span style="width: 25%; text-align: center;">eind datum</span>
-                <span style="width: 25%; text-align: right;">Beoordeling</span>
-            </th>
-        </tr>
-        @foreach (var item in Model.myRequests)
-        {
-            <tr>
-                <td style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="width: 25%; text-align: left;">@Html.DisplayFor(modelItem => item.employeeName)</span>
-                    <span style="width: 25%; text-align: center;">@Html.DisplayFor(modelItem => item.start)</span>
-                    <span style="width: 25%; text-align: center;">@Html.DisplayFor(modelItem => item.end)</span>
-                    <span style="width: 25%; text-align: right;">
-                        <span style="width: 12.5%; text-align: right;">
-                              <form asp-action="Approve" asp-controller="Leave" method="post">
-                                <input type="hidden" name="employeeId" value="@item.employeeId" />
-                                <input type="hidden" name="start" value="@item.start" />
-                                 <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-check"></i>
-                                 </button>
-                              </form>
-                        </span>
-                        <span style="width: 12.5%; text-align: right;">
-                             <form asp-action="Reject" asp-controller="Leave" method="post">
-                                <input type="hidden" name="employeeId" value="@item.employeeId" />
-                                <input type="hidden" name="start" value="@item.start" />
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                             </form>
-                        </span>
-                    </span>
-                </td>
-            </tr>
-        }
-    </table>
+    <table class="table table-bordered table-striped text-center" >
+        <thead>
+                <tr>
+                    <th style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between;">
+                        <span style="width: 25%; text-align: left;">Medewerker</span>
+                        <span style="width: 25%; text-align: center;">start datum</span>
+                        <span style="width: 25%; text-align: center;">eind datum</span>
+                        <span style="width: 25%; text-align: right;">Beoordeling</span>
+                    </th>
+                </tr>
+        </thead>
+        
+            @foreach (var item in Model.myRequests)
+            {
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="width: 25%; text-align: left;">@Html.DisplayFor(modelItem => item.employeeName)</span>
+                        <span style="width: 25%; text-align: center;">@Html.DisplayFor(modelItem => item.start)</span>
+                        <span style="width: 25%; text-align: center;">@Html.DisplayFor(modelItem => item.end)</span>
+                        <span style="width: 25%; text-align: right;">
+                            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                <form asp-action="Approve" asp-controller="Leave" method="post">
+                                    <input type="hidden" name="employeeId" value="@item.employeeId" />
+                                    <input type="hidden" name="start" value="@item.start" />
 
-    <div class="d-flex gap-2 mt-4">
-        <div>
-            <a asp-action="Index" class="btn btn-secondary">Verlof aanvragen</a>
+                                    <button type="submit" class="btn btn-success" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form asp-action="Reject" asp-controller="Leave" method="post">
+                                    <input type="hidden" name="employeeId" value="@item.employeeId" />
+                                    <input type="hidden" name="start" value="@item.start" />
+
+                                    <button type="submit" class="btn btn-danger" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </span>
+                    </td>
+                </tr>
+            }
+    </table>
+    @if (Model.myRequests.Count == 0)
+    {
+    <div class="alert alert-warning" style="margin-top:10px">Er zijn geen verlof verzoeken op dit moment.</div>
+    }
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm">
+                <a asp-controller="Leave"
+                   asp-action="LeaveManagement"
+                   asp-route-firstDayOfWeek="@Model.startOfWeek.AddDays(-7).ToString("dd-MM-yyyy")"
+                   class="btn btn-secondary">
+                    Week terug
+                </a>
+
+                <span class="fw-bold">@Model.startOfWeek.ToString("dd-MM-yyyy") </span>
+
+                <span>tot</span>
+
+                <span class="fw-bold">@Model.endOfWeek.ToString("dd-MM-yyyy")</span>
+
+                <a asp-controller="Leave"
+                   asp-action="LeaveManagement"
+                   asp-route-firstDayOfWeek="@Model.startOfWeek.AddDays(7).ToString("dd-MM-yyyy")"
+                   class="btn btn-secondary">
+                    Week vooruit
+                </a>
+            </div>
+            <div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm">
+                <a asp-controller="Leave"
+                   asp-action="AllRequestOverview"
+                   class="btn btn-secondary">
+                   Alle verzoeken bekijken
+                </a>
+            </div>
+
         </div>
 
     </div>
+
+    <table class="table table-bordered table-striped text-center">
+        <thead class="thead-dark">
+            <tr>
+                <th>
+                    Medewerker
+                    <p></p>
+
+                </th>
+                <th>
+                    Maandag
+                    <p>@Model.weekDates[0].ToString("dd-MM-yyyy")</p>
+                </th>
+                <th>
+                    Dinsdag
+                    <p>@Model.weekDates[1].ToString("dd-MM-yyyy")</p>
+                </th>
+                <th>
+                    Woensdag
+                    <p>@Model.weekDates[2].ToString("dd-MM-yyyy")</p>
+                </th>
+                <th>
+                    Donderdag
+                    <p>@Model.weekDates[3].ToString("dd-MM-yyyy")</p>
+                </th>
+                <th>
+                    Vrijdag
+                    <p>@Model.weekDates[4].ToString("dd-MM-yyyy")</p>
+                </th>
+                <th>
+                    Zaterdag
+                    <p>@Model.weekDates[5].ToString("dd-MM-yyyy")</p>
+                </th>
+                <th>
+                    Zondag
+                    <p>@Model.weekDates[6].ToString("dd-MM-yyyy")</p>
+                </th>
+
+            </tr>
+        </thead>
+            <tbody>
+                @foreach (var list in Model.myRequestsList)
+                {
+                var nameCount = 0;
+                <tr class="text-center">
+                    @foreach (var day in Model.weekDates)
+                    {
+                        @foreach (var item in list)
+                        {
+                            if (nameCount == 0)
+                            {
+                                <td>@item.FirstName @item.LastName</td>
+                                nameCount++;
+                            }
+                        }
+                        
+                        bool hasOverlap = list.Any(item =>
+                        item.StartDate.ToDateTime(new TimeOnly(0, 0)) <= day &&
+                        item.EndDate.ToDateTime(new TimeOnly(0, 0)) >= day
+                        );
+                            if (hasOverlap)
+                            {
+                                <td style="background-color:red"></td> <!-- Rode achtergrond voor overlappende dagen -->
+                            }
+                            else
+                            {
+                                <td></td> <!-- Lege cel als er geen overlap is -->
+                            }
+                        }
+                       
+                    </tr>
+                }
+            </tbody>
+    </table>
+        @if (Model.leaves.Count == 0)
+        {
+        <div class="alert alert-warning">Deze week er is niemand op verlof </div>
+        }
 </body>
