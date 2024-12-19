@@ -1,16 +1,16 @@
-﻿@model Bumbo.App.Web.Models.ViewModels.Availability.AvailabilityViewModel;
+﻿@using Bumbo.App.Web.Models.ViewModels.Availability
+@model AvailabilityViewModel;
 
 @{
     ViewData["Title"] = "Mijn Beschikbaarheid";
 }
 
-<div class="container">
-    <h1 class="text-center mb-4">Mijn Beschikbaarheid - Week X</h1>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Mijn Beschikbaarheid</h1>
 
     <div class="mb-3 text-end">
         <a asp-action="Edit" asp-route-employeeId="@Model.EmployeeId" asp-route-branchId="@Model.BranchId" class="btn btn-success">Beschikbaarheid Wijzigen</a>
         <a asp-controller="SchoolSchedule" asp-action="Details" asp-route-employeeId="@Model.EmployeeId" class="btn btn-primary">Schoolrooster Bekijken</a>
-
     </div>
 
     @if (TempData["SuccessMessage"] != null)

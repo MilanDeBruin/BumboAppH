@@ -41,7 +41,7 @@
                                     <a class="nav-link" asp-controller="Forecast" asp-action="Index" asp-route-branchId="1">Prognose</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index">Medewerker</a>
+                                    <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Personeelslijst</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-area="" asp-controller="Norm" asp-action="Index">Norm beheer</a>

@@ -1,11 +1,12 @@
-﻿@model Bumbo.App.Web.Models.ViewModels.SchoolSchedule.SchoolScheduleViewModel;
+﻿@using Bumbo.App.Web.Models.ViewModels.SchoolSchedule
+@model SchoolScheduleViewModel;
 
 @{
     ViewData["Title"] = "Mijn Schoolrooster";
 }
 
-<div class="container">
-    <h1 class="text-center mb-4">Mijn Schoolrooster - Week X</h1>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Mijn Schoolrooster</h1>
 
     <div class="mb-3 text-end">
         <a asp-action="Edit" asp-route-employeeId="@Model.EmployeeId" class="btn btn-success">Schoolrooster Wijzigen</a>

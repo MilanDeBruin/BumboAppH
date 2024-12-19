@@ -43,8 +43,8 @@
                             foreach (var employeeAvailability in dayAvailability.EmployeeAvailabilities)
                             {
                                 <tr>
-                                    <td>@employeeAvailability.Employee.first_name @employeeAvailability.Employee.last_name</td>
-                                    <td>@employeeAvailability.Employee.position</td>
+                                    <td>@employeeAvailability.Employee.FirstName @employeeAvailability.Employee.LastName</td>
+                                    <td>@employeeAvailability.Employee.Position</td>
                                     <td>@dayAvailability.WeekDay.ToString("dddd")</td>
                                     <td>
                                         @employeeAvailability.StartTime?.ToString(@"hh\:mm") - @employeeAvailability.EndTime?.ToString(@"hh\:mm")
@@ -110,7 +110,7 @@
                                                 }
 
                                                 <div class="work-block" style="left: @startLeft%; width: @width%;">
-                                                    @employeeAvailability.Employee.first_name @employeeAvailability.Employee.last_name
+                                                    @employeeAvailability.Employee.FirstName @employeeAvailability.Employee.LastName
                                                 </div>
                                             }
                                         }
