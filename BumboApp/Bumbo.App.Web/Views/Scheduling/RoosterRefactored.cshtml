@@ -102,8 +102,8 @@
 												<input type="hidden" name="StartTime" value="@schedule.StartTime.ToString("HH:mm")" />
 												<input type="hidden" name="EndTime" value="@schedule.EndTime.ToString("HH:mm")" />
 												<input type="hidden" name="Department" value="@schedule.Department" />
-												<span class="startTime">@schedule.StartTime</span> -
-												<span class="endTime">@schedule.EndTime</span> (<span class="department">@schedule.Department</span>)
+												<span class="startTime">@schedule.StartTime.ToString("HH:mm")</span> -
+												<span class="endTime">@schedule.EndTime.ToString("HH:mm")</span> (<span class="department">@schedule.Department</span>)
 												<button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Weet je zeker dat je deze wilt verwijderen? @schedule.Date van @schedule.StartTime tot @schedule.EndTime?')">X</button>
 											</form>
 										</div>
