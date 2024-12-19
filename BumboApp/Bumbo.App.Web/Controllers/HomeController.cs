@@ -53,7 +53,7 @@ namespace Bumbo.App.Web.Controllers
                         Date = group.Key,
                         Shifts = group.Select(schedule => new ShiftsViewModel
                         {
-                            Time = $"{schedule.StartTime:hh\\:mm} - {schedule.EndTime:hh\\:mm}",
+                            Time = $"{schedule.StartTime:HH:mm} - {schedule.EndTime:HH:mm}".ToString(),
                             Departement = schedule.Department,
                             Branch_Id = schedule.BranchId
                         }).ToList()
