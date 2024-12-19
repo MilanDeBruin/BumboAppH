@@ -6,14 +6,27 @@
 <h1 class="text-center mb-4">Beschikbaarheid</h1>
 
 <div class="container mt-5">
-
-    <div style="display: flex; gap: 20px;">
-        <!-- Personen Tabel -->
-        <div>
+    <!-- Filterformulier -->
+    <form method="get" class="mb-4">
+        <input type="hidden" name="branchId" value="@Model.BranchId" />
+        <label for="positionFilter">Filter op positie:</label>
+        <select id="positionFilter" name="position" class="form-control" style="width: 200px; display: inline-block;">
+            <option value="">-- Alle posities --</option>
+            <option value="Manager">Manager</option>
+            <option value="Caissière">Caissière</option>
+            <option value="Vakkenvuller">Vakkenvuller</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+    <!-- Beschikbaarheidsgegevens en Weekoverzicht in Flex-container -->
+    <div style="display: flex; gap: 20px; justify-content: space-between;">
+        <!-- Personeels Beschikbaarheid Tabel -->
+        <div style="flex: 1;">
             <table class="table table-bordered table-striped text-center">
                 <thead class="thead-dark">
                     <tr>
                         <th>Personeel</th>
+                        <th>Positie</th>
                         <th>Dag</th>
                         <th>Beschikbaarheid</th>
                     </tr>
@@ -21,23 +34,38 @@
                 <tbody>
                     @foreach (var dayAvailability in Model.DayAvailabilities)
                     {
-                        foreach (var employeeAvailability in dayAvailability.EmployeeAvailabilities)
+                        bool hasEmployeeAvailability = dayAvailability.EmployeeAvailabilities != null && dayAvailability.EmployeeAvailabilities.Any();
+
+                        // Controleer of er voor de hele week geen personeel beschikbaar is
+                        if (hasEmployeeAvailability)
                         {
-                            <tr>
-                                <td>@employeeAvailability.Employee.first_name @employeeAvailability.Employee.last_name</td>
-                                <td>@dayAvailability.WeekDay.ToString("dddd")</td>
-                                <td>
-                                    @employeeAvailability.StartTime?.ToString(@"hh\:mm") - @employeeAvailability.EndTime?.ToString(@"hh\:mm")
-                                </td>
-                            </tr>
+                            // Als er personeel beschikbaar is, toon de gegevens
+                            foreach (var employeeAvailability in dayAvailability.EmployeeAvailabilities)
+                            {
+                                <tr>
+                                    <td>@employeeAvailability.Employee.first_name @employeeAvailability.Employee.last_name</td>
+                                    <td>@employeeAvailability.Employee.position</td>
+                                    <td>@dayAvailability.WeekDay.ToString("dddd")</td>
+                                    <td>
+                                        @employeeAvailability.StartTime?.ToString(@"hh\:mm") - @employeeAvailability.EndTime?.ToString(@"hh\:mm")
+                                    </td>
+                                </tr>
+                            }
                         }
+                    }
+
+                    @if (Model.DayAvailabilities.All(d => d.EmployeeAvailabilities == null || !d.EmployeeAvailabilities.Any()))
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">Geen personeel beschikbaar voor de week</td>
+                        </tr>
                     }
                 </tbody>
             </table>
         </div>
 
         <!-- Weekoverzicht Tabel -->
-        <div style="flex-grow: 1;">
+        <div style="flex: 1;">
             <form method="post" asp-action="Availability">
                 <table class="table table-bordered table-striped text-center week-overview">
                     <thead class="thead-dark">
@@ -51,7 +79,7 @@
                         @for (int i = 0; i < 7; i++)
                         {
                             var currentDay = Model.DayAvailabilities.FirstOrDefault(d => d.WeekDay == Model.FirstDayOfWeek.AddDays(i));
-                            var openingTime = Model.OpeningDurations.OpeningTimes.FirstOrDefault(o => o.BranchId == Model.BranchId && o.StartTime.HasValue && o.EndTime.HasValue && o.Day == currentDay?.WeekDay);
+                            var openingTime = Model.OpeningDurations?.OpeningTimes.FirstOrDefault(o => o.BranchId == Model.BranchId && o.StartTime.HasValue && o.EndTime.HasValue && o.Day == currentDay?.WeekDay);
 
                             <tr>
                                 <td>@Model.FirstDayOfWeek.AddDays(i).ToString("dddd")</td>
@@ -60,14 +88,15 @@
                                     <div class="time-slot">
                                         @if (currentDay != null)
                                         {
-                                            @foreach (var employeeAvailability in currentDay.EmployeeAvailabilities)
+                                            var filteredEmployees = currentDay.EmployeeAvailabilities;
+
+                                            foreach (var employeeAvailability in filteredEmployees)
                                             {
                                                 var startLeft = 0;
                                                 var width = 0;
 
                                                 if (employeeAvailability.StartTime.HasValue && employeeAvailability.EndTime.HasValue && openingTime?.StartTime.HasValue == true)
                                                 {
-                                                    // Omzetten naar TimeSpan en de minuten berekenen
                                                     var startTimeSpan = employeeAvailability.StartTime.Value.ToTimeSpan();
                                                     var endTimeSpan = employeeAvailability.EndTime.Value.ToTimeSpan();
                                                     var branchStartTimeSpan = openingTime.StartTime.Value.ToTimeSpan();
@@ -76,13 +105,11 @@
                                                     var totalDayDuration = (branchEndTimeSpan - branchStartTimeSpan).TotalMinutes;
 
                                                     startLeft = (int)((startTimeSpan - branchStartTimeSpan).TotalMinutes / totalDayDuration * 100);
-
                                                     var workDuration = (endTimeSpan - startTimeSpan).TotalMinutes;
                                                     width = (int)((workDuration) / totalDayDuration * 100);
                                                 }
 
-
-                                                <div class="work-block" style="left: @startLeft%; width: @width%; z-index: 1;">
+                                                <div class="work-block" style="left: @startLeft%; width: @width%;">
                                                     @employeeAvailability.Employee.first_name @employeeAvailability.Employee.last_name
                                                 </div>
                                             }
@@ -120,11 +147,23 @@
         text-align: center;
         line-height: 60px;
         overflow: hidden;
-        z-index: 0;
     }
 
-    /* Nieuwe stijl voor de Planning kolom */
     .planning-column {
-        width: 300px; /* Pas de breedte aan zoals gewenst */
+        width: 300px;
     }
 </style>
+
+<script>
+    // Verkrijg de waarde van 'position' uit de URL querystring
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedPosition = urlParams.get('position');
+
+    // Verkrijg de select element
+    const positionSelect = document.getElementById('positionFilter');
+
+    // Als er een geselecteerde waarde is, stel deze dan in als geselecteerd
+    if (selectedPosition) {
+        positionSelect.value = selectedPosition;
+    }
+</script>
