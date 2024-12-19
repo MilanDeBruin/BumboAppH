@@ -119,11 +119,11 @@ public class SchedulingController : Controller
 		}
 		else 
         {
-            return StatusCode(500, new { success = false, message = $"Het rooster kon niet opgeslagen worden doordat: {result.Message}" });
+			//return StatusCode(500, new { success = false, message = $"Het rooster kon niet opgeslagen worden doordat: {result.Message}" });
+			return RedirectToAction("RoosterRefactored", "Scheduling", new { branchId = branchId, firstDayOfWeek = firstDateOfWeek });
+		}
 
-        }
-
-    }
+	}
 
 	[HttpPost]
 	public IActionResult RemoveSchedule(int branchId, string firstDateOfWeek, int employeeId, string date, string startTime, string endTime, string department)
