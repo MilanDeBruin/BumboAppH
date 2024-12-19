@@ -44,7 +44,13 @@ public class SchedulingController : Controller
 
 		foreach (Employee employee in dbEmployees)
         {
-            var filteredSchedules = _context.WorkSchedules.Where(e => e.EmployeeId == employee.EmployeeId).Where(ws => ws.Date >= date && ws.Date <= lastDateOfWeek).ToList();
+            List<WorkSchedule> filteredSchedules = _context.WorkSchedules.Where(e => e.EmployeeId == employee.EmployeeId).Where(ws => ws.Date >= date && ws.Date <= lastDateOfWeek).ToList();
+
+            for (int i = 0; i < filteredSchedules.Count; i++)
+            {
+                filteredSchedules[i].Department = Scheduling.getCorrectValue(filteredSchedules[i].Department);
+
+			}
 
 			EmployeeScheduleViewModel empData = new EmployeeScheduleViewModel
             {
@@ -69,7 +75,7 @@ public class SchedulingController : Controller
 
 			ForecastData data = new ForecastData();
             data.Date = forecast.Date;
-            data.Department = (DepartmentEnum)Enum.Parse(typeof(DepartmentEnum), depart);
+            data.Department = depart;
             data.ManHours = forecast.ManHours;
             FD.Add(data);
         }

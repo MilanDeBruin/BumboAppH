@@ -192,50 +192,51 @@
 
 		updateForecastGrid(forecastData, scheduledData);
 		
+		console.log("Document is ready");
+		console.log("Forecast Data:", forecastData);
+		console.log("Scheduled Data:", scheduledData);
+		function updateForecastGrid(forecastData, scheduledData) {
+			const dayMapping = {
+				0: 'Zondag',
+				1: 'Maandag',
+				2: 'Dinsdag',
+				3: 'Woensdag',
+				4: 'Donderdag',
+				5: 'Vrijdag',
+				6: 'Zaterdag'
+			};
 
-	});
-	function updateForecastGrid(forecastData, scheduledData) {
-		const dayMapping = {
-			0: 'Zondag',
-			1: 'Maandag',
-			2: 'Dinsdag',
-			3: 'Woensdag',
-			4: 'Donderdag',
-			5: 'Vrijdag',
-			6: 'Zaterdag'
-		};
+			function convertToHHMM(decimalHours) {
+				const hours = Math.floor(decimalHours);
+				const minutes = Math.round((decimalHours - hours) * 60);
+				return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+			}
 
-		function convertToHHMM(decimalHours) {
-			const hours = Math.floor(decimalHours);
-			const minutes = Math.round((decimalHours - hours) * 60);
-			return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-		}
+			// Map scheduled data for quick lookup
+			const scheduledMap = scheduledData.reduce((map, schedule) => {
+				const key = `${schedule.date}-${schedule.department}`;
+				map[key] = schedule.scheduledHours;
+				return map;
+			}, {});
 
-		// Map scheduled data for quick lookup
-		const scheduledMap = scheduledData.reduce((map, schedule) => {
-			const key = `${schedule.date}-${schedule.department}`;
-			map[key] = schedule.scheduledHours;
-			return map;
-		}, {});
+			// Clear any existing progress bars
+			document.querySelectorAll('.progress-bar-container').forEach(container => {
+				container.innerHTML = '';
+			});
 
-		// Clear any existing progress bars
-		document.querySelectorAll('.progress-bar-container').forEach(container => {
-			container.innerHTML = '';
-		});
+			// Process forecast data
+			forecastData.forEach(forecast => {
+				const dayOfWeek = new Date(forecast.date).getDay();
+				const dayName = dayMapping[dayOfWeek] || "Unknown";
+				const scheduledKey = `${forecast.date}-${forecast.department}`;
+				const scheduledHours = scheduledMap[scheduledKey] || 0;
+				const progressPercentage = forecast.manHours
+					? Math.min((scheduledHours / forecast.manHours) * 100, 100)
+					: 0;
 
-		// Process forecast data
-		forecastData.forEach(forecast => {
-			const dayOfWeek = new Date(forecast.date).getDay();
-			const dayName = dayMapping[dayOfWeek] || "Unknown";
-			const scheduledKey = `${forecast.date}-${forecast.department}`;
-			const scheduledHours = scheduledMap[scheduledKey] || 0;
-			const progressPercentage = forecast.manHours
-				? Math.min((scheduledHours / forecast.manHours) * 100, 100)
-				: 0;
-
-			const forecastElement = document.getElementById(`forecast-${dayName}-${forecast.department}`);
-			if (forecastElement) {
-				forecastElement.innerHTML = `
+				const forecastElement = document.getElementById(`forecast-${dayName}-${forecast.department}`);
+				if (forecastElement) {
+					forecastElement.innerHTML = `
 					<div class="progress-bar-container">
 						<div class="department-name">
 							<strong>${forecast.department}:</strong>
@@ -253,15 +254,18 @@
 						</div>
 					</div>
 				`;
-			}
-		});
+				}
+			});
 
-		// Initialize tooltips
-		const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-		tooltips.forEach(tooltip => {
-			new bootstrap.Tooltip(tooltip);
-		});
-	}
+			// Initialize tooltips
+			const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+			tooltips.forEach(tooltip => {
+				new bootstrap.Tooltip(tooltip);
+			});
+		}
+
+	});
+	
 
 </script>
 

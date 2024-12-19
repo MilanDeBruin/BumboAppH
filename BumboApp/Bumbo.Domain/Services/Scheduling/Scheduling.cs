@@ -165,14 +165,14 @@ public class Scheduling
 		{
 			case "Shelf":
 				return "Dkw";
-				break;
+
 			case "kassa":
 				return "Kassa";
-				break;
+
 			case "Vers":
 				return "Vers";
-				break;
+
 		}
-		return "Dkw";
+		return value;
 	}
 }
