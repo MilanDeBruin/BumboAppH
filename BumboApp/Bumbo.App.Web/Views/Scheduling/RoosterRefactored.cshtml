@@ -214,19 +214,19 @@
 				return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 			}
 
-			// Map scheduled data for quick lookup
+			
 			const scheduledMap = scheduledData.reduce((map, schedule) => {
 				const key = `${schedule.date}-${schedule.department}`;
 				map[key] = schedule.scheduledHours;
 				return map;
 			}, {});
 
-			// Clear any existing progress bars
+			
 			document.querySelectorAll('.progress-bar-container').forEach(container => {
 				container.innerHTML = '';
 			});
 
-			// Process forecast data
+			
 			forecastData.forEach(forecast => {
 				const dayOfWeek = new Date(forecast.date).getDay();
 				const dayName = dayMapping[dayOfWeek] || "Unknown";
@@ -235,6 +235,7 @@
 				const progressPercentage = forecast.manHours
 					? Math.min((scheduledHours / forecast.manHours) * 100, 100)
 					: 0;
+				const difference = forecast.manHours - scheduledHours;
 
 				const forecastElement = document.getElementById(`forecast-${dayName}-${forecast.department}`);
 				if (forecastElement) {
@@ -245,7 +246,7 @@
 						</div>
 						<div
 							class="progress progress-hover"
-							title="Ingepland: ${convertToHHMM(scheduledHours)} | Prognose: ${convertToHHMM(forecast.manHours)} | Voortgang: ${progressPercentage.toFixed(1)}%"
+								title="Ingepland: ${convertToHHMM(scheduledHours)} | Prognose: ${convertToHHMM(forecast.manHours)} | Uren nodig: ${difference}"
 							data-bs-toggle="tooltip"
 							data-bs-placement="top">
 							<div
@@ -259,7 +260,7 @@
 				}
 			});
 
-			// Initialize tooltips
+			
 			const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
 			tooltips.forEach(tooltip => {
 				new bootstrap.Tooltip(tooltip);
