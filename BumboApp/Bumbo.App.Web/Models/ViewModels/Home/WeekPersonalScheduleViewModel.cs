@@ -6,5 +6,7 @@
 
         public DateOnly FirstDayOfWeek { get; set; }
 
+        public Boolean isSick { get; set; }
+
     }
 }

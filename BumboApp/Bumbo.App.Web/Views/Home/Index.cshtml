@@ -12,32 +12,57 @@
 </head>
 
 <body>
-    <h2>Rooster Week </h2>
+    <div>
+        
+        @if (!Model.isSick)
+        {
+            <a asp-controller="Home" asp-action="Ziekmelden" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+                <input type="button" value="Ziekmelden"/>
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Home" asp-action="Ziekmelden">
+                <input type="button" value="Ziekgemeld" disabled="disabled" class="disable_button"/>
+            </a>
+        }
+        <h2>Rooster Week</h2>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center mt-3">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
     <div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm">
-        <a asp-controller="Home"    
+        <a asp-controller="Home"
            asp-action="Index"
-           asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.AddDays(-7).ToString("yyyy-MM-dd")"
+           asp-route-date="@Model.FirstDayOfWeek.AddDays(-7).ToString("yyyy-MM-dd")"
+           asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
            class="btn btn-secondary">
             Week terug
         </a>
+
+
 
         <span class="fw-bold">@Model.FirstDayOfWeek.ToString("dd-MM-yyyy")</span>
         <span>tot</span>
         <span class="fw-bold">@Model.FirstDayOfWeek.AddDays(6).ToString("dd-MM-yyyy")</span>
 
+
         <a asp-controller="Home"
            asp-action="Index"
-           asp-route-firstDayOfWeek="@Model.FirstDayOfWeek.AddDays(7).ToString("yyyy-MM-dd")"
+           asp-route-date="@Model.FirstDayOfWeek.AddDays(7).ToString("yyyy-MM-dd")"
+           asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
            class="btn btn-secondary">
             Week vooruit
         </a>
     </div>
 
+
     <div class="table-container">
-        @{
-            // Ensure we always have 7 blocks, one for each day of the week
-            var daysOfWeek = Enumerable.Range(0, 7).Select(i => DateOnly.FromDateTime(DateTime.Today).AddDays(i)).ToList();
-        }
 
         <table class="schedule-table">
             <thead>
@@ -49,28 +74,32 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var day in daysOfWeek)
-                {
-                    // Find matching WorkDay for the current day
-                    var shiftsForDay = Model.WorkDays.Where(w => w.date == day).ToList();
+                @{
+                    var daysOfWeek = Enumerable.Range(0, 7)
+                    .Select(offset => Model.FirstDayOfWeek.AddDays(offset))
+                    .ToList();
+                }
 
-                    if (shiftsForDay.Any())
+                @foreach (var date in daysOfWeek)
+                {
+                    var daySchedule = Model.WorkDays.FirstOrDefault(d => d.Date == date);
+                    if (daySchedule != null && daySchedule.Shifts.Any())
                     {
-                        foreach (var shift in shiftsForDay)
+                        foreach (var shift in daySchedule.Shifts)
                         {
                             <tr>
-                                <td>@day.ToString("yyyy-MM-dd")</td>
-                                <td>@(shift != null ? $"{shift.StartTime:hh\\:mm} - {shift.endTime:hh\\:mm}" : "")</td>
-                                <td>@(shift?.Departement ?? "N/A")</td>
-                                <td>@(shift?.Branch_Id > 0 ? shift.Branch_Id.ToString() : "N/A")</td>
+                                <td>@date.ToString("dd-MM-yyyy")</td>
+                                <td>@shift.Time</td>
+                                <td>@shift.Departement</td>
+                                <td>@shift.Branch_Id</td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td>@day.ToString("yyyy-MM-dd")</td>
-                            <td colspan="3" class="no-shifts">Geen shifts beschikbaar</td>
+                            <td>@date.ToString("dd-MM-yyyy")</td>
+                            <td colspan="3">Geen diensten</td>
                         </tr>
                     }
                 }
