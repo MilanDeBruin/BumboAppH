@@ -96,6 +96,7 @@
 										<div class="schedule-entry">
 											<form method="post" action="@Url.Action("RemoveSchedule", "Scheduling")">
 												<input type="hidden" name="BranchId" value="@Model.BranchId" />
+												<input type="hidden" name="FirstDateOfWeek" class="form-control" value="@Model.FirstDateOfWeek" />
 												<input type="hidden" name="EmployeeId" value="@employee.EmployeeId" />
 												<input type="hidden" name="Date" value="@schedule.Date.ToString("yyyy-MM-dd")" />
 												<input type="hidden" name="StartTime" value="@schedule.StartTime.ToString("HH:mm")" />
@@ -127,6 +128,7 @@
 				<div class="modal-body">
 					<form method="post" action="@Url.Action("AddSchedule", "Scheduling")">
 						<input type="hidden" name="BranchId" value="@Model.BranchId" />
+						<input type="hidden" name="FirstDateOfWeek" class="form-control" value="@Model.FirstDateOfWeek" />
 
 						<div class="form-group">
 							<label for="modalDepartment">Afdeling:</label>
@@ -152,7 +154,7 @@
 								@for (var i = 0; i < 7; i++)
 								{
 									var day = Model.FirstDateOfWeek.AddDays(i);
-									<option value="@day.ToString("yyyy-MM-dd")">@day.ToString("dd-MM-yyyy", new System.Globalization.CultureInfo("nl-NL")) - @day.ToString("dddd", new System.Globalization.CultureInfo("nl-NL"))</option>
+									<option value="@day.AddDays(-1).ToString("yyyy-MM-dd")">@day.ToString("dd-MM-yyyy", new System.Globalization.CultureInfo("nl-NL")) - @day.ToString("dddd", new System.Globalization.CultureInfo("nl-NL"))</option>
 								}
 							</select>
 						</div>

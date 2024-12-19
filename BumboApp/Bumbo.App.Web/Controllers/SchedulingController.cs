@@ -92,7 +92,7 @@ public class SchedulingController : Controller
     
 
     [HttpPost]
-    public IActionResult AddSchedule(int branchId, int employeeId, string date, string startTime, string endTime, string department)
+    public IActionResult AddSchedule(int branchId, string firstDateOfWeek, int employeeId, string date, string startTime, string endTime, string department)
     {
         ScheduleModel schedule = new ScheduleModel
         {
@@ -115,9 +115,9 @@ public class SchedulingController : Controller
         ScheduleSuccesModel result = Scheduling.SendDataToDb(schedule);
         if (result.Success)
         {
-            return RedirectToAction("RoosterRefactored", "Scheduling", new { branchId = branchId });
-        }
-        else 
+			return RedirectToAction("RoosterRefactored", "Scheduling", new { branchId = branchId, firstDayOfWeek = firstDateOfWeek });
+		}
+		else 
         {
             return StatusCode(500, new { success = false, message = $"Het rooster kon niet opgeslagen worden doordat: {result.Message}" });
 
@@ -126,7 +126,7 @@ public class SchedulingController : Controller
     }
 
 	[HttpPost]
-	public IActionResult RemoveSchedule(int branchId, int employeeId, string date, string startTime, string endTime, string department)
+	public IActionResult RemoveSchedule(int branchId, string firstDateOfWeek, int employeeId, string date, string startTime, string endTime, string department)
 	{
 		ScheduleModel schedule = new ScheduleModel
 		{
@@ -138,10 +138,10 @@ public class SchedulingController : Controller
 		};
 
 		Scheduling.DeleteDataFromDb(schedule);
-		return RedirectToAction("RoosterRefactored", "Scheduling", new { branchId = branchId });
+		return RedirectToAction("RoosterRefactored", "Scheduling", new { branchId = branchId, firstDayOfWeek = firstDateOfWeek });
 	}
 
-    [HttpPost]
+	[HttpPost]
     public IActionResult PublishSchedules(int branchId, string modalDateInput)
     {
         try
