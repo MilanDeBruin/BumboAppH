@@ -1,35 +1,34 @@
 using Bumbo.App.Web.Models.ViewModels;
-using Bumbo.Data.Models;
+using Bumbo.Data.Context;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bumbo.App.Web.Controllers;
 
-using System.Security.Claims;
-using Models.ViewModels.Forecast;
-using Bumbo.Data.Context;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 [Authorize]
 public class AccountController : Controller
 {
+    private readonly BumboDbContext _context;
     private readonly SignInManager<IdentityUser> _signInManager;
-        
-    public AccountController(SignInManager<IdentityUser> signInManager)
+    private readonly UserManager<IdentityUser> _userManager;
+
+    public AccountController(BumboDbContext dbContext, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
     {
-        this._signInManager = signInManager;
+        _context = dbContext;
+        _signInManager = signInManager;
+        _userManager = userManager;
     }
 
     [HttpGet]
     [AllowAnonymous]
     public IActionResult Login()
-{
-    var viewModel = new LoginViewModel();
-    return View(viewModel);
-}
+    {
+        var viewModel = new LoginViewModel();
+        return View(viewModel);
+    }
 
     [HttpPost]
     [AllowAnonymous]
@@ -42,6 +41,7 @@ public class AccountController : Controller
 
             if (result.Succeeded)
             {
+                Response.Cookies.Append("employee_id", viewModel.Email, new CookieOptions { Expires = DateTimeOffset.UtcNow.AddDays(7) });
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -59,5 +59,20 @@ public class AccountController : Controller
     {
         await _signInManager.SignOutAsync();
         return RedirectToAction("Index", "Home");
+    }
+    
+    // Method for development purposes
+    private async Task createUser(string userName, string password)
+    {
+        var result = await _userManager.CreateAsync(new IdentityUser(userName), password);
+        
+        if (result.Succeeded)
+        {
+            Console.WriteLine("User created");
+        }
+        else
+        {
+            Console.WriteLine("User not created");
+        }
     }
 }
