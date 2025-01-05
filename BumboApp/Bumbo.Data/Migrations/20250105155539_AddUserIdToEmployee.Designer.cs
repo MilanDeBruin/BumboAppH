@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bumbo.Data.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    [Migration("20250105150506_Initial")]
-    partial class Initial
+    [Migration("20250105155539_AddUserIdToEmployee")]
+    partial class AddUserIdToEmployee
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -163,6 +163,7 @@ namespace Bumbo.Data.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)")
                         .HasColumnName("user_id");
 

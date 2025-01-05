@@ -1,12 +1,13 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Bumbo.Data.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace Bumbo.Data.Context;
 
-public partial class BumboDbContext : DbContext
+public partial class BumboDbContext : IdentityDbContext
 {
     private readonly IConfiguration _configuration;
 
@@ -67,6 +68,8 @@ public partial class BumboDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        
         modelBuilder.Entity<Availability>(entity =>
         {
             entity.HasOne(d => d.Employee).WithMany(p => p.Availabilities)
@@ -213,8 +216,10 @@ public partial class BumboDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_work_shift_employee");
         });
-
-        OnModelCreatingPartial(modelBuilder);
+        
+        // Custom changes
+        modelBuilder.Entity<ApplicationUser>().HasOne(d => d.Employee).WithOne(p => p.ApplicationUser)
+            .HasForeignKey<Employee>(e => e.UserId);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

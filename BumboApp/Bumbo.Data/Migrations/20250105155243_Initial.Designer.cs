@@ -4,6 +4,7 @@ using Bumbo.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bumbo.Data.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    partial class BumboDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250105155243_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,9 +178,6 @@ namespace Bumbo.Data.Migrations
                     b.HasIndex("BranchId");
 
                     b.HasIndex("LaborContract");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("employee");
                 });
@@ -581,11 +581,6 @@ namespace Bumbo.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("nvarchar(21)");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -637,10 +632,6 @@ namespace Bumbo.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasDiscriminator().HasValue("IdentityUser");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -724,13 +715,6 @@ namespace Bumbo.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Bumbo.Data.Models.ApplicationUser", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.HasDiscriminator().HasValue("ApplicationUser");
-                });
-
             modelBuilder.Entity("Bumbo.Data.Models.Availability", b =>
                 {
                     b.HasOne("Bumbo.Data.Models.Employee", "Employee")
@@ -763,14 +747,6 @@ namespace Bumbo.Data.Migrations
                         .HasForeignKey("LaborContract")
                         .IsRequired()
                         .HasConstraintName("FK_employee_labor_contract");
-
-                    b.HasOne("Bumbo.Data.Models.ApplicationUser", "ApplicationUser")
-                        .WithOne("Employee")
-                        .HasForeignKey("Bumbo.Data.Models.Employee", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
 
                     b.Navigation("Branch");
 
@@ -1070,12 +1046,6 @@ namespace Bumbo.Data.Migrations
             modelBuilder.Entity("Bumbo.Data.Models.WorkStatus", b =>
                 {
                     b.Navigation("WorkSchedules");
-                });
-
-            modelBuilder.Entity("Bumbo.Data.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("Employee")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
