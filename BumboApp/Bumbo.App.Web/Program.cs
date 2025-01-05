@@ -3,6 +3,7 @@ using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 using Bumbo.Data.SqlRepository;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bumbo.App.Web
@@ -33,7 +34,23 @@ namespace Bumbo.App.Web
                 .AddTransient<Bumbo.Domain.Services.CAO.ICaoScheduleService,
                     Bumbo.Domain.Services.CAO.CaoScheduleService>();
 
-
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+                
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 0;
+                options.Password.RequiredUniqueChars = 0;
+                
+                options.User.RequireUniqueEmail = true;
+                
+                options.Lockout.AllowedForNewUsers = false;
+            }).AddEntityFrameworkStores<BumboDbContext>();
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -56,6 +73,8 @@ namespace Bumbo.App.Web
             app.UseStaticFiles();
 
             app.UseRouting();
+            
+            //Configuring Authentication Middleware to the Request Pipeline
             app.UseAuthentication();
             app.UseAuthorization();
 

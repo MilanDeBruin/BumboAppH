@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -48,6 +48,10 @@ public partial class Employee
     [Column("labor_contract")]
     [StringLength(50)]
     public string LaborContract { get; set; } = null!;
+
+    [Column("user_id")]
+    [StringLength(450)]
+    public string UserId { get; set; } = null!;
 
     [InverseProperty("Employee")]
     public virtual ICollection<Availability> Availabilities { get; set; } = new List<Availability>();

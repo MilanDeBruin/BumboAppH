@@ -56,13 +56,12 @@ public partial class BumboDbContext : DbContext
     public virtual DbSet<WorkShift> WorkShifts { get; set; }
 
     public virtual DbSet<WorkStatus> WorkStatuses { get; set; }
-    
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
         {
-            // optionsBuilder.UseSqlServer(_configuration.GetConnectionString("Bumbo"));
-            optionsBuilder.UseSqlServer("Server = .; Database = Bumbo; Integrated Security = True; TrustServerCertificate = True;");
+            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("Bumbo"));
         }
     }
     
