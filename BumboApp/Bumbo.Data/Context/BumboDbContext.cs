@@ -1,12 +1,25 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Bumbo.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Bumbo.Data.Context;
 
 public partial class BumboDbContext : DbContext
 {
+    private readonly IConfiguration _configuration;
+
+    public BumboDbContext(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+    
+    public BumboDbContext(DbContextOptions<BumboDbContext> options, IConfiguration configuration)
+        : base(options)
+    {
+        _configuration = configuration;
+    }
 
     public virtual DbSet<Availability> Availabilities { get; set; }
 
@@ -43,6 +56,15 @@ public partial class BumboDbContext : DbContext
     public virtual DbSet<WorkShift> WorkShifts { get; set; }
 
     public virtual DbSet<WorkStatus> WorkStatuses { get; set; }
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            // optionsBuilder.UseSqlServer(_configuration.GetConnectionString("Bumbo"));
+            optionsBuilder.UseSqlServer("Server = .; Database = Bumbo; Integrated Security = True; TrustServerCertificate = True;");
+        }
+    }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
