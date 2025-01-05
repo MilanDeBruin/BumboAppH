@@ -74,8 +74,8 @@ public class Scheduling
                 EndTime = TimeOnly.FromTimeSpan(model.EndTime),
                 Department = model.Department,
                 WorkStatus = "Default",
-                Concept = true,
-                IsSick = false
+                // Concept = true, TODO: Implement according to new database structure
+                // IsSick = false TODO: Implement according to new database structure
             };
 
             CaoSheduleValidatorEnum result = icss.ValidateSchedule(schedule);
@@ -154,7 +154,7 @@ public class Scheduling
         List<WorkSchedule> schedules = Context.WorkSchedules.Where(s => s.Date >= StartDate && s.Date <= StartDate.AddDays(7)).ToList();
         foreach (WorkSchedule schedule in schedules) 
         {
-            schedule.Concept = false;
+            // schedule.Concept = false; TODO: Implement according to new database structure
             _logger.LogInformation($" My date is: {schedule.Date} ------------------------------------- My date is + 1: {schedule.Date.AddDays(1)}------------------------------------------------------------------------------------");
         }
         Context.SaveChanges();

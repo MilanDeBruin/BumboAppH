@@ -30,7 +30,7 @@ namespace Bumbo.Data.SqlRepository
             if (existingEmployee == null) return false;
 
             existingEmployee.BranchId = employee.BranchId;
-            existingEmployee.Position = employee.Position;
+            // existingEmployee.Position = employee.Position; TODO: Implement using Identity
             existingEmployee.HiringDate = employee.HiringDate;
             existingEmployee.FirstName = employee.FirstName;
             existingEmployee.Infix = employee.Infix;
@@ -39,8 +39,8 @@ namespace Bumbo.Data.SqlRepository
             existingEmployee.HouseNumber = employee.HouseNumber;
             existingEmployee.Addition = employee.Addition;
             existingEmployee.ZipCode = employee.ZipCode;
-            existingEmployee.EmailAdres = employee.EmailAdres;
-            existingEmployee.Password = employee.Password;
+            // existingEmployee.EmailAdres = employee.EmailAdres; TODO: Implement using Identity
+            // existingEmployee.Password = employee.Password; TODO: Implement using Identity
             existingEmployee.LaborContract = employee.LaborContract;
 
             ctx.SaveChanges();
@@ -75,7 +75,8 @@ namespace Bumbo.Data.SqlRepository
 
         public IEnumerable<Position> GetPositions()
         {
-            return [.. ctx.Positions];
+            // return [.. ctx.Positions]; TODO: Implement using Identity
+            return null; 
         }
 
         public IEnumerable<LaborContract> GetLaborContracts()

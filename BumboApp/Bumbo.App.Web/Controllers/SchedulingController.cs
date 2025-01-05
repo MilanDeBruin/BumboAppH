@@ -56,7 +56,7 @@ public class SchedulingController : Controller
             {
                 EmployeeId = employee.EmployeeId,
                 Name = employee.FirstName + " " + employee.LastName,
-                MainFunction = employee.Position,
+                // MainFunction = employee.Position, TODO: Implement using Identity
                 Schedules = filteredSchedules,
             };
 

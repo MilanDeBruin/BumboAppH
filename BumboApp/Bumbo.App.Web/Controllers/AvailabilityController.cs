@@ -206,7 +206,7 @@ namespace Bumbo.App.Web.Controllers
                 // Filter beschikbaarheden op de geselecteerde positie, indien aanwezig
                 var filteredAvailabilities = weekAvailabilities.Where(a =>
                     a.Weekday.ToLower() == dayDate.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower() &&
-                    (string.IsNullOrEmpty(position) || a.Employee.Position == position)).ToList();
+                    (string.IsNullOrEmpty(position) /*|| a.Employee.Position == position TODO: Implement using Identity*/)).ToList(); 
 
                 foreach (var availability in filteredAvailabilities)
                 {
@@ -217,7 +217,7 @@ namespace Bumbo.App.Web.Controllers
                         {
                             EmployeeId = employee.EmployeeId,
                             BranchId = employee.BranchId,
-                            Position = employee.Position,
+                            // Position = employee.Position, TODO: Implement using Identity
                             HiringDate = employee.HiringDate,
                             FirstName = employee.FirstName,
                             Infix = employee.Infix,
@@ -226,8 +226,8 @@ namespace Bumbo.App.Web.Controllers
                             HouseNumber = employee.HouseNumber,
                             Addition = employee.Addition,
                             ZipCode = employee.ZipCode,
-                            EmailAdres = employee.EmailAdres,
-                            Password = employee.Password,
+                            // EmailAdres = employee.EmailAdres, TODO: Implement using Identity
+                            // Password = employee.Password, TODO: Implement using Identity
                         },
                         StartTime = availability.StartTime,
                         EndTime = availability.EndTime,

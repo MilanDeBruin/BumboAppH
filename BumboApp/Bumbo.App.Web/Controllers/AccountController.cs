@@ -40,7 +40,7 @@ public class AccountController : Controller
 
         // Attempt to find the employee with the provided email and password
         var employee = await this._context.Employees
-            .FirstOrDefaultAsync(e => e.EmailAdres == viewModel.Email && e.Password == viewModel.Password);
+            .FirstOrDefaultAsync(e => e.EmailAdres == viewModel.Email && e.Password == viewModel.Password); 
 
         if (employee != null)
         {
@@ -48,7 +48,7 @@ public class AccountController : Controller
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, viewModel.Email),
-                new Claim("position", employee.Position),
+                // new Claim("position", employee.Position), TODO: Implement
                 new Claim("branch_id", employee.BranchId.ToString()),
                 new Claim("employee_id", employee.EmployeeId.ToString())
             };

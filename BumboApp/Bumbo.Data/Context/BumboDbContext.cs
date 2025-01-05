@@ -30,8 +30,6 @@ public partial class BumboDbContext : DbContext
 
     public virtual DbSet<OpeningHour> OpeningHours { get; set; }
 
-    public virtual DbSet<Position> Positions { get; set; }
-
     public virtual DbSet<SchoolSchedule> SchoolSchedules { get; set; }
 
     public virtual DbSet<StoreTraffic> StoreTraffics { get; set; }
@@ -41,6 +39,8 @@ public partial class BumboDbContext : DbContext
     public virtual DbSet<Weekday> Weekdays { get; set; }
 
     public virtual DbSet<WorkSchedule> WorkSchedules { get; set; }
+
+    public virtual DbSet<WorkShift> WorkShifts { get; set; }
 
     public virtual DbSet<WorkStatus> WorkStatuses { get; set; }
     
@@ -66,10 +66,6 @@ public partial class BumboDbContext : DbContext
             entity.HasOne(d => d.LaborContractNavigation).WithMany(p => p.Employees)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_employee_labor_contract");
-
-            entity.HasOne(d => d.PositionNavigation).WithMany(p => p.Employees)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_employee_position");
 
             entity.HasMany(d => d.Departments).WithMany(p => p.Employees)
                 .UsingEntity<Dictionary<string, object>>(
@@ -171,8 +167,6 @@ public partial class BumboDbContext : DbContext
 
         modelBuilder.Entity<WorkSchedule>(entity =>
         {
-            entity.Property(e => e.Concept).HasDefaultValue(true);
-
             entity.HasOne(d => d.Branch).WithMany(p => p.WorkSchedules)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_work_schedule_branch");
@@ -188,6 +182,15 @@ public partial class BumboDbContext : DbContext
             entity.HasOne(d => d.WorkStatusNavigation).WithMany(p => p.WorkSchedules)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_work_schedule_work_status");
+        });
+
+        modelBuilder.Entity<WorkShift>(entity =>
+        {
+            entity.HasKey(e => new { e.EmployeeId, e.StartTime }).HasName("PK_work_shift_1");
+
+            entity.HasOne(d => d.Employee).WithMany(p => p.WorkShifts)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_work_shift_employee");
         });
 
         OnModelCreatingPartial(modelBuilder);

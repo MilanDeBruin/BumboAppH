@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace Bumbo.Data.Models;
 
 [Table("employee")]
-[Index("EmailAdres", Name = "IX_employee", IsUnique = true)]
 public partial class Employee
 {
     [Key]
@@ -16,10 +15,6 @@ public partial class Employee
 
     [Column("branch_id")]
     public int BranchId { get; set; }
-
-    [Column("position")]
-    [StringLength(50)]
-    public string Position { get; set; } = null!;
 
     [Column("hiring_date")]
     public DateOnly HiringDate { get; set; }
@@ -50,14 +45,6 @@ public partial class Employee
     [StringLength(20)]
     public string ZipCode { get; set; } = null!;
 
-    [Column("email_adres")]
-    [StringLength(254)]
-    public string EmailAdres { get; set; } = null!;
-
-    [Column("password")]
-    [StringLength(50)]
-    public string Password { get; set; } = null!;
-
     [Column("labor_contract")]
     [StringLength(50)]
     public string LaborContract { get; set; } = null!;
@@ -76,15 +63,14 @@ public partial class Employee
     [InverseProperty("Employee")]
     public virtual ICollection<Leave> Leaves { get; set; } = new List<Leave>();
 
-    [ForeignKey("Position")]
-    [InverseProperty("Employees")]
-    public virtual Position PositionNavigation { get; set; } = null!;
-
     [InverseProperty("Employee")]
     public virtual ICollection<SchoolSchedule> SchoolSchedules { get; set; } = new List<SchoolSchedule>();
 
     [InverseProperty("Employee")]
     public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new List<WorkSchedule>();
+
+    [InverseProperty("Employee")]
+    public virtual ICollection<WorkShift> WorkShifts { get; set; } = new List<WorkShift>();
 
     [ForeignKey("EmployeeId")]
     [InverseProperty("Employees")]

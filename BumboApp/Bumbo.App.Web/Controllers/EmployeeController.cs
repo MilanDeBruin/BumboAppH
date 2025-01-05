@@ -23,7 +23,7 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = employee.EmployeeId,
                 BranchId = employee.BranchId,
-                Position = employee.Position,
+                // Position = employee.Position TODO: Implement using Identity
                 FirstName = employee.FirstName,
                 Infix = employee.Infix,
                 LastName = employee.LastName,
@@ -44,7 +44,7 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = employee.EmployeeId,
                 BranchId = employee.BranchId,
-                Position = employee.Position,
+                // Position = employee.Position, TODO: Implement using Identity
                 HiringDate = employee.HiringDate,
                 FirstName = employee.FirstName,
                 Infix = employee.Infix,
@@ -53,8 +53,8 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = employee.HouseNumber,
                 Addition = employee.Addition,
                 ZipCode = employee.ZipCode,
-                EmailAdres = employee.EmailAdres,
-                Password = employee.Password,
+                // EmailAdres = employee.EmailAdres, TODO: Implement using Identity
+                // Password = employee.Password, TODO: Implement using Identity
                 LaborContract = employee.LaborContract,
             };
 
@@ -127,7 +127,7 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = viewModel.EmployeeId,
                 BranchId = viewModel.BranchId,
-                Position = viewModel.Position,
+                // Position = viewModel.Position,
                 HiringDate = viewModel.HiringDate,
                 FirstName = viewModel.FirstName,
                 Infix = viewModel.Infix,
@@ -136,8 +136,8 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = viewModel.HouseNumber,
                 Addition = viewModel.Addition,
                 ZipCode = viewModel.ZipCode,
-                EmailAdres = viewModel.EmailAdres,
-                Password = viewModel.Password,
+                // EmailAdres = viewModel.EmailAdres, TODO: Implement using Identity
+                // Password = viewModel.Password,TODO: Implement using Identity
                 LaborContract = viewModel.LaborContract,
             };
 
@@ -156,7 +156,7 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = employee.EmployeeId,
                 BranchId = employee.BranchId,
-                Position = employee.Position,
+                // Position = employee.Position, TODO: Implement using Identity
                 HiringDate = employee.HiringDate,
                 FirstName = employee.FirstName,
                 Infix = employee.Infix,
@@ -165,15 +165,15 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = employee.HouseNumber,
                 Addition = employee.Addition,
                 ZipCode = employee.ZipCode,
-                EmailAdres = employee.EmailAdres,
-                Password = employee.Password,
+                // EmailAdres = employee.EmailAdres, TODO: Implement using Identity
+                // Password = employee.Password, TODO: Implement using Identity
                 LaborContract = employee.LaborContract,
                 Branches = [.. _context.Branches.Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })],
-                Positions = [.. _context.Positions.Select(p => new SelectListItem
+                Positions = [.. _context.Positions.Select(p => new SelectListItem // TODO: Implement using Identity
                 {
                     Value = p.Position1,
                     Text = p.Position1
@@ -198,7 +198,7 @@ namespace Bumbo.App.Web.Controllers
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })];
-                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem
+                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem // TODO: Implement using Identity
                 {
                     Value = p.Position1,
                     Text = p.Position1
@@ -223,12 +223,12 @@ namespace Bumbo.App.Web.Controllers
                     "Geboortedatum kan niet later zijn dan startdatum contract"
                 );
 
-                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem
+                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem // TODO: Implement using Identity
                 {
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })];
-                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem
+                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem // TODO: Implement using Identity
                 {
                     Value = p.Position1,
                     Text = p.Position1
@@ -245,7 +245,7 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = viewModel.EmployeeId,
                 BranchId = viewModel.BranchId,
-                Position = viewModel.Position,
+                // Position = viewModel.Position, TODO: Implement using Identity
                 HiringDate = viewModel.HiringDate,
                 FirstName = viewModel.FirstName,
                 Infix = viewModel.Infix,
@@ -254,8 +254,8 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = viewModel.HouseNumber,
                 Addition = viewModel.Addition,
                 ZipCode = viewModel.ZipCode,
-                EmailAdres = viewModel.EmailAdres,
-                Password = viewModel.Password,
+                // EmailAdres = viewModel.EmailAdres, TODO: Implement using Identity
+                // Password = viewModel.Password, TODO: Implement using Identity
                 LaborContract = viewModel.LaborContract
             };
 
