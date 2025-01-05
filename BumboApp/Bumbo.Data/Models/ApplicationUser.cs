@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Bumbo.Data.Models;
-
-public class ApplicationUser : IdentityUser
+namespace Bumbo.Data.Models
 {
-    public virtual Employee Employee { get; set; }
+    public class ApplicationUser : IdentityUser
+    {
+        public virtual Employee Employee { get; set; }
+    }
 }

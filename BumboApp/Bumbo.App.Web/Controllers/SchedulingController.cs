@@ -11,10 +11,12 @@ using Bumbo.Domain.Models.Schedueling;
 using Bumbo.Domain.Services.CAO;
 using Bumbo.Domain.Models;
 using Bumbo.App.Web.Models.ViewModels.Schedule;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.VisualBasic;
 
 namespace Bumbo.App.Web.Controllers;
 
+[Authorize]
 public class SchedulingController : Controller
 {
     private readonly BumboDbContext _context;

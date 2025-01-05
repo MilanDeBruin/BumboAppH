@@ -1,3 +1,7 @@
+using Bumbo.App.Web.Models.ViewModels;
+using Bumbo.Data.Models;
+using Microsoft.AspNetCore.Identity;
+
 namespace Bumbo.App.Web.Controllers;
 
 using System.Security.Claims;
@@ -9,70 +13,51 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+[Authorize]
 public class AccountController : Controller
 {
-    private readonly BumboDbContext _context;
-
-    public AccountController(BumboDbContext bumboDbContext)
+    private readonly SignInManager<IdentityUser> _signInManager;
+        
+    public AccountController(SignInManager<IdentityUser> signInManager)
     {
-        this._context = bumboDbContext;
+        this._signInManager = signInManager;
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult Login()
-    {
-        if(User.Identity.IsAuthenticated)
-        {
-            return this.RedirectToAction("Index", "Home");
-        }
-        var model = new LoginViewModel();
-        return View(model);
-    }
+{
+    var viewModel = new LoginViewModel();
+    return View(viewModel);
+}
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Login(LoginViewModel viewModel)
     {
-        // Check if the model state is valid
-        if (!this.ModelState.IsValid)
+        if (ModelState.IsValid)
         {
-            return this.View(viewModel);
-        }
 
-        // Attempt to find the employee with the provided email and password
-        var employee = await this._context.Employees
-            .FirstOrDefaultAsync(e => e.EmailAdres == viewModel.Email && e.Password == viewModel.Password); 
+            var result = await _signInManager.PasswordSignInAsync(viewModel.Email, viewModel.Password, false, false);
 
-        if (employee != null)
-        {
-            // Create claims for the authenticated user
-            var claims = new List<Claim>
+            if (result.Succeeded)
             {
-                new Claim(ClaimTypes.Name, viewModel.Email),
-                // new Claim("position", employee.Position), TODO: Implement
-                new Claim("branch_id", employee.BranchId.ToString()),
-                new Claim("employee_id", employee.EmployeeId.ToString())
-            };
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            // Sign in the user with the created claims
-            await this.HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity));
-
-            // Redirect to the Home page upon successful login
-            return this.RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return View(viewModel);
+            }
         }
 
-        // Add an error message to the model state if authentication fails
-        this.ModelState.AddModelError(string.Empty, "Invalid email or password");
         return this.View(viewModel);
     }
 
-    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Logout()
     {
-        await this.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return this.RedirectToAction("Login", "Account");
+        await _signInManager.SignOutAsync();
+        return RedirectToAction("Index", "Home");
     }
 }
