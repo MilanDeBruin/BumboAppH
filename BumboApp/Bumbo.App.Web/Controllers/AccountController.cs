@@ -1,5 +1,8 @@
+using System.Security.Claims;
 using Bumbo.App.Web.Models.ViewModels;
 using Bumbo.Data.Context;
+using Bumbo.Data.Interfaces;
+using Bumbo.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,12 +17,15 @@ public class AccountController : Controller
     private readonly BumboDbContext _context;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly IEmployeeRepository _employeeRepository;
 
-    public AccountController(BumboDbContext dbContext, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+    public AccountController(BumboDbContext dbContext, SignInManager<IdentityUser> signInManager,
+        UserManager<IdentityUser> userManager, IEmployeeRepository employeeRepository)
     {
         _context = dbContext;
         _signInManager = signInManager;
         _userManager = userManager;
+        _employeeRepository = employeeRepository;
     }
 
     [HttpGet]
@@ -36,19 +42,45 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-
             var result = await _signInManager.PasswordSignInAsync(viewModel.Email, viewModel.Password, false, false);
 
             if (result.Succeeded)
             {
-                Response.Cookies.Append("employee_id", viewModel.Email, new CookieOptions { Expires = DateTimeOffset.UtcNow.AddDays(7) });
+                var user = await _userManager.FindByEmailAsync(viewModel.Email);
+                
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "User not found.");
+                    return View(viewModel);
+                }
+
+                var employee = _employeeRepository.GetEmployee(user.Id);
+                if (employee == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Employee not found.");
+                    return View(viewModel);
+                }
+
+                var claims = new List<Claim>
+                {
+                    new Claim("employee_id", employee.EmployeeId.ToString()),
+                    new Claim("branch_id", employee.BranchId.ToString()),
+                    new Claim("user_id", user.Id)
+                };
+                
+                var claimsResult = await _userManager.AddClaimsAsync(user, claims);
+                
+                if (!claimsResult.Succeeded)
+                {
+                    ModelState.AddModelError(string.Empty, "Failed to add claims.");
+                    return View(viewModel);
+                }
+                
                 return RedirectToAction("Index", "Home");
             }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                return View(viewModel);
-            }
+
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            return View(viewModel);
         }
 
         return this.View(viewModel);
@@ -60,12 +92,12 @@ public class AccountController : Controller
         await _signInManager.SignOutAsync();
         return RedirectToAction("Index", "Home");
     }
-    
+
     // Method for development purposes
     private async Task createUser(string userName, string password)
     {
         var result = await _userManager.CreateAsync(new IdentityUser(userName), password);
-        
+
         if (result.Succeeded)
         {
             Console.WriteLine("User created");
