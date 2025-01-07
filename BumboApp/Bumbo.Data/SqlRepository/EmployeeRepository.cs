@@ -13,6 +13,11 @@ namespace Bumbo.Data.SqlRepository
             return ctx.Employees.FirstOrDefault(e => e.EmployeeId == id);
         }
 
+        public Employee? GetEmployee(string userId)
+        {
+            return ctx.Employees.FirstOrDefault(e => e.UserId == userId);
+        }
+        
         public IEnumerable<Employee> GetEmployees(int branchId)
         {
             return [.. ctx.Employees.Where(e => e.BranchId == branchId)];
