@@ -1,0 +1,101 @@
+﻿@using Bumbo.App.Web.Models.ViewModels.Dayoverview
+@model List<DayOverviewViewModel>
+@{
+
+    var date = ViewData["Date"] != null
+        ? (DateOnly)ViewData["Date"]
+        : DateOnly.FromDateTime(DateTime.Today);
+}
+
+<h1>Dagoverzicht - @date.ToShortDateString()</h1>
+
+@{
+    var selectedDate = (DateOnly)ViewData["Date"];
+}
+
+<div class="date-selector-container" ">
+    <form asp-controller="DayOverview" asp-action="Index" method="get" class="form-inline">
+        <button type="submit" name="date" value="@selectedDate.AddDays(-1).ToString("yyyy-MM-dd")" class="btn btn-primary">Vorige Dag</button>
+        <button type="submit" name="date" value="@selectedDate.AddDays(1).ToString("yyyy-MM-dd")" class="btn btn-primary">Volgende Dag</button>
+        <input type="date" id="datePicker" name="date" value="@selectedDate.ToString("yyyy-MM-dd")" class="form-control mx-2" onchange="this.form.submit()" />
+
+        
+    </form>
+</div>
+
+<form method="post" action="@Url.Action("Save", "DayOverview")">
+    <input type="hidden" name="date" value="@date" /> 
+
+    <table>
+        <thead>
+            <tr>
+                <th>Voornaam</th>
+                <th>Achternaam</th>
+                <th>Geplande Uren</th>
+                <th>Gewerkte Uren</th>
+                <th>Verschil</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.FirstName</td>
+                    <td>@item.LastName</td>
+                    <td>@item.PlannedHours</td>
+                    <td>
+                        <input type="number" name="updatedHours[@Model.IndexOf(item)].WorkedHours" value="@item.WorkedHours" />
+                        <input type="hidden" name="updatedHours[@Model.IndexOf(item)].EmployeeId" value="@item.EmployeeId" />
+                        <input type="hidden" name="updatedHours[@Model.IndexOf(item)].BranchId" value="@item.BranchId" />
+                    </td>
+                    <td>@item.Difference</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit">Opslaan</button>
+</form>
+<style>
+    .date-selector-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-bottom: 20px;
+        gap: 10px; 
+    }
+
+    button {
+        padding: 5px 15px;
+        font-size: 14px;
+    }
+
+    input[type="date"] {
+        padding: 5px;
+        width: 200px;
+    }
+
+    table {
+        margin-top: 20px;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left; 
+    }
+
+    th {
+        background-color: #f4f4f4; 
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1; 
+    }
+</style>
