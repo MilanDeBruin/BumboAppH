@@ -131,13 +131,22 @@ namespace Bumbo.App.Web.Controllers
 
                     if (availability == null)
                     {
-                        _context.Availabilities.Add(new Availability
+                        //_context.Availabilities.Add(new Availability
+                        //{
+                        //    EmployeeId = availabilityViewModel.EmployeeId,
+                        //    Weekday = weekdayName,
+                        //    StartTime = dailyAvailability.StartTime.Value,
+                        //    EndTime = dailyAvailability.EndTime.Value
+                        //});
+
+                        Availability updatedAvailability = new Availability
                         {
                             EmployeeId = availabilityViewModel.EmployeeId,
                             Weekday = weekdayName,
                             StartTime = dailyAvailability.StartTime.Value,
                             EndTime = dailyAvailability.EndTime.Value
-                        });
+                        };
+                        _availabilityRepository.SaveAvailability(updatedAvailability);
                     }
                     else
                     {
