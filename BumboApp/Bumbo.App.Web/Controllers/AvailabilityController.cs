@@ -105,6 +105,17 @@ namespace Bumbo.App.Web.Controllers
         public IActionResult Edit(AvailabilityViewModel availabilityViewModel)
         {
             if (!ModelState.IsValid) return View(availabilityViewModel);
+            
+            double totalAvailability = availabilityViewModel.DailyAvailabilities
+                .Where(d => d.StartTime.HasValue && d.EndTime.HasValue)
+                .Sum(d => (d.EndTime.Value - d.StartTime.Value).TotalHours);
+
+            if (totalAvailability < 2)
+            {
+                TempData["ErrorMessage"] = "Je moet een weekbeschikbaarheid hebben van minstens 2 uur";
+                
+                return View(availabilityViewModel);
+            }
 
             // Door iedere werkdag van het formulier lopen en de index van de huidige loop bijhouden
             foreach (var (dailyAvailability, i) in availabilityViewModel.DailyAvailabilities.Select((value, index) => (value, index)))
@@ -131,14 +142,6 @@ namespace Bumbo.App.Web.Controllers
 
                     if (availability == null)
                     {
-                        //_context.Availabilities.Add(new Availability
-                        //{
-                        //    EmployeeId = availabilityViewModel.EmployeeId,
-                        //    Weekday = weekdayName,
-                        //    StartTime = dailyAvailability.StartTime.Value,
-                        //    EndTime = dailyAvailability.EndTime.Value
-                        //});
-
                         Availability updatedAvailability = new Availability
                         {
                             EmployeeId = availabilityViewModel.EmployeeId,

@@ -5,6 +5,9 @@ namespace Bumbo.UnitTests.Cao.HelperClasses;
 
 public class TestAvailabilityRepository : IAvailabilityRepository
 {
+    public void SaveAvailability(Availability availability) {}
+    
+    
     public SchoolSchedule GetDailySchoolSchedule(int employeeId, DayOfWeek dayOfWeek)
     {
         return new SchoolSchedule();
