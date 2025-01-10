@@ -31,10 +31,10 @@ namespace Bumbo.Data.SqlRepository
             var user = new IdentityUser
             {
                 UserName = email,
-                Email = email
+                Email = email,
             };
             
-            var result = userManager.CreateAsync(user).Result;
+            var result = userManager.CreateAsync(user, password).Result;
             var newUser = userManager.FindByEmailAsync(email).Result;
 
             if (newUser != null)

@@ -35,7 +35,7 @@
                                 <a class="nav-link" asp-area="" asp-controller="Leave" asp-action="Index" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">Verlof aanvragen</a>
                             </li>
 
-                            @if (User.FindFirst("position")?.Value == "Manager")
+                            @if (User.FindFirst("position")?.Value == "manager")
                             {
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Forecast" asp-action="Index" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Prognose</a>

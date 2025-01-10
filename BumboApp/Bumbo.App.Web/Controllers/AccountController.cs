@@ -66,7 +66,7 @@ public class AccountController : Controller
                     new Claim("employee_id", employee.EmployeeId.ToString()),
                     new Claim("branch_id", employee.BranchId.ToString()),
                     new Claim("user_id", user.Id),
-                    new Claim("position", _employeeRepository.getRoles(user.Id))
+                    new Claim("position", _employeeRepository.getRoles(user.Id).ToLower())
                 };
                 
                 var claimsResult = await _userManager.AddClaimsAsync(user, claims);
@@ -76,6 +76,10 @@ public class AccountController : Controller
                     ModelState.AddModelError(string.Empty, "Failed to add claims.");
                     return View(viewModel);
                 }
+                
+                // Reload the user's claims, so the new claims are available
+                await _signInManager.SignOutAsync();
+                await _signInManager.SignInAsync(user, isPersistent: false);
                 
                 return RedirectToAction("Index", "Home");
             }
