@@ -26,15 +26,15 @@
                     <tr>
                         <td>
                             @System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Model.DailyAvailabilities[i].Weekday.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower())
-                            <input type="hidden" asp-for="DailyAvailabilities[@i].Weekday" />
+                            <input type="hidden" asp-for="DailyAvailabilities[i].Weekday" />
                         </td>
                         <td>
-                            <input asp-for="DailyAvailabilities[@i].StartTime" type="time" class="form-control" />
-                            <span asp-validation-for="DailyAvailabilities[@i].StartTime" class="text-danger"></span>
+                            <input asp-for="DailyAvailabilities[i].StartTime" type="time" class="form-control" />
+                            <span asp-validation-for="DailyAvailabilities[i].StartTime" class="text-danger"></span>
                         </td>
                         <td>
-                            <input asp-for="DailyAvailabilities[@i].EndTime" type="time" class="form-control" />
-                            <span asp-validation-for="DailyAvailabilities[@i].EndTime" class="text-danger"></span>
+                            <input asp-for="DailyAvailabilities[i].EndTime" type="time" class="form-control" />
+                            <span asp-validation-for="DailyAvailabilities[i].EndTime" class="text-danger"></span>
                         </td>
                     </tr>
                 }
