@@ -3,17 +3,20 @@ using Bumbo.App.Web.Models.ViewModels.Employee;
 using Bumbo.Data.Context;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
+using Bumbo.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Bumbo.App.Web.Controllers
 {
     [Authorize]
-    public class EmployeeController(BumboDbContext context, IEmployeeRepository employeeRepository) : Controller
+    public class EmployeeController(BumboDbContext context, IEmployeeRepository employeeRepository, RoleManager<IdentityRole> roleManager) : Controller
     {
         private readonly BumboDbContext _context = context;
         private readonly IEmployeeRepository _employeeRepository = employeeRepository;
+        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
 
         public IActionResult Index(int branchId)
         {
@@ -44,7 +47,7 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = employee.EmployeeId,
                 BranchId = employee.BranchId,
-                // Position = employee.Position, TODO: Implement using Identity
+                Position = _employeeRepository.getRoles(employee.UserId),
                 HiringDate = employee.HiringDate,
                 FirstName = employee.FirstName,
                 Infix = employee.Infix,
@@ -72,11 +75,11 @@ namespace Bumbo.App.Web.Controllers
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })],
-                Positions = [.. _context.Positions.Select(p => new SelectListItem
+                Positions = _roleManager.Roles.Select(r => new SelectListItem
                 {
-                    Value = p.Position1,
-                    Text = p.Position1
-                })],
+                    Value = r.Name,
+                    Text = r.Name
+                }),
                 LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
@@ -109,11 +112,11 @@ namespace Bumbo.App.Web.Controllers
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })];
-                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem
+                viewModel.Positions = _roleManager.Roles.Select(r => new SelectListItem
                 {
-                    Value = p.Position1,
-                    Text = p.Position1
-                })];
+                    Value = r.Name,
+                    Text = r.Name
+                });
                 viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
@@ -127,7 +130,6 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = viewModel.EmployeeId,
                 BranchId = viewModel.BranchId,
-                // Position = viewModel.Position,
                 HiringDate = viewModel.HiringDate,
                 FirstName = viewModel.FirstName,
                 Infix = viewModel.Infix,
@@ -136,12 +138,10 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = viewModel.HouseNumber,
                 Addition = viewModel.Addition,
                 ZipCode = viewModel.ZipCode,
-                // EmailAdres = viewModel.EmailAdres, TODO: Implement using Identity
-                // Password = viewModel.Password,TODO: Implement using Identity
                 LaborContract = viewModel.LaborContract,
             };
 
-            _employeeRepository.SaveEmployee(employee);
+            _employeeRepository.SaveEmployee(employee, viewModel.EmailAdres, viewModel.Password, RoleEnum.Employee); // TODO: Allow user to choose employee type (employee, manager)
             TempData["SuccessMessage"] = "Medewerker is aangemaakt!";
             return RedirectToAction("Index", new { branchId = viewModel.BranchId });
         }
@@ -173,11 +173,11 @@ namespace Bumbo.App.Web.Controllers
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })],
-                Positions = [.. _context.Positions.Select(p => new SelectListItem // TODO: Implement using Identity
+                Positions = _roleManager.Roles.Select(r => new SelectListItem
                 {
-                    Value = p.Position1,
-                    Text = p.Position1
-                })],
+                    Value = r.Name,
+                    Text = r.Name
+                }),
                 LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
@@ -198,11 +198,11 @@ namespace Bumbo.App.Web.Controllers
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })];
-                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem // TODO: Implement using Identity
+                viewModel.Positions = _roleManager.Roles.Select(r => new SelectListItem
                 {
-                    Value = p.Position1,
-                    Text = p.Position1
-                })];
+                    Value = r.Name,
+                    Text = r.Name
+                });
                 viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
@@ -228,11 +228,11 @@ namespace Bumbo.App.Web.Controllers
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })];
-                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem // TODO: Implement using Identity
+                viewModel.Positions = _roleManager.Roles.Select(r => new SelectListItem
                 {
-                    Value = p.Position1,
-                    Text = p.Position1
-                })];
+                    Value = r.Name,
+                    Text = r.Name
+                });
                 viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,

@@ -1,12 +1,15 @@
 using Bumbo.Data.Context;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
+using Bumbo.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
 
 namespace Bumbo.Data.SqlRepository
 {
-    public class EmployeeRepository(BumboDbContext ctx) : IEmployeeRepository
+    public class EmployeeRepository(BumboDbContext ctx, UserManager<IdentityUser> userManager) : IEmployeeRepository
     {
         readonly BumboDbContext ctx = ctx;
+        readonly UserManager<IdentityUser> userManager = userManager;
 
         public Employee? GetEmployee(int id)
         {
@@ -23,8 +26,25 @@ namespace Bumbo.Data.SqlRepository
             return [.. ctx.Employees.Where(e => e.BranchId == branchId)];
         }
 
-        public void SaveEmployee(Employee employee)
+        public void SaveEmployee(Employee employee, string email, string password, RoleEnum role)
         {
+            var user = new IdentityUser
+            {
+                UserName = email,
+                Email = email
+            };
+            
+            var result = userManager.CreateAsync(user).Result;
+            var newUser = userManager.FindByEmailAsync(email).Result;
+
+            if (newUser != null)
+            {
+                userManager.AddToRoleAsync(newUser, role.ToString().ToLower()).Wait();
+                employee.UserId = newUser.Id;
+            }
+            
+            if (!result.Succeeded) return;
+            
             ctx.Employees.Add(employee);
             ctx.SaveChanges();
         }
@@ -71,6 +91,15 @@ namespace Bumbo.Data.SqlRepository
             return employee != null
                 ? $"{employee.FirstName} {employee.LastName}"
                 : "Employee not found";
+        }
+        
+        public string getRoles(string userId)
+        {
+            var user = userManager.FindByIdAsync(userId.ToString()).Result;
+            if (user == null) return "User not found";
+
+            var role = userManager.GetRolesAsync(user).Result.FirstOrDefault(); // TODO: Currently only returns the first role, not all roles (since a user can have multiple roles)
+            return role ?? "Role not found";
         }
 
         public IEnumerable<Branch> GetBranches()
