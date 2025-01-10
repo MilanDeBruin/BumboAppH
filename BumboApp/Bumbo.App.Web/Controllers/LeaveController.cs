@@ -53,21 +53,22 @@ namespace Bumbo.App.Web.Controllers
                 EndDate = viewModel.end,
                 LeaveStatus = viewModel.status
             };
+            int check = lRepo.doAllChecks(newRequest);
 
-            if (repo.checkStartDateForDuble(newRequest.EmployeeId, newRequest.StartDate))
+            switch (check)
             {
-                TempData["FailedMessage"] = $"Er is al verlof aangevraagd op deze datum!";
-                return RedirectToAction("Index", new { employeeId = viewModel.employeeId });
-            }
-
-            if (lRepo.startDateHigherThanEndDate(newRequest) && repo.getOverlap(newRequest.StartDate, newRequest.EndDate, newRequest.EmployeeId))
-            {
-                repo.SetLeaveRequest(newRequest);
-                TempData["SuccessMessage"] = $"Verlof is aangevraagd!";
-            }
-            else
-            {
-                TempData["FailedMessage"] = $"Verlof is niet aangevraagd!";
+                case 1:
+                    TempData["FailedMessage"] = $"Kan geen verlof aanvragen voor vandaag of eerdere datums!";
+                    break;
+                case 2:
+                    TempData["FailedMessage"] = $"Start datum mag niet hoger zijn de de eind datum!";
+                    break;
+                case 3:
+                    TempData["FailedMessage"] = $"Er is al verlof aangevraagd op deze datum!";
+                    break;
+                case 4:
+                    TempData["FailedMessage"] = $"Verlof verzoek loop over een eerder aangevraagd verzoek!";
+                    break;
             }
 
             return RedirectToAction("Index", new { employeeId = viewModel.employeeId });
