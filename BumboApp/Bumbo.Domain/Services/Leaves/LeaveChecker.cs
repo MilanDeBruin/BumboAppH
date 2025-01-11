@@ -20,18 +20,18 @@ namespace Bumbo.Domain.Services.Leaves
             }
             else
             {
-                return -1;
+                return 0;
             }
         }
         public int CheckOverlap(Leave leaveRequest)
         {
             if (repo.getOverlap(leaveRequest.StartDate, leaveRequest.EndDate, leaveRequest.EmployeeId))
             {
-                return 4;
+                return 0;
             }
             else
             {
-                return -1;
+                return 4;
             }
         }
 
@@ -45,7 +45,7 @@ namespace Bumbo.Domain.Services.Leaves
             }
             else
             {
-                return -1;
+                return 0;
             }
         }
 
@@ -57,7 +57,7 @@ namespace Bumbo.Domain.Services.Leaves
             }
             else
             {
-                return -1;
+                return 0;
             }
         }
 

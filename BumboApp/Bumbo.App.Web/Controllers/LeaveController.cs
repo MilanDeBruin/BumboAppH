@@ -57,6 +57,9 @@ namespace Bumbo.App.Web.Controllers
 
             switch (check)
             {
+                case 0:
+                    TempData["SuccessMessage"] = $"Verlof is aangevraagd!";
+                    break;
                 case 1:
                     TempData["FailedMessage"] = $"Kan geen verlof aanvragen voor vandaag of eerdere datums!";
                     break;
@@ -70,6 +73,7 @@ namespace Bumbo.App.Web.Controllers
                     TempData["FailedMessage"] = $"Verlof verzoek loop over een eerder aangevraagd verzoek!";
                     break;
             }
+
 
             return RedirectToAction("Index", new { employeeId = viewModel.employeeId });
         }
