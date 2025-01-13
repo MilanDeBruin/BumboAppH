@@ -41,8 +41,8 @@ public partial class WorkSchedule
     [Column("is_sick")]
     public bool IsSick { get; set; }
 
-    [Column("is_concept")]
-    public bool IsConcept { get; set; }
+    [Column("concept")]
+    public bool Concept { get; set; }
 
     [ForeignKey("BranchId")]
     [InverseProperty("WorkSchedules")]
