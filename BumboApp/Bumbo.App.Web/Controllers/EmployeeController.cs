@@ -47,7 +47,7 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = employee.EmployeeId,
                 BranchId = employee.BranchId,
-                Position = _employeeRepository.getRoles(employee.UserId),
+                Position = _employeeRepository.GetRoles(employee.UserId),
                 HiringDate = employee.HiringDate,
                 FirstName = employee.FirstName,
                 Infix = employee.Infix,

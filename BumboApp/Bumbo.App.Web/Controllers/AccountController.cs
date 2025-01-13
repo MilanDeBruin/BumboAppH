@@ -42,7 +42,7 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-            var result = await _signInManager.PasswordSignInAsync(viewModel.Email, viewModel.Password, false, false); // TODO: Shouldn't be async
+            var result = await _signInManager.PasswordSignInAsync(viewModel.Email, viewModel.Password, false, false);
 
             if (result.Succeeded)
             {
@@ -66,7 +66,7 @@ public class AccountController : Controller
                     new Claim("employee_id", employee.EmployeeId.ToString()),
                     new Claim("branch_id", employee.BranchId.ToString()),
                     new Claim("user_id", user.Id),
-                    new Claim("position", _employeeRepository.getRoles(user.Id).ToLower())
+                    new Claim("position", _employeeRepository.GetRoles(user.Id).ToLower())
                 };
                 
                 var claimsResult = await _userManager.AddClaimsAsync(user, claims);

@@ -55,7 +55,7 @@ namespace Bumbo.Data.SqlRepository
             if (existingEmployee == null) return false;
 
             existingEmployee.BranchId = employee.BranchId;
-            // existingEmployee.Position = employee.Position; TODO: Implement using Identity
+            existingEmployee.UserId = employee.UserId;
             existingEmployee.HiringDate = employee.HiringDate;
             existingEmployee.FirstName = employee.FirstName;
             existingEmployee.Infix = employee.Infix;
@@ -93,7 +93,7 @@ namespace Bumbo.Data.SqlRepository
                 : "Employee not found";
         }
         
-        public string getRoles(string userId)
+        public string GetRoles(string userId)
         {
             var user = userManager.FindByIdAsync(userId.ToString()).Result;
             if (user == null) return "User not found";
@@ -105,12 +105,6 @@ namespace Bumbo.Data.SqlRepository
         public IEnumerable<Branch> GetBranches()
         {
             return [.. ctx.Branches];
-        }
-
-        public IEnumerable<Position> GetPositions()
-        {
-            // return [.. ctx.Positions]; TODO: Implement using Identity
-            return null; 
         }
 
         public IEnumerable<LaborContract> GetLaborContracts()

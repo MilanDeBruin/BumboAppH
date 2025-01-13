@@ -12,9 +12,8 @@ namespace Bumbo.Data.Interfaces
         public bool UpdateEmployee(Employee employee);
         public bool DeleteEmployee(int employeeId);
         public string FindNameFromId(int id);
-        public string getRoles(string userId);
+        public string GetRoles(string userId);
         public IEnumerable<Branch> GetBranches();
-        public IEnumerable<Position> GetPositions();
         public IEnumerable<LaborContract> GetLaborContracts();
     }
 }
