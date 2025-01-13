@@ -60,7 +60,7 @@ public class HomeRepository : IHomeRepository
 
     public void Inklokken(int employeeId)
     {
-       
+       // _db.work_shift.Where(ws => ws.EmployeeId = employeeId);
     }
 
     public void Uitklokken(int employeeId)
