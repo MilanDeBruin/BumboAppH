@@ -56,8 +56,8 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = employee.HouseNumber,
                 Addition = employee.Addition,
                 ZipCode = employee.ZipCode,
-                // EmailAdres = employee.EmailAdres, TODO: Implement using Identity
-                // Password = employee.Password, TODO: Implement using Identity
+                // EmailAdres = employee.EmailAdres, TODO: Remove?
+                // Password = employee.Password, TODO: Remove?
                 LaborContract = employee.LaborContract,
             };
 
@@ -156,7 +156,7 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = employee.EmployeeId,
                 BranchId = employee.BranchId,
-                // Position = employee.Position, TODO: Implement using Identity
+                Position = _employeeRepository.GetRoles(employee.UserId),
                 HiringDate = employee.HiringDate,
                 FirstName = employee.FirstName,
                 Infix = employee.Infix,
@@ -165,8 +165,8 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = employee.HouseNumber,
                 Addition = employee.Addition,
                 ZipCode = employee.ZipCode,
-                // EmailAdres = employee.EmailAdres, TODO: Implement using Identity
-                // Password = employee.Password, TODO: Implement using Identity
+                // EmailAdres = employee.EmailAdres, TODO: Remove?
+                // Password = employee.Password, TODO: Remove?
                 LaborContract = employee.LaborContract,
                 Branches = [.. _context.Branches.Select(b => new SelectListItem
                 {
@@ -253,8 +253,6 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = viewModel.HouseNumber,
                 Addition = viewModel.Addition,
                 ZipCode = viewModel.ZipCode,
-                // EmailAdres = viewModel.EmailAdres, TODO: Implement using Identity
-                // Password = viewModel.Password, TODO: Implement using Identity
                 LaborContract = viewModel.LaborContract
             };
 

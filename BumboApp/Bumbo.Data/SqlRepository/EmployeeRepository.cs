@@ -96,9 +96,6 @@ namespace Bumbo.Data.SqlRepository
             if (employee == null) return false;
             var user = userManager.FindByIdAsync(employee.UserId).Result;
             if (user != null) userManager.DeleteAsync(user).Wait();
-
-            ctx.Employees.Remove(employee);
-            ctx.SaveChanges();
             return true;
         }
 
