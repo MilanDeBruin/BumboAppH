@@ -60,8 +60,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="DayOverview" asp-action="Index" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Dag overzicht</a>
                                 </li>
+
                                 <li class="nav-item">
-                                    <a class="navbar-brand" asp-area="" asp-controller="MonthOverview" asp-action="Index" asp-route-employeeId="@User.FindFirst("employee_id")?.Value"> Maand overzicht</>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="MonthOverview" asp-action="Index" asp-route-employeeId="@User.FindFirst("employee_id")?.Value"> Maand overzicht</a>
                                 </li>
 
                             }
