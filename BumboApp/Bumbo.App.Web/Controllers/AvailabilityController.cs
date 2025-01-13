@@ -12,7 +12,7 @@ using Bumbo.App.Web.Models.ViewModels.Employee;
 namespace Bumbo.App.Web.Controllers
 {
     [Authorize]
-    public class AvailabilityController(BumboDbContext context, IAvailabilityRepository availabilityRepository) : Controller
+    public class AvailabilityController(BumboDbContext context, IAvailabilityRepository availabilityRepository, IEmployeeRepository employeeRepository) : Controller
     {
         private readonly IAvailabilityRepository _availabilityRepository = availabilityRepository;
         private readonly BumboDbContext _context = context;
@@ -217,7 +217,7 @@ namespace Bumbo.App.Web.Controllers
                         {
                             EmployeeId = employee.EmployeeId,
                             BranchId = employee.BranchId,
-                            // Position = employee.Position, TODO: Implement using Identity
+                            Position = employee.Position,
                             HiringDate = employee.HiringDate,
                             FirstName = employee.FirstName,
                             Infix = employee.Infix,
