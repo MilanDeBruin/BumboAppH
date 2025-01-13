@@ -9,11 +9,13 @@ using Bumbo.Domain.Models;
 using Bumbo.App.Web.Models.ViewModels.Home;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
+using Microsoft.AspNetCore.Authorization;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace Bumbo.App.Web.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly IHomeRepository _repo;

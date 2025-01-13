@@ -15,7 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace BumboApp.Controllers
 {
-    [Authorize]
+    [Authorize(Roles="manager")]
     public class ForecastController : Controller
     {
         private readonly IGenerateForecastService _generateForecastService;

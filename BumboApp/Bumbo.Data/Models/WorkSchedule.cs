@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bumbo.Data.Models;
 
-[PrimaryKey("EmployeeId", "Date", "BranchId", "StartTime")]
+[PrimaryKey("EmployeeId", "Date", "BranchId")]
 [Table("work_schedule")]
 public partial class WorkSchedule
 {
@@ -22,7 +22,6 @@ public partial class WorkSchedule
     [Column("branch_id")]
     public int BranchId { get; set; }
 
-    [Key]
     [Column("start_time")]
     [Precision(0)]
     public TimeOnly StartTime { get; set; }
@@ -39,11 +38,11 @@ public partial class WorkSchedule
     [StringLength(50)]
     public string WorkStatus { get; set; } = null!;
 
-    [Column("concept")]
-    public bool Concept { get; set; }
-
     [Column("is_sick")]
     public bool IsSick { get; set; }
+
+    [Column("concept")]
+    public bool Concept { get; set; }
 
     [ForeignKey("BranchId")]
     [InverseProperty("WorkSchedules")]

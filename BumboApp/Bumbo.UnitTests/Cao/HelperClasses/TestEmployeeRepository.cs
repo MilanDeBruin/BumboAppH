@@ -1,5 +1,6 @@
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
+using Bumbo.Domain.Enums;
 
 namespace Bumbo.UnitTests.Cao.HelperClasses;
 
@@ -48,17 +49,22 @@ public class TestEmployeeRepository : IEmployeeRepository
         };
     }
 
+    public Employee? GetEmployee(string userId)
+    {
+        throw new NotImplementedException();
+    }
+
     public IEnumerable<Employee> GetEmployees(int branchId)
     {
         throw new NotImplementedException();
     }
 
-    public void SaveEmployee(Employee employee)
+    public void SaveEmployee(Employee employee, string email, string password, RoleEnum role)
     {
         throw new NotImplementedException();
     }
 
-    public bool UpdateEmployee(Employee employee)
+    public bool UpdateEmployee(Employee employee, string emailAdres, string password)
     {
         throw new NotImplementedException();
     }
@@ -69,6 +75,11 @@ public class TestEmployeeRepository : IEmployeeRepository
     }
 
     public string FindNameFromId(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public string GetRoles(string userId)
     {
         throw new NotImplementedException();
     }

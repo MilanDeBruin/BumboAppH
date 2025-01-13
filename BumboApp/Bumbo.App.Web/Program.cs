@@ -3,6 +3,7 @@ using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 using Bumbo.Data.SqlRepository;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bumbo.App.Web
@@ -33,7 +34,23 @@ namespace Bumbo.App.Web
                 .AddTransient<Bumbo.Domain.Services.CAO.ICaoScheduleService,
                     Bumbo.Domain.Services.CAO.CaoScheduleService>();
 
-
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+                
+                options.Password.RequireDigit = false; // TODO: Maybe change this to true on release
+                options.Password.RequireLowercase = false; // TODO: Maybe change this to true on release
+                options.Password.RequireNonAlphanumeric = false; // TODO: Maybe change this to true on release
+                options.Password.RequireUppercase = false; // TODO: Maybe change this to true on release
+                options.Password.RequiredLength = 0; // TODO: Maybe change this to a different value on release
+                options.Password.RequiredUniqueChars = 0; // TODO: Maybe change this to a different value true on release
+                
+                options.User.RequireUniqueEmail = true;
+                
+                options.Lockout.AllowedForNewUsers = false;
+            }).AddEntityFrameworkStores<BumboDbContext>();
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -56,6 +73,8 @@ namespace Bumbo.App.Web
             app.UseStaticFiles();
 
             app.UseRouting();
+            
+            //Configuring Authentication Middleware to the Request Pipeline
             app.UseAuthentication();
             app.UseAuthorization();
 
