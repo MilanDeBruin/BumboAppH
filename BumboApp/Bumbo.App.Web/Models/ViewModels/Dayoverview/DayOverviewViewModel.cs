@@ -8,6 +8,7 @@
 		public Decimal PlannedHours { get; set; }
 		public Decimal WorkedHours { get; set; }
         public string WorkedHoursString { get; set; }
+		public TimeSpan WorkedHoursTimeSpan { get; set; }
         public Decimal Difference => PlannedHours - WorkedHours;
 		public int BranchId { get; set; }
 	}
