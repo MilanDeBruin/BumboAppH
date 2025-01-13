@@ -16,7 +16,7 @@ using Microsoft.VisualBasic;
 
 namespace Bumbo.App.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles="manager")]
 public class SchedulingController : Controller
 {
     private readonly BumboDbContext _context;

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BumboApp.Controllers
 {
-    [Authorize]
+    [Authorize(Roles="manager")]
     public class NormController : Controller
     {
         private readonly INormRepository repo;

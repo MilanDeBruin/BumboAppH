@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Bumbo.App.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles="manager")]
     public class EmployeeController(BumboDbContext context, IEmployeeRepository employeeRepository) : Controller
     {
         private readonly BumboDbContext _context = context;
