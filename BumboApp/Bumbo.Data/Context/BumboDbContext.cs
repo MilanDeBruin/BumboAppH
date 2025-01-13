@@ -44,6 +44,8 @@ public partial class BumboDbContext : IdentityDbContext
 
     public virtual DbSet<OpeningHour> OpeningHours { get; set; }
 
+    public virtual DbSet<Position> Positions { get; set; }
+
     public virtual DbSet<SchoolSchedule> SchoolSchedules { get; set; }
 
     public virtual DbSet<StoreTraffic> StoreTraffics { get; set; }
@@ -90,6 +92,10 @@ public partial class BumboDbContext : IdentityDbContext
             entity.HasOne(d => d.LaborContractNavigation).WithMany(p => p.Employees)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_employee_labor_contract");
+
+            entity.HasOne(d => d.PositionNavigation).WithMany(p => p.Employees)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_employee_position");
 
             entity.HasMany(d => d.Departments).WithMany(p => p.Employees)
                 .UsingEntity<Dictionary<string, object>>(

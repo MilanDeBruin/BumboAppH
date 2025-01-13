@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Bumbo.Data.Models;
 
@@ -15,6 +12,10 @@ public partial class Employee
 
     [Column("branch_id")]
     public int BranchId { get; set; }
+
+    [Column("position")]
+    [StringLength(50)]
+    public string Position { get; set; } = null!;
 
     [Column("hiring_date")]
     public DateOnly HiringDate { get; set; }
@@ -67,6 +68,10 @@ public partial class Employee
 
     [InverseProperty("Employee")]
     public virtual ICollection<Leave> Leaves { get; set; } = new List<Leave>();
+
+    [ForeignKey("Position")]
+    [InverseProperty("Employees")]
+    public virtual Position PositionNavigation { get; set; } = null!;
 
     [InverseProperty("Employee")]
     public virtual ICollection<SchoolSchedule> SchoolSchedules { get; set; } = new List<SchoolSchedule>();
