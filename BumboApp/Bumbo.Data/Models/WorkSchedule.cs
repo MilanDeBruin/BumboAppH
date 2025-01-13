@@ -38,6 +38,12 @@ public partial class WorkSchedule
     [StringLength(50)]
     public string WorkStatus { get; set; } = null!;
 
+    [Column("is_sick")]
+    public bool IsSick { get; set; }
+
+    [Column("is_concept")]
+    public bool IsConcept { get; set; }
+
     [ForeignKey("BranchId")]
     [InverseProperty("WorkSchedules")]
     public virtual Branch Branch { get; set; } = null!;

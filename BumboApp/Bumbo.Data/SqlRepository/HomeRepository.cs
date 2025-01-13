@@ -33,7 +33,7 @@ public class HomeRepository : IHomeRepository
             foreach (var workSchedule in workSchedules)
             {
                
-                // workSchedule.IsSick = true; TODO: Implement according to new database structure
+                workSchedule.IsSick = true;
             }
         }
         _db.SaveChanges();
@@ -44,9 +44,8 @@ public class HomeRepository : IHomeRepository
 
         var sick = _db.WorkSchedules.Where(ws => ws.EmployeeId == employeeId && ws.Date == DateOnly.FromDateTime(DateTime.Now)).ToList();
 
-        // bool isSick = sick.Any(ws => ws.IsSick); TODO: Implement according to new database structure
-        // return isSick;
-        return false;
+        bool isSick = sick.Any(ws => ws.IsSick);
+        return isSick;
     }
 
 }
