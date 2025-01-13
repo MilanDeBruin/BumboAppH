@@ -38,6 +38,7 @@ public class HomeRepository : IHomeRepository
             }
         }
         _db.SaveChanges();
+        Console.WriteLine("Sick set");
     }
 
     public Boolean GetSick(int employeeId)
