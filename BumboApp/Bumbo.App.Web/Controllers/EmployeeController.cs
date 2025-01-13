@@ -1,23 +1,19 @@
-﻿using Bumbo.App.Web.Models.ViewModels.Availability;
-using Bumbo.App.Web.Models.ViewModels.Employee;
+﻿using Bumbo.App.Web.Models.ViewModels.Employee;
 using Bumbo.Data.Context;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 using Bumbo.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Bumbo.App.Web.Controllers
 {
     [Authorize]
-    public class EmployeeController(BumboDbContext context, IEmployeeRepository employeeRepository, RoleManager<IdentityRole> roleManager) : Controller
+    public class EmployeeController(BumboDbContext context, IEmployeeRepository employeeRepository) : Controller
     {
         private readonly BumboDbContext _context = context;
         private readonly IEmployeeRepository _employeeRepository = employeeRepository;
-        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
-
         public IActionResult Index(int branchId)
         {
             var employees = _employeeRepository.GetEmployees(branchId);
@@ -142,7 +138,7 @@ namespace Bumbo.App.Web.Controllers
                 LaborContract = viewModel.LaborContract,
             };
 
-            _employeeRepository.SaveEmployee(employee, viewModel.EmailAdres, viewModel.Password, RoleEnum.Employee); // TODO: Allow user to choose employee type (employee, manager)
+            _employeeRepository.SaveEmployee(employee, viewModel.EmailAdres, viewModel.Password, RoleEnum.Employee);
             TempData["SuccessMessage"] = "Medewerker is aangemaakt!";
             return RedirectToAction("Index", new { branchId = viewModel.BranchId });
         }

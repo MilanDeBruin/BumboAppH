@@ -64,7 +64,7 @@ public class TestEmployeeRepository : IEmployeeRepository
         throw new NotImplementedException();
     }
 
-    public bool UpdateEmployee(Employee employee)
+    public bool UpdateEmployee(Employee employee, string emailAdres, string password)
     {
         throw new NotImplementedException();
     }
