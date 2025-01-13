@@ -24,12 +24,21 @@
                         <ul class="navbar-nav me-auto">
                             <li class="nav-item">
                                 <a class="nav-link text-dark"
-                                    asp-area=""
-                                    asp-controller="Availability"
-                                    asp-action="Details"
-                                    asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
-                                    asp-route-branchId="@User.FindFirst("branch_id")?.Value"
+                                   asp-area=""
+                                   asp-controller="Availability"
+                                   asp-action="Details"
+                                   asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
+                                   asp-route-branchId="@User.FindFirst("branch_id")?.Value"
                                 >Mijn Beschikbaarheid</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="SchoolSchedule"
+                                   asp-action="Details"
+                                   asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
+                                >Schoolrooster</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="Leave" asp-action="Index" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">Verlof aanvragen</a>
