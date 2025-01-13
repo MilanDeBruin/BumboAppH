@@ -40,12 +40,12 @@ namespace Bumbo.App.Web
                 options.SignIn.RequireConfirmedEmail = false;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
                 
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 0;
-                options.Password.RequiredUniqueChars = 0;
+                options.Password.RequireDigit = false; // TODO: Maybe change this to true on release
+                options.Password.RequireLowercase = false; // TODO: Maybe change this to true on release
+                options.Password.RequireNonAlphanumeric = false; // TODO: Maybe change this to true on release
+                options.Password.RequireUppercase = false; // TODO: Maybe change this to true on release
+                options.Password.RequiredLength = 0; // TODO: Maybe change this to a different value on release
+                options.Password.RequiredUniqueChars = 0; // TODO: Maybe change this to a different value true on release
                 
                 options.User.RequireUniqueEmail = true;
                 
