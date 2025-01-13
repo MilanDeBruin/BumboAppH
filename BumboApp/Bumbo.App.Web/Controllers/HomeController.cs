@@ -41,7 +41,7 @@ namespace Bumbo.App.Web.Controllers
                     WorkDays = new List<DayPersonalScheduleViewModel>()
                 };
                 List<WorkSchedule> schedules = _repo.GetScheduleData(employeeId, firstDayOfWeek);
-
+                
                  var groupedSchedules = schedules
                 .GroupBy(schedule => schedule.Date)
                 .OrderBy(group => group.Key);
@@ -61,7 +61,8 @@ namespace Bumbo.App.Web.Controllers
                     viewModel.WorkDays.Add(daySchedule);
 
                 }
-                viewModel.isSick = _repo.GetSick(employeeId); 
+                viewModel.isSick = _repo.GetSick(employeeId);
+                viewModel.sickListNames = _repo.getSickList();
                 return View(viewModel);
            
         }
@@ -74,7 +75,17 @@ namespace Bumbo.App.Web.Controllers
             _repo.SetSick(employeeId, date);
             TempData["SuccessMessage"] = "Je bent ziekgemeld!";
             return RedirectToAction("Index");
-        }    
+        }
+
+        public IActionResult Inklokken(int employeeId)
+        {
+            return null;
+        }
+
+        public IActionResult uitklokken(int employeeId)
+        {
+            return null;
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

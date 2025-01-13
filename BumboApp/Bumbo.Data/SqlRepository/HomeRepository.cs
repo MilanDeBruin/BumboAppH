@@ -2,6 +2,7 @@ using Bumbo.Data.Context;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging.Abstractions;
 
 
 namespace Bumbo.Data.SqlRepository;
@@ -46,6 +47,25 @@ public class HomeRepository : IHomeRepository
 
         bool isSick = sick.Any(ws => ws.IsSick);
         return isSick;
+    }
+
+    public List<string> getSickList()
+    {
+        var sicklist = (from ws in _db.WorkSchedules
+         join em in _db.Employees on ws.EmployeeId equals em.EmployeeId
+         where ws.IsSick == true && ws.Date == DateOnly.FromDateTime(DateTime.Now)
+         select em.FirstName).ToList();
+        return sicklist;
+    }
+
+    public void Inklokken(int employeeId)
+    {
+       
+    }
+
+    public void Uitklokken(int employeeId)
+    {
+
     }
 
 }

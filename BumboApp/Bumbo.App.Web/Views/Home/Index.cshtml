@@ -26,9 +26,12 @@
                 <input type="button" value="Ziekgemeld" disabled="disabled" class="disable_button"/>
             </a>
         }
-        <h2>Rooster Week</h2>
+       
     </div>
 
+    <div class="main-container">
+    <div class="right-section">
+    <h2>Rooster Week</h2>
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success text-center mt-3">
@@ -62,9 +65,9 @@
     </div>
 
 
-    <div class="table-container">
+    
 
-        <table class="schedule-table">
+        <table class="table-container">
             <thead>
                 <tr>
                     <th>Datum</th>
@@ -105,6 +108,53 @@
                 }
             </tbody>
         </table>
+
+         @if (User.FindFirst("position")?.Value == "Manager")
+         {
+         <div>    
+            <h5>Zieke medewerkers van vandaag</h5>
+            <div class="scrollable-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var sickmodel = Model.sickListNames;
+                        }
+                        @foreach (var name in sickmodel)
+                        {
+                            <tr>
+                                <td>@name </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            </div>
+         }
+        </div>
+
+        <div class=" left-section">
+            @if (!Model.isSick)
+            {
+                <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+                    <input type="button" value="Inklokken" />
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Home" asp-action="Uitklokken">
+                    <input type="button" value="Uitklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value" />
+                </a>
+            }
+
+        </div>
+
+
+
     </div>
 
 

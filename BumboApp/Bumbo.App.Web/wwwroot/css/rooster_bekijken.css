@@ -1,20 +1,54 @@
-﻿body {
+﻿/* General Body Styling */
+body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     height: 100vh;
     background-color: #f0f0f0;
-
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
-.table-container {
+/* Main Container */
+.main-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
     margin: 20px auto;
+    align-items: flex-start;
+}
+
+/* Left Section */
+.left-section {
+    flex: 3; 
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Right Section */
+.right-section {
+    flex: auto; 
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Container */
+.table-container {
+    margin: 20px 0;
     width: 100%;
-    max-width: 800px;
 }
 
 .schedule-table {
-    width: 100%;
+    width: 80%;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
 }
@@ -30,21 +64,14 @@
         font-weight: bold;
     }
 
-
 .no-shifts {
     text-align: center;
     font-style: italic;
     color: #999;
 }
 
-.button{
-    margin-right: 10px;
-    background-color:red;
-
-}
-
-
-input[type=button]  {
+/* Buttons */
+input[type=button] {
     background-color: lightgreen;
     color: black;
     border: none;
@@ -56,16 +83,24 @@ input[type=button]  {
     right: 8%;
 }
 
-input[type=button]:disabled {
-    background-color: lightgray;
-    color: black;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor:default;
-    margin-top: 5px;
-    position: absolute;
-    right: 8%;
+    input[type=button]:disabled {
+        background-color: lightgray;
+        color: black;
+        cursor: default;
+    }
+
+/* Scrollable Table */
+.scrollable-table {
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
 }
 
-
+/* Alerts */
+.alert {
+    margin-top: 10px;
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 5px;
+}
