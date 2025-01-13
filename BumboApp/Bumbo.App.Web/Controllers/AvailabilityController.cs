@@ -12,7 +12,7 @@ using Bumbo.App.Web.Models.ViewModels.Employee;
 namespace Bumbo.App.Web.Controllers
 {
     [Authorize]
-    public class AvailabilityController(BumboDbContext context, IAvailabilityRepository availabilityRepository) : Controller
+    public class AvailabilityController(BumboDbContext context, IAvailabilityRepository availabilityRepository, IEmployeeRepository employeeRepository) : Controller
     {
         private readonly IAvailabilityRepository _availabilityRepository = availabilityRepository;
         private readonly BumboDbContext _context = context;
@@ -218,7 +218,7 @@ namespace Bumbo.App.Web.Controllers
                 // Filter beschikbaarheden op de geselecteerde positie, indien aanwezig
                 var filteredAvailabilities = weekAvailabilities.Where(a =>
                     a.Weekday.ToLower() == dayDate.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower() &&
-                    (string.IsNullOrEmpty(position) || a.Employee.Position == position)).ToList();
+                    (string.IsNullOrEmpty(position) /*|| a.Employee.Position == position TODO: Implement using Identity*/)).ToList(); 
 
                 foreach (var availability in filteredAvailabilities)
                 {
@@ -238,8 +238,8 @@ namespace Bumbo.App.Web.Controllers
                             HouseNumber = employee.HouseNumber,
                             Addition = employee.Addition,
                             ZipCode = employee.ZipCode,
-                            EmailAdres = employee.EmailAdres,
-                            Password = employee.Password,
+                            // EmailAdres = employee.EmailAdres, TODO: Implement using Identity
+                            // Password = employee.Password, TODO: Implement using Identity
                         },
                         StartTime = availability.StartTime,
                         EndTime = availability.EndTime,
