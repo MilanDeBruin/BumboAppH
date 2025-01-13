@@ -9,7 +9,7 @@ namespace Bumbo.Data.Interfaces
         public Employee? GetEmployee(string userId);
         public IEnumerable<Employee> GetEmployees(int branchId);
         public void SaveEmployee(Employee employee, string email, string password, RoleEnum role); 
-        public bool UpdateEmployee(Employee employee);
+        public bool UpdateEmployee(Employee employee, string emailAdres,  string password);
         public bool DeleteEmployee(int employeeId);
         public string FindNameFromId(int id);
         public string GetRoles(string userId);

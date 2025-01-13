@@ -26,7 +26,7 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = employee.EmployeeId,
                 BranchId = employee.BranchId,
-                // Position = employee.Position TODO: Implement using Identity
+                Position = _employeeRepository.GetRoles(employee.UserId),
                 FirstName = employee.FirstName,
                 Infix = employee.Infix,
                 LastName = employee.LastName,
@@ -223,12 +223,12 @@ namespace Bumbo.App.Web.Controllers
                     "Geboortedatum kan niet later zijn dan startdatum contract"
                 );
 
-                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem // TODO: Implement using Identity
+                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })];
-                viewModel.Positions = _roleManager.Roles.Select(r => new SelectListItem
+                viewModel.Positions = _roleManager.Roles.Select(r => new SelectListItem // TODO: Remove?
                 {
                     Value = r.Name,
                     Text = r.Name
@@ -245,7 +245,6 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = viewModel.EmployeeId,
                 BranchId = viewModel.BranchId,
-                // Position = viewModel.Position, TODO: Implement using Identity
                 HiringDate = viewModel.HiringDate,
                 FirstName = viewModel.FirstName,
                 Infix = viewModel.Infix,
@@ -259,7 +258,7 @@ namespace Bumbo.App.Web.Controllers
                 LaborContract = viewModel.LaborContract
             };
 
-            if (!_employeeRepository.UpdateEmployee(employee))
+            if (!_employeeRepository.UpdateEmployee(employee, viewModel.EmailAdres, viewModel.Password))
             {
                 TempData["ErrorMessage"] = "Medewerker kon niet worden gewijzigd!";
                 return View(viewModel);

@@ -49,13 +49,12 @@ namespace Bumbo.Data.SqlRepository
             ctx.SaveChanges();
         }
 
-        public bool UpdateEmployee(Employee employee)
+        public bool UpdateEmployee(Employee employee, string emailAdres, string password)
         {
             var existingEmployee = ctx.Employees.Find(employee.EmployeeId);
             if (existingEmployee == null) return false;
 
             existingEmployee.BranchId = employee.BranchId;
-            existingEmployee.UserId = employee.UserId;
             existingEmployee.HiringDate = employee.HiringDate;
             existingEmployee.FirstName = employee.FirstName;
             existingEmployee.Infix = employee.Infix;
@@ -64,17 +63,39 @@ namespace Bumbo.Data.SqlRepository
             existingEmployee.HouseNumber = employee.HouseNumber;
             existingEmployee.Addition = employee.Addition;
             existingEmployee.ZipCode = employee.ZipCode;
-            // existingEmployee.EmailAdres = employee.EmailAdres; TODO: Implement using Identity
-            // existingEmployee.Password = employee.Password; TODO: Implement using Identity
+            if (!string.IsNullOrEmpty(emailAdres)) ChangeUsername(existingEmployee.UserId, emailAdres);
+            if (!string.IsNullOrEmpty(password)) ChangePassword(existingEmployee.UserId, password);
             existingEmployee.LaborContract = employee.LaborContract;
 
             ctx.SaveChanges();
             return true;
         }
+        
+        private void ChangePassword(string userId, string password)
+        {
+            var user = userManager.FindByIdAsync(userId).Result;
+            if (user == null) return;
+
+            userManager.RemovePasswordAsync(user).Wait();
+            userManager.AddPasswordAsync(user, password).Wait();
+        }
+        
+        private void ChangeUsername(string userId, string email)
+        {
+            var user = userManager.FindByIdAsync(userId).Result;
+            if (user == null) return;
+
+            user.Email = email;
+            user.UserName = email;
+            userManager.UpdateAsync(user).Wait();
+        }
+        
         public bool DeleteEmployee(int employeeId)
         {
             var employee = ctx.Employees.Find(employeeId);
             if (employee == null) return false;
+            var user = userManager.FindByIdAsync(employee.UserId).Result;
+            if (user != null) userManager.DeleteAsync(user).Wait();
 
             ctx.Employees.Remove(employee);
             ctx.SaveChanges();
