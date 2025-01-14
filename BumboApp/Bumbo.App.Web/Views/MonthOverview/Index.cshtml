@@ -27,7 +27,7 @@
                     <th>Achternaam</th>
                     <th>Geplande Uren</th>
                     <th>Gewerkte Uren</th>
-                    <th>Verschil (Gepland - Gewerkt)</th>
+                    <th>Verschil (Gewerkt - Gepland)</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,7 +38,7 @@
                         <td>@employee.LastName</td>
                         <td>@employee.PlannedHours</td>
                         <td>@employee.WorkedHours</td>
-                        <td>@(employee.PlannedHours - employee.WorkedHours)</td>
+                        <td>@(employee.WorkedHours - employee.PlannedHours )</td>
                     </tr>
                 }
             </tbody>
