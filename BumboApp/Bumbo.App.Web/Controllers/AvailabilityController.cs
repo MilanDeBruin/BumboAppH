@@ -12,7 +12,7 @@ using Bumbo.App.Web.Models.ViewModels.Employee;
 namespace Bumbo.App.Web.Controllers
 {
     [Authorize]
-    public class AvailabilityController(BumboDbContext context, IAvailabilityRepository availabilityRepository) : Controller
+    public class AvailabilityController(BumboDbContext context, IAvailabilityRepository availabilityRepository, IEmployeeRepository employeeRepository) : Controller
     {
         private readonly IAvailabilityRepository _availabilityRepository = availabilityRepository;
         private readonly BumboDbContext _context = context;
@@ -105,6 +105,17 @@ namespace Bumbo.App.Web.Controllers
         public IActionResult Edit(AvailabilityViewModel availabilityViewModel)
         {
             if (!ModelState.IsValid) return View(availabilityViewModel);
+            
+            double totalAvailability = availabilityViewModel.DailyAvailabilities
+                .Where(d => d.StartTime.HasValue && d.EndTime.HasValue)
+                .Sum(d => (d.EndTime.Value - d.StartTime.Value).TotalHours);
+
+            if (totalAvailability < 2)
+            {
+                TempData["ErrorMessage"] = "Je moet een weekbeschikbaarheid hebben van minstens 2 uur";
+                
+                return View(availabilityViewModel);
+            }
 
             // Door iedere werkdag van het formulier lopen en de index van de huidige loop bijhouden
             foreach (var (dailyAvailability, i) in availabilityViewModel.DailyAvailabilities.Select((value, index) => (value, index)))
@@ -131,13 +142,14 @@ namespace Bumbo.App.Web.Controllers
 
                     if (availability == null)
                     {
-                        _context.Availabilities.Add(new Availability
+                        Availability updatedAvailability = new Availability
                         {
                             EmployeeId = availabilityViewModel.EmployeeId,
                             Weekday = weekdayName,
                             StartTime = dailyAvailability.StartTime.Value,
                             EndTime = dailyAvailability.EndTime.Value
-                        });
+                        };
+                        _availabilityRepository.SaveAvailability(updatedAvailability);
                     }
                     else
                     {
@@ -206,7 +218,7 @@ namespace Bumbo.App.Web.Controllers
                 // Filter beschikbaarheden op de geselecteerde positie, indien aanwezig
                 var filteredAvailabilities = weekAvailabilities.Where(a =>
                     a.Weekday.ToLower() == dayDate.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower() &&
-                    (string.IsNullOrEmpty(position) || a.Employee.Position == position)).ToList();
+                    (string.IsNullOrEmpty(position) /*|| a.Employee.Position == position TODO: Implement using Identity*/)).ToList(); 
 
                 foreach (var availability in filteredAvailabilities)
                 {
@@ -226,8 +238,8 @@ namespace Bumbo.App.Web.Controllers
                             HouseNumber = employee.HouseNumber,
                             Addition = employee.Addition,
                             ZipCode = employee.ZipCode,
-                            EmailAdres = employee.EmailAdres,
-                            Password = employee.Password,
+                            // EmailAdres = employee.EmailAdres, TODO: Implement using Identity
+                            // Password = employee.Password, TODO: Implement using Identity
                         },
                         StartTime = availability.StartTime,
                         EndTime = availability.EndTime,

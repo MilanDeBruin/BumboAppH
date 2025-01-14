@@ -31,7 +31,7 @@ public class GenerateForecastModel
             {
                 BranchId = BranchId,
                 Date = forecastDay.Date,
-                Department = DepartmentEnum.Dkw.ToString(),
+                Department = DepartmentEnum.Shelf.ToString(),
                 ManHours = CalculateShelfStackerHours(
                     norms.FirstOrDefault(n => n.SupermarketActivity == "Coli uitladen"),
                     norms.FirstOrDefault(n => n.SupermarketActivity == "Vakken vullen"),

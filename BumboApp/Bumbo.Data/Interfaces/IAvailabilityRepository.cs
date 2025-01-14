@@ -5,6 +5,7 @@ namespace Bumbo.Data.Interfaces;
 public interface IAvailabilityRepository
 {
 
+    public void SaveAvailability(Availability availability);
     public SchoolSchedule? GetDailySchoolSchedule(int employeeId, DayOfWeek dayOfWeek);
 
     public TimeOnly GetStoreOpeningHour(int branchId, DateOnly dayofWeek);

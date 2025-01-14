@@ -2,7 +2,7 @@
 
 public enum DepartmentEnum
 {
-    Dkw,
+    Shelf,
     Kassa,
     Vers
 

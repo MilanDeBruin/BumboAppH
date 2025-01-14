@@ -8,10 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.Design;
 using Microsoft.VisualBasic;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Bumbo.App.Web.Controllers
 {
+    [Authorize]
     public class LeaveController : Controller
     {
         private readonly ILeaveRepository repo;

@@ -15,7 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace BumboApp.Controllers
 {
-    [Authorize]
+    [Authorize(Roles="manager")]
     public class ForecastController : Controller
     {
         private readonly IGenerateForecastService _generateForecastService;
@@ -150,7 +150,7 @@ namespace BumboApp.Controllers
                 {
                     BranchId = viewModel.BranchId,
                     Date = dayForecast.Date,
-                    Department = DepartmentEnum.Dkw.ToString(),
+                    Department = DepartmentEnum.Shelf.ToString(),
                     ManHours = dayForecast.ShelfStackerHours
                 });
             }
