@@ -12,4 +12,5 @@
         public Decimal Difference => PlannedHours - WorkedHours;
 		public int BranchId { get; set; }
 	}
+
 }

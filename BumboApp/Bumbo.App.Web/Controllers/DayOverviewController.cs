@@ -1,6 +1,8 @@
 ﻿using Bumbo.App.Web.Models.ViewModels.Dayoverview;
 using Bumbo.Data.Context;
+
 using Bumbo.Data.Models;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,6 +19,7 @@ namespace Bumbo.App.Web.Controllers
 		{
 			_context = context;
             _logger = logger;
+
         }
 
         public async Task<IActionResult> Index(string? date, string? search)
@@ -24,6 +27,7 @@ namespace Bumbo.App.Web.Controllers
             _logger.LogInformation("open action triggered...");
 
             DateTime selectedDate;
+
             if (string.IsNullOrEmpty(date) || !DateTime.TryParse(date, out selectedDate))
             {
                 selectedDate = DateTime.Today;
@@ -33,6 +37,7 @@ namespace Bumbo.App.Web.Controllers
             var workSchedules = await _context.WorkSchedules
                 .Where(ws => ws.Date == DateOnly.FromDateTime(selectedDate))
                 .ToListAsync();
+
 
             var workShifts = await _context.WorkShifts
                 .Where(ws => ws.StartTime.Date == selectedDate)
@@ -78,6 +83,7 @@ namespace Bumbo.App.Web.Controllers
         {
             _logger.LogInformation("Save action triggered... -------------------------------------------------------------------------");
 
+
             foreach (var update in updatedHours)
             {
 
@@ -108,6 +114,7 @@ namespace Bumbo.App.Web.Controllers
                     _context.WorkShifts.Update(workShift);
                 }
             }
+
 
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", new { date });
