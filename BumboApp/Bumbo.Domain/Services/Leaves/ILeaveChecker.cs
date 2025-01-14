@@ -9,7 +9,10 @@ namespace Bumbo.Domain.Services.Leaves
 {
     public interface ILeaveChecker
     {
-        public Boolean startDateHigherThanEndDate(Leave request);
-        public Boolean checkForOverlap(List<Leave> allRequests, Leave request);
+        public int CheckRequestStartDate(Leave request);
+        public int CheckstartDateHigherThanEndDate(Leave request);
+        public int checkStartDateForDuble(Leave request);
+        public int CheckOverlap(Leave leaveRequest);
+        public int doAllChecks(Leave request);
     }
 }
