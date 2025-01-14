@@ -88,6 +88,13 @@ namespace Bumbo.App.Web
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=DayOverview}/{action=Index}/{date?}");
+            });
+
             app.Run();
         }
     }

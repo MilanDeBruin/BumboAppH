@@ -65,6 +65,15 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Scheduling" asp-action="RoosterRefactored" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Roostering</a>
                                 </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="DayOverview" asp-action="Index" asp-route-branchId="@User.FindFirst("branch_id")?.Value">Dag overzicht</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="MonthOverview" asp-action="Index" asp-route-employeeId="@User.FindFirst("employee_id")?.Value"> Maand overzicht</a>
+                                </li>
+
                             }
                         </ul>
                         <form asp-controller="Account" asp-action="Logout" method="post" class="d-flex">
