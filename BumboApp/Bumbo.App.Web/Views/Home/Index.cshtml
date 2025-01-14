@@ -11,19 +11,19 @@
     <link rel="stylesheet" href="~/css/rooster_bekijken.css">
 </head>
 
+
 <body>
     <div>
-
         @if (!Model.isSick)
         {
             <a asp-controller="Home" asp-action="Ziekmelden" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-                <input type="button" value="Ziekmelden" />
+                <input type="button" value="Ziekmelden" class="btn btn-secondary"/>
             </a>
         }
         else
         {
             <a asp-controller="Home" asp-action="Ziekmelden">
-                <input type="button" value="Ziekgemeld" disabled="disabled" class="disable_button" />
+                <input type="button" value="Ziekgemeld" disabled="disabled" class="btn btn-secondary" />
             </a>
         }
         <h2>Rooster Week</h2>
@@ -131,20 +131,20 @@
                     </table>
                 </div>
             </div>
-            
          }
         </div>
-        
-            @if (!Model.isSick)
-            {
-                <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-                    <input type="button" value="Inklokken" />
-                </a>
-            }
-            else
-            {
-                <a asp-controller="Home" asp-action="Uitklokken">
-                    <input type="button" value="Uitklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value" />
-                </a>
-            }
+    @if (Model.ingeklokt == false)
+    {
+        <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+            <input type="button" value="Inklokken" class="btn btn-primary"/>
+        </a>
+    }
+    else
+    {
+        <a asp-controller="Home" asp-action="Uitklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+            <input type="button" value="Uitklokken" class="btn btn-primary" />
+        </a>
+    }
 </body>
+        
+           

@@ -63,6 +63,7 @@ namespace Bumbo.App.Web.Controllers
                     viewModel.WorkDays.Add(daySchedule);
 
                 }
+                viewModel.ingeklokt = _repo.GetIngeklokt(employeeId);
                 viewModel.isSick = _repo.GetSick(employeeId);
                 viewModel.sickListNames = _repo.getSickList();
                 return View(viewModel);
@@ -72,7 +73,16 @@ namespace Bumbo.App.Web.Controllers
         [HttpGet]
         public IActionResult Ziekmelden(int employeeId)
         {
-
+            if (_repo.GetIngeklokt(employeeId) == true)
+            {
+                TempData["SuccessMessage"] = "Je bent ingeklokt en mag niet ziekmelden!";
+                return RedirectToAction("Index");
+            }
+            if (_repo.CheckShift(employeeId) == false)
+            {
+                TempData["SuccessMessage"] = "je hebt geen dienst vandaag.";
+                return RedirectToAction("Index");
+            }
             DateOnly date = DateOnly.FromDateTime(DateTime.Now);
             _repo.SetSick(employeeId, date);
             TempData["SuccessMessage"] = "Je bent ziekgemeld!";
@@ -81,12 +91,21 @@ namespace Bumbo.App.Web.Controllers
 
         public IActionResult Inklokken(int employeeId)
         {
-            return null;
+            if(_repo.GetSick(employeeId) == true)
+            {
+                TempData["SuccessMessage"] = "Je bent ziek en mag niet inklokken!";
+                return RedirectToAction("Index");
+            }
+            _repo.Inklokken(employeeId);
+            TempData["SuccessMessage"] = "Je bent ingeklokt!";
+            return RedirectToAction("Index");
         }
 
-        public IActionResult uitklokken(int employeeId)
+        public IActionResult Uitklokken(int employeeId)
         {
-            return null;
+            _repo.Uitklokken(employeeId);
+            TempData["SuccessMessage"] = "Je bent uitgeklokt!";
+            return RedirectToAction("Index");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

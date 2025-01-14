@@ -36,14 +36,14 @@
     color: #999;
 }
 
-.button {
+.btn btn-primary {
     margin-right: 10px;
     background-color: red;
 }
 
 
-input[type=button] {
-    background-color: lightgreen;
+input[type=button].btn btn-primary {
+    background-color: blue;
     color: black;
     border: none;
     border-radius: 5px;
@@ -54,17 +54,17 @@ input[type=button] {
     right: 8%;
 }
 
-input[type=button]:disabled {
-     background-color: lightgray;
-     color: black;
-     border: none;
-     border-radius: 5px;
-     padding: 5px 10px;
-     cursor: default;
-     margin-top: 5px;
-     position: absolute;
-     right: 8%;   
-    }    
+input[type=button]:disabled.btn btn-primary {
+    background-color: lightgray;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: default;
+    margin-top: 5px;
+    position: absolute;
+    right: 8%;
+}    
 
 
 .sicktable-container {
@@ -134,3 +134,6 @@ input[type=button]:disabled {
     .sicktable::-webkit-scrollbar-track {
         background-color: #f4f4f4; /* Background for scrollbar track */
     }
+
+
+  

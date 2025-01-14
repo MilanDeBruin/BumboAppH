@@ -10,6 +10,8 @@ namespace Bumbo.App.Web.Models.ViewModels.Home
 
         public Boolean isSick { get; set; }
 
+        public Boolean ingeklokt { get; set; }
+        
         public List<string>? sickListNames { get; set; }
 
     }
