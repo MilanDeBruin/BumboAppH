@@ -11,19 +11,19 @@
     <link rel="stylesheet" href="~/css/rooster_bekijken.css">
 </head>
 
+
 <body>
     <div>
-        
         @if (!Model.isSick)
         {
             <a asp-controller="Home" asp-action="Ziekmelden" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-                <input type="button" value="Ziekmelden"/>
+                <input type="button" value="Ziekmelden" class="btn btn-secondary"/>
             </a>
         }
         else
         {
             <a asp-controller="Home" asp-action="Ziekmelden">
-                <input type="button" value="Ziekgemeld" disabled="disabled" class="disable_button"/>
+                <input type="button" value="Ziekgemeld" disabled="disabled" class="btn btn-secondary" />
             </a>
         }
         <h2>Rooster Week</h2>
@@ -105,8 +105,46 @@
                 }
             </tbody>
         </table>
-    </div>
 
-
-
+         @if (User.FindFirst("position")?.Value == "Manager")
+         {
+            <div class="sicktable-container">
+                <h5>Zieke medewerkers van vandaag</h5>
+                <div class="sicktable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Employee Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var sickmodel = Model.sickListNames;
+                            }
+                            @foreach (var name in sickmodel)
+                            {
+                                <tr>
+                                    <td>@name</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+         }
+        </div>
+    @if (Model.ingeklokt == false)
+    {
+        <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+            <input type="button" value="Inklokken" class="btn btn-primary"/>
+        </a>
+    }
+    else
+    {
+        <a asp-controller="Home" asp-action="Uitklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+            <input type="button" value="Uitklokken" class="btn btn-primary" />
+        </a>
+    }
 </body>
+        
+           
