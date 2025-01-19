@@ -60,9 +60,9 @@
                     <td>
                         <input type="time"
                                name="updatedHours[@Model.IndexOf(item)].WorkedHoursString"
-                               value="@item.WorkedHoursString"
+                               value="@TimeSpan.Parse(item.WorkedHoursString).ToString(@"hh\:mm")"
                                step="300"
-                               class="worked-hours-input" /> 
+                               class="worked-hours-input" />
                         <input type="hidden" name="updatedHours[@Model.IndexOf(item)].EmployeeId" value="@item.EmployeeId" />
                         <input type="hidden" name="updatedHours[@Model.IndexOf(item)].BranchId" value="@item.BranchId" />
                     </td>
@@ -70,12 +70,10 @@
                         @if (TimeSpan.TryParse(item.WorkedHoursString, out var workedTimeSpan))
                         {
                             var difference = workedTimeSpan - TimeSpan.FromHours((double)item.PlannedHours);
-                            @string.Format("{0:hh\\:mm}", difference)
+                            var sign = difference.TotalMinutes >= 0 ? "+" : "-";
+                            @string.Format("{0}{1:hh\\:mm}", sign, difference.Duration())
                         }
-                        @* else
-                        {
-                            "-";
-                        } *@
+                        
                     </td>
 
                 </tr>
