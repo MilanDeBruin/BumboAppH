@@ -56,16 +56,17 @@
                 <tr>
                     <td>@item.FirstName</td>
                     <td>@item.LastName</td>
-                    <td>@TimeSpan.FromHours((double)item.PlannedHours).ToString(@"hh\:mm")</td> 
+                    <td>@TimeSpan.FromHours((double)item.PlannedHours).ToString(@"hh\:mm")</td>
                     <td>
                         <input type="time"
                                name="updatedHours[@Model.IndexOf(item)].WorkedHoursString"
-                               value="@TimeSpan.Parse(item.WorkedHoursString).ToString(@"hh\:mm")"
+                               value="@TimeSpan.Parse(item.WorkedHoursString).ToString(@"hh\:mm", System.Globalization.CultureInfo.InvariantCulture)"
                                step="300"
                                class="worked-hours-input" />
                         <input type="hidden" name="updatedHours[@Model.IndexOf(item)].EmployeeId" value="@item.EmployeeId" />
                         <input type="hidden" name="updatedHours[@Model.IndexOf(item)].BranchId" value="@item.BranchId" />
                     </td>
+
                     <td>
                         @if (TimeSpan.TryParse(item.WorkedHoursString, out var workedTimeSpan))
                         {
