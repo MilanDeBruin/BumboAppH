@@ -11,9 +11,9 @@
      <form asp-action="Create" method="post">
         <div class="row gy-3">
             <div class="col-md-6">
-                <label asp-for="BranchId" class="form-label">Vestigingsnummer*</label>
+                <label asp-for="BranchId" class="form-label">Vestiging*</label>
                 <select asp-for="BranchId" asp-items="Model.Branches" class="form-select">
-                    <option value="">Selecteer een branch</option>
+                    <option value="" disabled selected>Selecteer een vestiging</option>
                 </select>
                 <span asp-validation-for="BranchId" class="text-danger"></span>
             </div>
@@ -21,7 +21,7 @@
             <div class="col-md-6">
                 <label asp-for="LaborContract" class="form-label">Contracttype*</label>
                 <select asp-for="LaborContract" asp-items="Model.LaborContracts" class="form-select">
-                    <option value="">Selecteer een contracttype</option>
+                    <option value="" disabled selected>Selecteer een contracttype</option>
                 </select>
                 <span asp-validation-for="LaborContract" class="text-danger"></span>
             </div>
@@ -29,62 +29,65 @@
             <div class="col-md-6">
                 <label asp-for="Position" class="form-label">Afdeling*</label>
                 <select asp-for="Position" asp-items="Model.Positions" class="form-select">
-                    <option value="">Selecteer een afdeling</option>
+                    <option value="" disabled selected>Selecteer een afdeling</option>
                 </select>
                 <span asp-validation-for="Position" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
                 <label asp-for="HiringDate" class="form-label">Startdatum contract*</label>
-                <input asp-for="HiringDate" type="date" class="form-control" min="1979-10-18" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                <input asp-for="HiringDate" type="date" class="form-control" min="1979-10-18" 
+                       max="@DateTime.Now.ToString("yyyy-MM-dd")" />
                 <span asp-validation-for="HiringDate" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
                 <label asp-for="FirstName" class="form-label">Voornaam*</label>
-                <input asp-for="FirstName" class="form-control" />
+                <input asp-for="FirstName" placeholder="Jan" class="form-control" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
                 <label asp-for="Infix" class="form-label">Tussenvoegsel</label>
-                <input asp-for="Infix" class="form-control" />
+                <input asp-for="Infix" placeholder="de" class="form-control" />
                 <span asp-validation-for="Infix" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
                 <label asp-for="LastName" class="form-label">Achternaam*</label>
-                <input asp-for="LastName" class="form-control" />
+                <input asp-for="LastName" placeholder="Vries" class="form-control" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
                 <label asp-for="DateOfBirth" class="form-label">Geboortedatum*</label>
-                <input asp-for="DateOfBirth" type="date" class="form-control" min="@DateTime.Now.AddYears(-100).ToString("yyyy-MM-dd")" max="@DateTime.Now.AddYears(-13).ToString("yyyy-MM-dd")" />
+                <input asp-for="DateOfBirth" type="date" class="form-control" 
+                       min="@DateTime.Now.AddYears(-100).ToString("yyyy-MM-dd")" 
+                       max="@DateTime.Now.AddYears(-13).ToString("yyyy-MM-dd")" />
                 <span asp-validation-for="DateOfBirth" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
                 <label asp-for="HouseNumber" class="form-label">Huisnummer*</label>
-                <input asp-for="HouseNumber" type="number" class="form-control" min="0" max="9999" />
+                <input asp-for="HouseNumber" type="number" placeholder="1" class="form-control" min="0" max="9999" />
                 <span asp-validation-for="HouseNumber" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
                 <label asp-for="Addition" class="form-label">Toevoeging</label>
-                <input asp-for="Addition" class="form-control" />
+                <input asp-for="Addition" placeholder="A" class="form-control" />
                 <span asp-validation-for="Addition" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
                 <label asp-for="ZipCode" class="form-label">Postcode*</label>
-                <input asp-for="ZipCode" class="form-control" />
+                <input asp-for="ZipCode" placeholder="1234AB" class="form-control" />
                 <span asp-validation-for="ZipCode" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">
                 <label asp-for="EmailAdres" class="form-label">E-mailadres*</label>
-                <input asp-for="EmailAdres" type="email" class="form-control" />
+                <input asp-for="EmailAdres" type="email" placeholder="naam@domein.nl" class="form-control" />
                 <span asp-validation-for="EmailAdres" class="text-danger"></span>
             </div>
 

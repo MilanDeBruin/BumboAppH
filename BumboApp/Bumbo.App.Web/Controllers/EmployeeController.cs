@@ -10,16 +10,24 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Bumbo.App.Web.Controllers
 {
     [Authorize(Roles="manager")]
-    public class EmployeeController(BumboDbContext context, IEmployeeRepository employeeRepository) : Controller
+    public class EmployeeController(BumboDbContext context,
+        IEmployeeRepository employeeRepository, IBranchRepository branchRepository, 
+        IPositionRepository positionRepository, ILaborContractRepository laborContractRepository
+        ) : Controller
     {
         private readonly BumboDbContext _context = context;
         private readonly IEmployeeRepository _employeeRepository = employeeRepository;
+        private readonly IBranchRepository _branchRepository = branchRepository;
+        private readonly IPositionRepository _positionRepository = positionRepository;
+        private readonly ILaborContractRepository _laborContractRepository = laborContractRepository;
+        
         public IActionResult Index(int branchId)
         {
-            var employees = _employeeRepository.GetEmployees(branchId);
+            var employees = _employeeRepository.GetAllEmployeesByBranchId(branchId);
 
             var model = employees.Select(employee => new EmployeeViewModel
             {
+                UserId = employee.UserId,
                 EmployeeId = employee.EmployeeId,
                 BranchId = employee.BranchId,
                 Position = employee.Position,
@@ -36,11 +44,12 @@ namespace Bumbo.App.Web.Controllers
         [HttpGet]
         public IActionResult Details(int employeeId)
         {
-            var employee = _employeeRepository.GetEmployee(employeeId);
+            var employee = _employeeRepository.GetEmployeeByEmployeeId(employeeId);
             if (employee == null) return NotFound();
 
-            var viewModel = new EmployeeViewModel()
+            var viewModel = new EmployeeViewModel
             {
+                UserId = employee.UserId,
                 EmployeeId = employee.EmployeeId,
                 BranchId = employee.BranchId,
                 Position = employee.Position,
@@ -52,8 +61,6 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = employee.HouseNumber,
                 Addition = employee.Addition,
                 ZipCode = employee.ZipCode,
-                // EmailAdres = employee.EmailAdres, TODO: Remove?
-                // Password = employee.Password, TODO: Remove?
                 LaborContract = employee.LaborContract,
             };
 
@@ -63,27 +70,27 @@ namespace Bumbo.App.Web.Controllers
         [HttpGet]
         public IActionResult Create(int branchId)
         {
-            var viewModel = new EmployeeViewModel
+            var employeeViewModel = new EmployeeViewModel
             {
                 BranchId = branchId,
-                Branches = [.. _context.Branches.Select(b => new SelectListItem
+                Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
-                    Text = b.BranchId.ToString(),
-                })],
-                Positions = _context.Positions.Select(p => new SelectListItem
+                    Text = b.ZipCode,
+                }),
+                Positions = _positionRepository.GetAllPositions().Select(p => new SelectListItem
                 {
                     Value = p.Position1,
-                    Text = p.Position1
+                    Text = p.Position1,
                 }),
-                LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
+                LaborContracts = _laborContractRepository.GetAllLaborContracts().Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
-                    Text = lc.LaborContract1
-                })]
+                    Text = lc.LaborContract1,
+                })
             };
 
-            return View(viewModel);
+            return View(employeeViewModel);
         }
 
         [HttpPost]
@@ -103,26 +110,27 @@ namespace Bumbo.App.Web.Controllers
                     );
                 }
 
-                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem
+                viewModel.Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
-                    Text = b.BranchId.ToString(),
-                })];
-                viewModel.Positions = _context.Positions.Select(p => new SelectListItem
+                    Text = b.ZipCode,
+                });
+                viewModel.Positions = _positionRepository.GetAllPositions().Select(p => new SelectListItem
                 {
                     Value = p.Position1,
-                    Text = p.Position1
+                    Text = p.Position1,
                 });
-                viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
-                {
-                    Value = lc.LaborContract1,
-                    Text = lc.LaborContract1
-                })];
+                viewModel.LaborContracts = _laborContractRepository.GetAllLaborContracts().Select(lc =>
+                    new SelectListItem
+                    {
+                        Value = lc.LaborContract1,
+                        Text = lc.LaborContract1,
+                    });
 
                 return View(viewModel);
             }
-
-            var employee = new Employee()
+            
+            var employee = new Employee
             {
                 EmployeeId = viewModel.EmployeeId,
                 BranchId = viewModel.BranchId,
@@ -163,23 +171,22 @@ namespace Bumbo.App.Web.Controllers
                 Addition = employee.Addition,
                 ZipCode = employee.ZipCode,
                 // EmailAdres = employee.EmailAdres, TODO: Remove?
-                // Password = employee.Password, TODO: Remove?
                 LaborContract = employee.LaborContract,
-                Branches = [.. _context.Branches.Select(b => new SelectListItem
+                Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
-                    Text = b.BranchId.ToString(),
-                })],
-                Positions = _context.Positions.Select(p => new SelectListItem
+                    Text = b.ZipCode,
+                }),
+                Positions = _positionRepository.GetAllPositions().Select(p => new SelectListItem
                 {
                     Value = p.Position1,
-                    Text = p.Position1
+                    Text = p.Position1,
                 }),
-                LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
+                LaborContracts = _laborContractRepository.GetAllLaborContracts().Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
-                    Text = lc.LaborContract1
-                })]
+                    Text = lc.LaborContract1,
+                })
             };
 
             return View(viewModel);
@@ -190,21 +197,22 @@ namespace Bumbo.App.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem
+                viewModel.Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
-                    Text = b.BranchId.ToString(),
-                })];
-                viewModel.Positions = _context.Positions.Select(p => new SelectListItem
+                    Text = b.ZipCode,
+                });
+                viewModel.Positions = _positionRepository.GetAllPositions().Select(p => new SelectListItem
                 {
                     Value = p.Position1,
-                    Text = p.Position1
+                    Text = p.Position1,
                 });
-                viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
-                {
-                    Value = lc.LaborContract1,
-                    Text = lc.LaborContract1
-                })];
+                viewModel.LaborContracts = _laborContractRepository.GetAllLaborContracts().Select(lc =>
+                    new SelectListItem
+                    {
+                        Value = lc.LaborContract1,
+                        Text = lc.LaborContract1,
+                    });
 
                 return View(viewModel);
             }
@@ -220,24 +228,26 @@ namespace Bumbo.App.Web.Controllers
                     "Geboortedatum kan niet later zijn dan startdatum contract"
                 );
 
-                viewModel.Branches = [.. _context.Branches.Select(b => new SelectListItem
+                viewModel.Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
-                    Text = b.BranchId.ToString(),
-                })];
-                viewModel.Positions = _context.Positions.Select(p => new SelectListItem
+                    Text = b.ZipCode,
+                });
+                viewModel.Positions = _positionRepository.GetAllPositions().Select(p => new SelectListItem
                 {
                     Value = p.Position1,
-                    Text = p.Position1
+                    Text = p.Position1,
                 });
-                viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
-                {
-                    Value = lc.LaborContract1,
-                    Text = lc.LaborContract1
-                })];
+                viewModel.LaborContracts = _laborContractRepository.GetAllLaborContracts().Select(lc =>
+                    new SelectListItem
+                    {
+                        Value = lc.LaborContract1,
+                        Text = lc.LaborContract1,
+                    });
+                
                 return View(viewModel);
             }
-
+            
             var employee = new Employee
             {
                 EmployeeId = viewModel.EmployeeId,
@@ -266,9 +276,9 @@ namespace Bumbo.App.Web.Controllers
         [HttpPost]
         public IActionResult Delete(int employeeId) // Werkt nog niet als Employee een Availability heeft. EmployeeId wordt op null gezet voor de Availability, maar dat kan niet?
         {
-            Employee? employee = _employeeRepository.GetEmployee(employeeId);
+            var employee = _employeeRepository.GetEmployeeByEmployeeId(employeeId);
             if (employee == null) return NotFound();
-            int branchId = employee.BranchId;
+            var branchId = employee.BranchId;
 
             if (!_employeeRepository.DeleteEmployee(employeeId))
             {
