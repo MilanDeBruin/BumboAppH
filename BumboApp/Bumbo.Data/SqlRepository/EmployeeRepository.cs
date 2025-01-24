@@ -3,27 +3,37 @@ using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 using Bumbo.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bumbo.Data.SqlRepository
 {
-    public class EmployeeRepository(BumboDbContext ctx, UserManager<IdentityUser> userManager) : IEmployeeRepository
+    public class EmployeeRepository(BumboDbContext context, UserManager<IdentityUser> userManager) : IEmployeeRepository
     {
-        readonly BumboDbContext ctx = ctx;
-        readonly UserManager<IdentityUser> userManager = userManager;
+        readonly BumboDbContext _context = context;
+        readonly UserManager<IdentityUser> _userManager = userManager;
 
-        public Employee? GetEmployee(int id)
+        public Employee? GetEmployeeByEmployeeId(int id)
         {
-            return ctx.Employees.FirstOrDefault(e => e.EmployeeId == id);
+            var employeeToRead = _context.Employees
+                .FirstOrDefault(e => e.EmployeeId == id);
+            
+            return employeeToRead;
         }
 
-        public Employee? GetEmployee(string userId)
+        public Employee? GetEmployeeByUserId(string userId)
         {
-            return ctx.Employees.FirstOrDefault(e => e.UserId == userId);
+            var employeeToRead = _context.Employees
+                .FirstOrDefault(e => e.UserId == userId);
+            
+            return employeeToRead;
         }
         
-        public IEnumerable<Employee> GetEmployees(int branchId)
+        public IQueryable<Employee> GetAllEmployeesByBranchId(int branchId)
         {
-            return [.. ctx.Employees.Where(e => e.BranchId == branchId)];
+            var employeesToRead = _context.Employees
+                .Where(e => e.BranchId == branchId);
+            
+            return employeesToRead;
         }
 
         public void SaveEmployee(Employee employee, string email, string password, RoleEnum role)
@@ -34,24 +44,24 @@ namespace Bumbo.Data.SqlRepository
                 Email = email,
             };
             
-            var result = userManager.CreateAsync(user, password).Result;
-            var newUser = userManager.FindByEmailAsync(email).Result;
+            var result = _userManager.CreateAsync(user, password).Result;
+            var newUser = _userManager.FindByEmailAsync(email).Result;
 
             if (newUser != null)
             {
-                userManager.AddToRoleAsync(newUser, role.ToString().ToLower()).Wait();
+                _userManager.AddToRoleAsync(newUser, role.ToString().ToLower()).Wait();
                 employee.UserId = newUser.Id;
             }
             
             if (!result.Succeeded) return;
             
-            ctx.Employees.Add(employee);
-            ctx.SaveChanges();
+            _context.Employees.Add(employee);
+            _context.SaveChanges();
         }
 
         public bool UpdateEmployee(Employee employee, string emailAdres, string password)
         {
-            var existingEmployee = ctx.Employees.Find(employee.EmployeeId);
+            var existingEmployee = _context.Employees.Find(employee.EmployeeId);
             if (existingEmployee == null) return false;
 
             existingEmployee.BranchId = employee.BranchId;
@@ -67,41 +77,41 @@ namespace Bumbo.Data.SqlRepository
             if (!string.IsNullOrEmpty(password)) ChangePassword(existingEmployee.UserId, password);
             existingEmployee.LaborContract = employee.LaborContract;
 
-            ctx.SaveChanges();
+            _context.SaveChanges();
             return true;
         }
         
         private void ChangePassword(string userId, string password)
         {
-            var user = userManager.FindByIdAsync(userId).Result;
+            var user = _userManager.FindByIdAsync(userId).Result;
             if (user == null) return;
 
-            userManager.RemovePasswordAsync(user).Wait();
-            userManager.AddPasswordAsync(user, password).Wait();
+            _userManager.RemovePasswordAsync(user).Wait();
+            _userManager.AddPasswordAsync(user, password).Wait();
         }
         
         private void ChangeUsername(string userId, string email)
         {
-            var user = userManager.FindByIdAsync(userId).Result;
+            var user = _userManager.FindByIdAsync(userId).Result;
             if (user == null) return;
 
             user.Email = email;
             user.UserName = email;
-            userManager.UpdateAsync(user).Wait();
+            _userManager.UpdateAsync(user).Wait();
         }
         
         public bool DeleteEmployee(int employeeId)
         {
-            var employee = ctx.Employees.Find(employeeId);
+            var employee = _context.Employees.Find(employeeId);
             if (employee == null) return false;
-            var user = userManager.FindByIdAsync(employee.UserId).Result;
-            if (user != null) userManager.DeleteAsync(user).Wait();
+            var user = _userManager.FindByIdAsync(employee.UserId).Result;
+            if (user != null) _userManager.DeleteAsync(user).Wait();
             return true;
         }
 
         public string FindNameFromId(int id)
         {
-            var employee = ctx.Employees
+            var employee = _context.Employees
                 .Where(e => e.EmployeeId == id)
                 .Select(e => new { e.FirstName, e.LastName })
                 .FirstOrDefault();
@@ -110,24 +120,24 @@ namespace Bumbo.Data.SqlRepository
                 ? $"{employee.FirstName} {employee.LastName}"
                 : "Employee not found";
         }
+
+        public string FindEmailFromUserId(string userId)
+        {
+            var email = _context.Users
+                .Where(u => u.Id == userId)
+                .Select(e => e.Email)
+                .FirstOrDefault();
+
+            return email !=null ? $"{email}" : "Email not found";
+        }
         
         public string GetRoles(string userId)
         {
-            var user = userManager.FindByIdAsync(userId.ToString()).Result;
+            var user = _userManager.FindByIdAsync(userId.ToString()).Result;
             if (user == null) return "User not found";
 
-            var role = userManager.GetRolesAsync(user).Result.FirstOrDefault(); // TODO: Currently only returns the first role, not all roles (since a user can have multiple roles)
+            var role = _userManager.GetRolesAsync(user).Result.FirstOrDefault(); // TODO: Currently only returns the first role, not all roles (since a user can have multiple roles)
             return role ?? "Role not found";
-        }
-
-        public IEnumerable<Branch> GetBranches()
-        {
-            return [.. ctx.Branches];
-        }
-
-        public IEnumerable<LaborContract> GetLaborContracts()
-        {
-            return ctx.LaborContracts.ToList();
         }
     }
 }
