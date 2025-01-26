@@ -12,13 +12,14 @@
 }
 
 <h1>Dagoverzicht - @date.ToShortDateString()</h1>
-
 @{
     var selectedDate = (DateOnly)ViewData["Date"];
 }
 
 <div class="top-bar">
     <div class="date-selector-container">
+        
+
         <form asp-controller="DayOverview" asp-action="Index" method="get" class="form-inline">
             <button type="submit" name="date" value="@selectedDate.AddDays(-1).ToString("yyyy-MM-dd")" class="btn btn-primary">Vorige Dag</button>
             <button type="submit" name="date" value="@selectedDate.AddDays(1).ToString("yyyy-MM-dd")" class="btn btn-primary">Volgende Dag</button>
@@ -37,6 +38,7 @@
 
 <form method="post" action="@Url.Action("Save", "DayOverview")">
     <input type="hidden" name="date" value="@date" />
+    
 
 
     <table>
@@ -51,9 +53,8 @@
         </thead>
         <tbody>
             @foreach (var item in Model)
-
             {
-                <tr>
+                <tr class="employee-row" data-shifts="@string.Join(", ", item.Shifts.Select(s => $"{s.StartTime} - {s.EndTime}"))">
                     <td>@item.FirstName</td>
                     <td>@item.LastName</td>
                     <td>@TimeSpan.FromHours((double)item.PlannedHours).ToString(@"hh\:mm")</td>
@@ -61,12 +62,10 @@
                         <input type="time"
                                name="updatedHours[@Model.IndexOf(item)].WorkedHoursString"
                                value="@TimeSpan.Parse(item.WorkedHoursString).ToString(@"hh\:mm", System.Globalization.CultureInfo.InvariantCulture)"
-                               step="300"
                                class="worked-hours-input" />
                         <input type="hidden" name="updatedHours[@Model.IndexOf(item)].EmployeeId" value="@item.EmployeeId" />
                         <input type="hidden" name="updatedHours[@Model.IndexOf(item)].BranchId" value="@item.BranchId" />
                     </td>
-
                     <td>
                         @if (TimeSpan.TryParse(item.WorkedHoursString, out var workedTimeSpan))
                         {
@@ -74,16 +73,69 @@
                             var sign = difference.TotalMinutes >= 0 ? "+" : "-";
                             @string.Format("{0}{1:hh\\:mm}", sign, difference.Duration())
                         }
-                        
                     </td>
-
                 </tr>
             }
         </tbody>
     </table>
     <button type="submit">Opslaan</button>
 </form>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM Loaded");
+        const rows = document.querySelectorAll(".employee-row");
 
+        rows.forEach(row => {
+            console.log("Row found:", row);
+            row.addEventListener("mouseenter", function () {
+                const shifts = row.getAttribute("data-shifts");
+                console.log("Tooltip data:", shifts);
+                if (shifts) {
+                    showTooltip(row, shifts);
+                }
+            });
+            
+            row.addEventListener("mouseleave", function () {
+                hideTooltip();
+            });
+        });
+
+        function showTooltip(element, text) {
+            let tooltip = document.querySelector(".custom-tooltip");
+
+            // If tooltip doesn't exist, create it
+            if (!tooltip) {
+                tooltip = document.createElement("div");
+                tooltip.className = "custom-tooltip";
+                document.body.appendChild(tooltip);
+            }
+
+            tooltip.innerText = text;
+
+            // Immediately position the tooltip relative to the element
+            let rect = element.getBoundingClientRect();
+            tooltip.style.left = rect.left + window.scrollX + 10 + "px";
+            tooltip.style.top = rect.top + window.scrollY + 10 + "px";
+            tooltip.style.display = "block";
+
+            console.log(`Tooltip position: left=${tooltip.style.left}, top=${tooltip.style.top}`);
+
+            // Update position dynamically on mousemove
+            element.addEventListener("mousemove", function (e) {
+                tooltip.style.left = e.pageX + 10 + "px";
+                tooltip.style.top = e.pageY + 10 + "px";
+            });
+        }
+
+        function hideTooltip() {
+            
+            let tooltip = document.querySelector(".custom-tooltip");
+            if (tooltip) {
+                tooltip.remove();
+            }
+        }
+    });
+</script>
 <style>
     .top-bar {
         display: flex;
@@ -92,6 +144,18 @@
         margin-bottom: 20px;
     }
 
+    .custom-tooltip {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        white-space: nowrap;
+        z-index: 1000;
+        pointer-events: none;
+        display: block;
+    }
     .date-selector-container {
         display: flex;
         align-items: center;
