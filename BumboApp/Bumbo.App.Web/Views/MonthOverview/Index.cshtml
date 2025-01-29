@@ -1,0 +1,96 @@
+﻿@using Bumbo.App.Web.Models.ViewModels
+@model List<Bumbo.App.Web.Models.ViewModels.Dayoverview.DayOverviewViewModel>
+
+@{
+    var selectedMonth = ViewData["SelectedMonth"] != null
+        ? (DateOnly)ViewData["SelectedMonth"]
+        : DateOnly.FromDateTime(DateTime.Today);
+    var firstDayOfMonth = new DateOnly(selectedMonth.Year, selectedMonth.Month, 1);
+    var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+}
+
+<h1>Maandoverzicht - @selectedMonth.ToString("MMMM yyyy")</h1>
+
+<div class="month-selector-container">
+    <form asp-controller="MonthOverview" asp-action="Index" method="get" class="form-inline">
+        <input type="month" id="monthPicker" name="month" value="@firstDayOfMonth.ToString("yyyy-MM")" class="form-control mx-2" onchange="this.form.submit()" />
+    </form>
+</div>
+
+@if (Model.Any())
+{
+    <form asp-controller="MonthOverview" asp-action="Save" method="post">
+        <table>
+            <thead>
+                <tr>
+                    <th>Voornaam</th>
+                    <th>Achternaam</th>
+                    <th>Geplande Uren</th>
+                    <th>Gewerkte Uren</th>
+                    <th>Verschil (Gepland - Gewerkt)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var employee in Model)
+                {
+                    <tr>
+                        <td>@employee.FirstName</td>
+                        <td>@employee.LastName</td>
+                        <td>@employee.PlannedHours</td>
+                        <td>@employee.WorkedHours</td>
+                        <td>@(employee.PlannedHours - employee.WorkedHours)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </form>
+}
+else
+{
+    <p>Er zijn geen gegevens voor deze maand.</p>
+}
+
+<style>
+    .month-selector-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    input[type="month"] {
+        padding: 5px;
+        width: 200px;
+    }
+
+    table {
+        margin-top: 20px;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    input[type="number"] {
+        width: 80px;
+        padding: 5px;
+    }
+</style>

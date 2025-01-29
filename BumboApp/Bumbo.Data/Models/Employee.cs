@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Bumbo.Data.Models;
 
 [Table("employee")]
-[Index("EmailAdres", Name = "IX_employee", IsUnique = true)]
 public partial class Employee
 {
     [Key]
@@ -50,17 +46,14 @@ public partial class Employee
     [StringLength(20)]
     public string ZipCode { get; set; } = null!;
 
-    [Column("email_adres")]
-    [StringLength(254)]
-    public string EmailAdres { get; set; } = null!;
-
-    [Column("password")]
-    [StringLength(50)]
-    public string Password { get; set; } = null!;
-
     [Column("labor_contract")]
     [StringLength(50)]
     public string LaborContract { get; set; } = null!;
+
+    [Column("user_id")]
+    [StringLength(450)]
+    public string UserId { get; set; } = null!;
+    public virtual ApplicationUser ApplicationUser { get; set; } = null!;
 
     [InverseProperty("Employee")]
     public virtual ICollection<Availability> Availabilities { get; set; } = new List<Availability>();
@@ -85,6 +78,9 @@ public partial class Employee
 
     [InverseProperty("Employee")]
     public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new List<WorkSchedule>();
+
+    [InverseProperty("Employee")]
+    public virtual ICollection<WorkShift> WorkShifts { get; set; } = new List<WorkShift>();
 
     [ForeignKey("EmployeeId")]
     [InverseProperty("Employees")]

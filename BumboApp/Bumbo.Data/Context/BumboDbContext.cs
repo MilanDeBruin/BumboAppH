@@ -1,12 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using Bumbo.Data.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Bumbo.Data.Context;
 
-public partial class BumboDbContext : DbContext
+public partial class BumboDbContext : IdentityDbContext
 {
+    private readonly IConfiguration _configuration;
+
+    public BumboDbContext(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+    
+    public BumboDbContext(DbContextOptions<BumboDbContext> options, IConfiguration configuration)
+        : base(options)
+    {
+        _configuration = configuration;
+    }
 
     public virtual DbSet<Availability> Availabilities { get; set; }
 
@@ -42,10 +56,22 @@ public partial class BumboDbContext : DbContext
 
     public virtual DbSet<WorkSchedule> WorkSchedules { get; set; }
 
+    public virtual DbSet<WorkShift> WorkShifts { get; set; }
+
     public virtual DbSet<WorkStatus> WorkStatuses { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("Bumbo"));
+        }
+    }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        
         modelBuilder.Entity<Availability>(entity =>
         {
             entity.HasOne(d => d.Employee).WithMany(p => p.Availabilities)
@@ -190,7 +216,18 @@ public partial class BumboDbContext : DbContext
                 .HasConstraintName("FK_work_schedule_work_status");
         });
 
-        OnModelCreatingPartial(modelBuilder);
+        modelBuilder.Entity<WorkShift>(entity =>
+        {
+            entity.HasKey(e => new { e.EmployeeId, e.StartTime }).HasName("PK_work_shift_1");
+
+            entity.HasOne(d => d.Employee).WithMany(p => p.WorkShifts)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_work_shift_employee");
+        });
+        
+        // Custom changes
+        modelBuilder.Entity<ApplicationUser>().HasOne(d => d.Employee).WithOne(p => p.ApplicationUser)
+            .HasForeignKey<Employee>(e => e.UserId);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

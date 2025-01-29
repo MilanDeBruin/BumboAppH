@@ -1,20 +1,19 @@
-﻿using Bumbo.App.Web.Models.ViewModels.Availability;
-using Bumbo.App.Web.Models.ViewModels.Employee;
+﻿using Bumbo.App.Web.Models.ViewModels.Employee;
 using Bumbo.Data.Context;
 using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
+using Bumbo.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Bumbo.App.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles="manager")]
     public class EmployeeController(BumboDbContext context, IEmployeeRepository employeeRepository) : Controller
     {
         private readonly BumboDbContext _context = context;
         private readonly IEmployeeRepository _employeeRepository = employeeRepository;
-
         public IActionResult Index(int branchId)
         {
             var employees = _employeeRepository.GetEmployees(branchId);
@@ -53,8 +52,8 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = employee.HouseNumber,
                 Addition = employee.Addition,
                 ZipCode = employee.ZipCode,
-                EmailAdres = employee.EmailAdres,
-                Password = employee.Password,
+                // EmailAdres = employee.EmailAdres, TODO: Remove?
+                // Password = employee.Password, TODO: Remove?
                 LaborContract = employee.LaborContract,
             };
 
@@ -72,11 +71,11 @@ namespace Bumbo.App.Web.Controllers
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })],
-                Positions = [.. _context.Positions.Select(p => new SelectListItem
+                Positions = _context.Positions.Select(p => new SelectListItem
                 {
                     Value = p.Position1,
                     Text = p.Position1
-                })],
+                }),
                 LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
@@ -109,11 +108,11 @@ namespace Bumbo.App.Web.Controllers
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })];
-                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem
+                viewModel.Positions = _context.Positions.Select(p => new SelectListItem
                 {
                     Value = p.Position1,
                     Text = p.Position1
-                })];
+                });
                 viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
@@ -136,12 +135,10 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = viewModel.HouseNumber,
                 Addition = viewModel.Addition,
                 ZipCode = viewModel.ZipCode,
-                EmailAdres = viewModel.EmailAdres,
-                Password = viewModel.Password,
                 LaborContract = viewModel.LaborContract,
             };
 
-            _employeeRepository.SaveEmployee(employee);
+            _employeeRepository.SaveEmployee(employee, viewModel.EmailAdres, viewModel.Password, RoleEnum.Employee);
             TempData["SuccessMessage"] = "Medewerker is aangemaakt!";
             return RedirectToAction("Index", new { branchId = viewModel.BranchId });
         }
@@ -165,19 +162,19 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = employee.HouseNumber,
                 Addition = employee.Addition,
                 ZipCode = employee.ZipCode,
-                EmailAdres = employee.EmailAdres,
-                Password = employee.Password,
+                // EmailAdres = employee.EmailAdres, TODO: Remove?
+                // Password = employee.Password, TODO: Remove?
                 LaborContract = employee.LaborContract,
                 Branches = [.. _context.Branches.Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })],
-                Positions = [.. _context.Positions.Select(p => new SelectListItem
+                Positions = _context.Positions.Select(p => new SelectListItem
                 {
                     Value = p.Position1,
                     Text = p.Position1
-                })],
+                }),
                 LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
@@ -198,11 +195,11 @@ namespace Bumbo.App.Web.Controllers
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })];
-                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem
+                viewModel.Positions = _context.Positions.Select(p => new SelectListItem
                 {
                     Value = p.Position1,
                     Text = p.Position1
-                })];
+                });
                 viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
@@ -228,11 +225,11 @@ namespace Bumbo.App.Web.Controllers
                     Value = b.BranchId.ToString(),
                     Text = b.BranchId.ToString(),
                 })];
-                viewModel.Positions = [.. _context.Positions.Select(p => new SelectListItem
+                viewModel.Positions = _context.Positions.Select(p => new SelectListItem
                 {
                     Value = p.Position1,
                     Text = p.Position1
-                })];
+                });
                 viewModel.LaborContracts = [.. _context.LaborContracts.Select(lc => new SelectListItem
                 {
                     Value = lc.LaborContract1,
@@ -245,7 +242,6 @@ namespace Bumbo.App.Web.Controllers
             {
                 EmployeeId = viewModel.EmployeeId,
                 BranchId = viewModel.BranchId,
-                Position = viewModel.Position,
                 HiringDate = viewModel.HiringDate,
                 FirstName = viewModel.FirstName,
                 Infix = viewModel.Infix,
@@ -254,12 +250,10 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = viewModel.HouseNumber,
                 Addition = viewModel.Addition,
                 ZipCode = viewModel.ZipCode,
-                EmailAdres = viewModel.EmailAdres,
-                Password = viewModel.Password,
                 LaborContract = viewModel.LaborContract
             };
 
-            if (!_employeeRepository.UpdateEmployee(employee))
+            if (!_employeeRepository.UpdateEmployee(employee, viewModel.EmailAdres, viewModel.Password))
             {
                 TempData["ErrorMessage"] = "Medewerker kon niet worden gewijzigd!";
                 return View(viewModel);

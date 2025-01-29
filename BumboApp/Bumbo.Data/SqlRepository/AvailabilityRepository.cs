@@ -14,6 +14,12 @@ public class AvailabilityRepository : IAvailabilityRepository
         _dbContext = dbContext;
     }
 
+    public void SaveAvailability(Availability availability)
+    {
+        _dbContext.Availabilities.Add(availability);
+        _dbContext.SaveChanges();
+    }
+
     public SchoolSchedule? GetDailySchoolSchedule(int employeeId, DayOfWeek dayOfWeek)
     {
         string weekDay;
