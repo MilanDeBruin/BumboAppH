@@ -1,13 +1,12 @@
-﻿body {
+﻿﻿body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     height: 100vh;
     background-color: #f0f0f0;
-
 }
 
-.table-container {
+.main-container {
     margin: 20px auto;
     width: 100%;
     max-width: 800px;
@@ -37,15 +36,14 @@
     color: #999;
 }
 
-.button{
+.btn btn-primary {
     margin-right: 10px;
-    background-color:red;
-
+    background-color: red;
 }
 
 
-input[type=button]  {
-    background-color: lightgreen;
+input[type=button].btn btn-primary {
+    background-color: blue;
     color: black;
     border: none;
     border-radius: 5px;
@@ -56,16 +54,86 @@ input[type=button]  {
     right: 8%;
 }
 
-input[type=button]:disabled {
+input[type=button]:disabled.btn btn-primary {
     background-color: lightgray;
     color: black;
     border: none;
     border-radius: 5px;
     padding: 5px 10px;
-    cursor:default;
+    cursor: default;
     margin-top: 5px;
     position: absolute;
     right: 8%;
+}    
+
+
+.sicktable-container {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
 }
 
+    .sicktable-container h5 {
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+    }
 
+.sicktable {
+    max-height: 200px; /* Limit the height to enable scrolling */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+    .sicktable table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .sicktable th,
+    .sicktable td {
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .sicktable th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
+
+    .sicktable tr:hover {
+        background-color: #f1f1f1; /* Highlight row on hover */
+    }
+
+    .sicktable td {
+        color: #555;
+    }
+
+    .sicktable::-webkit-scrollbar {
+        width: 8px; /* Width of the scrollbar */
+    }
+
+    .sicktable::-webkit-scrollbar-thumb {
+        background-color: #bbb; /* Color of the scrollbar thumb */
+        border-radius: 10px; /* Round scrollbar thumb edges */
+    }
+
+        .sicktable::-webkit-scrollbar-thumb:hover {
+            background-color: #999; /* Hover effect for scrollbar thumb */
+        }
+
+    .sicktable::-webkit-scrollbar-track {
+        background-color: #f4f4f4; /* Background for scrollbar track */
+    }
+
+
+  
