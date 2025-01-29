@@ -61,6 +61,7 @@ namespace Bumbo.App.Web.Controllers
             {
                 case 0:
                     TempData["SuccessMessage"] = $"Verlof is aangevraagd!";
+                    repo.SetLeaveRequest(newRequest);
                     break;
                 case 1:
                     TempData["FailedMessage"] = $"Kan geen verlof aanvragen voor vandaag of eerdere datums!";
