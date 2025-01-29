@@ -1,39 +1,88 @@
-﻿using Bumbo.Data.Models;
+﻿using Bumbo.Data.Interfaces;
+using Bumbo.Data.Models;
 namespace Bumbo.Domain.Services.Leaves
 {
     public class LeaveChecker : ILeaveChecker
     {
-        public Boolean startDateHigherThanEndDate(Leave request)
+
+        private readonly ILeaveRepository repo;
+
+        public LeaveChecker(ILeaveRepository repo)
         {
-            return (request.StartDate <= request.EndDate);
+            this.repo = repo;
         }
 
-        public Boolean checkForOverlap(List<Leave> allRequests, Leave request)
+        public int CheckRequestStartDate(Leave request)
         {
-            if (request.StartDate < DateOnly.FromDateTime(DateTime.Now))
+            if (request.StartDate <= DateOnly.FromDateTime(DateTime.Now))
             {
-                return false;
+                return 1;
             }
-            foreach (Leave oldrequest in allRequests)
+            else
             {
-                // checks if the new requests start and end date are before an old requests startdate
-                if (request.StartDate < oldrequest.StartDate && request.EndDate < oldrequest.StartDate ) 
-                {
-                    return true;
-                }
-                // checks if the new requests start date is in between an old request start and enddate
-                if(request.StartDate > oldrequest.StartDate && request.StartDate < oldrequest.EndDate)
-                {
-                    return false;
-                }
-                // checks if the new requests end date is in between an old request start and enddate
-                if (request.EndDate > oldrequest.StartDate && request.EndDate > oldrequest.EndDate )
-                {
-                    return false ;
-                }
+                return 0;
+            }
+        }
+        public int CheckOverlap(Leave leaveRequest)
+        {
+            if (repo.getOverlap(leaveRequest.StartDate, leaveRequest.EndDate, leaveRequest.EmployeeId))
+            {
+                return 0;
+            }
+            else
+            {
+                return 4;
+            }
+        }
+
+        
+
+        public int checkStartDateForDuble(Leave request)
+        {
+            if (repo.checkStartDateForDuble(request.EmployeeId, request.StartDate))
+            {
+                return 3;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public int CheckstartDateHigherThanEndDate(Leave request)
+        {
+            if ((request.StartDate >= request.EndDate))
+            {
+                return 2;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public int doAllChecks(Leave request)
+        {
+            int checkResult = 0;
+
+            checkResult = CheckRequestStartDate(request);
+            if (checkResult > 0)
+            {
+                return checkResult;
             }
 
-            return true;
+            checkResult = CheckstartDateHigherThanEndDate(request);
+            if (checkResult > 0)
+            {
+                return checkResult;
+            }
+            checkResult = checkStartDateForDuble(request);
+            if (checkResult > 0)
+            {
+                return checkResult;
+            }
+            checkResult = CheckOverlap(request);
+            return checkResult;
         }
     }
 }

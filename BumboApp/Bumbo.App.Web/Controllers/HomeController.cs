@@ -43,7 +43,7 @@ namespace Bumbo.App.Web.Controllers
                     WorkDays = new List<DayPersonalScheduleViewModel>()
                 };
                 List<WorkSchedule> schedules = _repo.GetScheduleData(employeeId, firstDayOfWeek);
-
+                
                  var groupedSchedules = schedules
                 .GroupBy(schedule => schedule.Date)
                 .OrderBy(group => group.Key);
@@ -63,7 +63,9 @@ namespace Bumbo.App.Web.Controllers
                     viewModel.WorkDays.Add(daySchedule);
 
                 }
-                viewModel.isSick = _repo.GetSick(employeeId); 
+                viewModel.ingeklokt = _repo.GetIngeklokt(employeeId);
+                viewModel.isSick = _repo.GetSick(employeeId);
+                viewModel.sickListNames = _repo.getSickList();
                 return View(viewModel);
            
         }
@@ -71,12 +73,40 @@ namespace Bumbo.App.Web.Controllers
         [HttpGet]
         public IActionResult Ziekmelden(int employeeId)
         {
-
+            if (_repo.GetIngeklokt(employeeId) == true)
+            {
+                TempData["SuccessMessage"] = "Je bent ingeklokt en mag niet ziekmelden!";
+                return RedirectToAction("Index");
+            }
+            if (_repo.CheckShift(employeeId) == false)
+            {
+                TempData["SuccessMessage"] = "je hebt geen dienst vandaag.";
+                return RedirectToAction("Index");
+            }
             DateOnly date = DateOnly.FromDateTime(DateTime.Now);
             _repo.SetSick(employeeId, date);
             TempData["SuccessMessage"] = "Je bent ziekgemeld!";
             return RedirectToAction("Index");
-        }    
+        }
+
+        public IActionResult Inklokken(int employeeId)
+        {
+            if(_repo.GetSick(employeeId) == true)
+            {
+                TempData["SuccessMessage"] = "Je bent ziek en mag niet inklokken!";
+                return RedirectToAction("Index");
+            }
+            _repo.Inklokken(employeeId);
+            TempData["SuccessMessage"] = "Je bent ingeklokt!";
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Uitklokken(int employeeId)
+        {
+            _repo.Uitklokken(employeeId);
+            TempData["SuccessMessage"] = "Je bent uitgeklokt!";
+            return RedirectToAction("Index");
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

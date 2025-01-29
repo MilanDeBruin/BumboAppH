@@ -54,7 +54,7 @@ public class Scheduling
         {
 			switch (model.Department)
 			{
-				case "Dkw":
+				case "Shelf":
 					model.Department = "Shelf";
 					break;
 				case "kassa":
@@ -99,7 +99,7 @@ public class Scheduling
 
             switch (model.Department)
             {
-                case "Dkw":
+                case "Shelf":
                     checker.Department = "Shelf";
 					break;
 				case "kassa":
@@ -164,7 +164,7 @@ public class Scheduling
 		switch (value)
 		{
 			case "Shelf":
-				return "Dkw";
+				return "Shelf";
 
 			case "kassa":
 				return "Kassa";
