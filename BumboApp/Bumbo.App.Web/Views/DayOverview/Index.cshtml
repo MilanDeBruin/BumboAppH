@@ -1,6 +1,12 @@
 ﻿@using Bumbo.App.Web.Models.ViewModels.Dayoverview
 @model List<DayOverviewViewModel>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
 
 @{
     var date = ViewData["Date"] != null
@@ -36,10 +42,8 @@
     </div>
 </div>
 
-<form method="post" action="@Url.Action("Save", "DayOverview")">
+<form method="post" action="@Url.Action("Save", "DayOverview")" onsubmit="return confirmSave()">
     <input type="hidden" name="date" value="@date" />
-    
-
 
     <table>
         <thead>
@@ -85,6 +89,9 @@
     <button type="submit">Opslaan</button>
 </form>
 <script>
+    function confirmSave() {
+        return confirm("Weet je zeker dat je de wijzigingen wilt opslaan?");
+    }
     document.addEventListener("DOMContentLoaded", function () {
         console.log("DOM Loaded");
         const rows = document.querySelectorAll(".employee-row");

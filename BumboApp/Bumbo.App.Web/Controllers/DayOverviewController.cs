@@ -77,7 +77,7 @@ namespace Bumbo.App.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Save(List<DayOverviewViewModel> updatedHours, DateOnly date)
         {
-            _logger.LogInformation("Save action triggered... -------------------------------------------------------------------------");
+            _logger.LogInformation("Save action triggered...");
 
             foreach (var update in updatedHours)
             {
@@ -87,48 +87,36 @@ namespace Bumbo.App.Web.Controllers
                     continue;
                 }
 
-                
                 var workShifts = await _context.WorkShifts
                     .Where(ws => ws.EmployeeId == update.EmployeeId && ws.StartTime.Date == date.ToDateTime(TimeOnly.MinValue).Date)
                     .ToListAsync();
 
-                
                 if (workedTimeSpan == TimeSpan.Zero && workShifts.Any())
                 {
-                    _logger.LogInformation($"EmployeeId {update.EmployeeId} has no worked hours for the selected date. Removing all shifts...");
-
-                    _context.WorkShifts.RemoveRange(workShifts);  
-                    continue;  
+                    _logger.LogInformation($"EmployeeId {update.EmployeeId} has no worked hours. Removing all shifts...");
+                    _context.WorkShifts.RemoveRange(workShifts);
+                    continue;
                 }
 
                 if (workShifts.Any())
                 {
-                   
-                    var totalExistingWorkedTime = workShifts
-                        .Skip(1) 
-                        .Sum(ws => (ws.EndTime - ws.StartTime)?.TotalMinutes ?? 0);
-
-                    
+                    var totalExistingWorkedTime = workShifts.Skip(1).Sum(ws => (ws.EndTime - ws.StartTime)?.TotalMinutes ?? 0);
                     var remainingWorkedMinutes = workedTimeSpan.TotalMinutes - totalExistingWorkedTime;
 
-                    
                     if (remainingWorkedMinutes > 0)
                     {
                         var firstShift = workShifts.First();
                         firstShift.EndTime = firstShift.StartTime.AddMinutes(remainingWorkedMinutes);
-
-                        
                         _context.WorkShifts.Update(firstShift);
                     }
                     else
                     {
-                        _logger.LogWarning($"Total worked time is less than the existing shifts' time for EmployeeId {update.EmployeeId}. Skipping update.");
+                        _logger.LogWarning($"Total worked time is less than existing shifts' time for EmployeeId {update.EmployeeId}. Skipping update.");
                         continue;
                     }
                 }
                 else
                 {
-                    
                     var newWorkShift = new WorkShift
                     {
                         EmployeeId = update.EmployeeId,
@@ -140,8 +128,12 @@ namespace Bumbo.App.Web.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            
+            TempData["SuccessMessage"] = "Wijzigingen succesvol opgeslagen!";
             return RedirectToAction("Index", new { date });
         }
+
 
 
 
