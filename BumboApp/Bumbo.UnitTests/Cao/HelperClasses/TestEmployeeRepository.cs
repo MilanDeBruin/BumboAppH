@@ -59,7 +59,7 @@ public class TestEmployeeRepository : IEmployeeRepository
         throw new NotImplementedException();
     }
 
-    public void SaveEmployee(Employee employee, string email, string password, RoleEnum role)
+    public void AddEmployee(Employee employee, string email, string password, RoleEnum role)
     {
         throw new NotImplementedException();
     }

@@ -3,7 +3,6 @@ using Bumbo.Data.Interfaces;
 using Bumbo.Data.Models;
 using Bumbo.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Bumbo.Data.SqlRepository
 {
@@ -36,7 +35,7 @@ namespace Bumbo.Data.SqlRepository
             return employeesToRead;
         }
 
-        public void SaveEmployee(Employee employee, string email, string password, RoleEnum role)
+        public void AddEmployee(Employee employee, string email, string password, RoleEnum role)
         {
             var user = new IdentityUser
             {
