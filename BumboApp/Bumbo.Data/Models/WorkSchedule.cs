@@ -44,6 +44,9 @@ public partial class WorkSchedule
     [Column("concept")]
     public bool Concept { get; set; }
 
+    [Column("trade_employee")]
+    public bool TradeEmployee { get; set; }
+
     [ForeignKey("BranchId")]
     [InverseProperty("WorkSchedules")]
     public virtual Branch Branch { get; set; } = null!;
