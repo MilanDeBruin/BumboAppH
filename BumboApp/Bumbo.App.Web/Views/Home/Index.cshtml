@@ -91,12 +91,23 @@
                 @foreach (var date in daysOfWeek)
                 {
                     var daySchedule = Model.WorkDays.FirstOrDefault(d => d.Date == date);
+                    var today = DateOnly.FromDateTime(DateTime.Now);
                     if (daySchedule != null && daySchedule.Shifts.Any())
                     {
                         foreach (var shift in daySchedule.Shifts)
                         {
                             <tr>
-                                <td>@date.ToString("dd-MM-yyyy")</td>
+                                @if(date == today){
+                                    <td style="background-color: rgba(0, 155, 50, 0.75);">
+                                        @date.ToString("dd-MM-yyyy")
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        @date.ToString("dd-MM-yyyy")
+                                    </td>
+                                }
                                 @if (shift.Is_Sick)
                                 {
                                     <td style="background-color: rgba(255, 0, 0, 0.75);">@shift.Time</td>
