@@ -57,7 +57,8 @@ namespace Bumbo.App.Web.Controllers
                         {
                             Time = $"{schedule.StartTime:HH:mm} - {schedule.EndTime:HH:mm}".ToString(),
                             Departement = schedule.Department,
-                            Branch_Id = schedule.BranchId
+                            Branch_Id = schedule.BranchId,
+                            Is_Sick = schedule.IsSick
                         }).ToList()
                     };
                     viewModel.WorkDays.Add(daySchedule);
@@ -75,12 +76,12 @@ namespace Bumbo.App.Web.Controllers
         {
             if (_repo.GetIngeklokt(employeeId) == true)
             {
-                TempData["SuccessMessage"] = "Je bent ingeklokt en mag niet ziekmelden!";
+                TempData["WarningMessage"] = "Je bent ingeklokt en mag niet ziekmelden!";
                 return RedirectToAction("Index");
             }
             if (_repo.CheckShift(employeeId) == false)
             {
-                TempData["SuccessMessage"] = "je hebt geen dienst vandaag.";
+                TempData["WarningMessage"] = "je hebt geen dienst vandaag.";
                 return RedirectToAction("Index");
             }
             DateOnly date = DateOnly.FromDateTime(DateTime.Now);
@@ -93,7 +94,7 @@ namespace Bumbo.App.Web.Controllers
         {
             if(_repo.GetSick(employeeId) == true)
             {
-                TempData["SuccessMessage"] = "Je bent ziek en mag niet inklokken!";
+                TempData["WarningMessage"] = "Je bent ziek en mag niet inklokken!";
                 return RedirectToAction("Index");
             }
             _repo.Inklokken(employeeId);
