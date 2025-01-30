@@ -34,7 +34,7 @@ public class EmployeeViewModel
 
     [Required(ErrorMessage = "Huisnummer is verplicht")]
     [Range(0, 9999, ErrorMessage = "Huisnummer moet tussen 0 en 9999 zijn")]
-    public int HouseNumber { get; set; }
+    public int? HouseNumber { get; set; }
 
     [StringLength(3, ErrorMessage = "Toevoeging moet korter dan 3 nummers zijn")]
     [RegularExpression(@"^[a-zA-Z0-9]{1,3}$", ErrorMessage = "Toevoeging moet 1 tot 3 alfanumerieke tekens bevatten")]
@@ -57,8 +57,8 @@ public class EmployeeViewModel
     [Required(ErrorMessage = "Contracttype is verplicht")]
     public string LaborContract { get; set; }
     
-    public string UserId { get; set; }
-    public ApplicationUser ApplicationUser { get; set; }
+    public string? UserId { get; set; }
+    public ApplicationUser? ApplicationUser { get; set; }
     public IEnumerable<SelectListItem>? Branches { get; set; }
     public IEnumerable<SelectListItem>? Positions { get; set; }
     public IEnumerable<SelectListItem>? LaborContracts { get; set; }

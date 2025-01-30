@@ -146,7 +146,7 @@ namespace Bumbo.App.Web.Controllers
                 LaborContract = viewModel.LaborContract,
             };
 
-            _employeeRepository.SaveEmployee(employee, viewModel.EmailAdres, viewModel.Password, RoleEnum.Employee);
+            _employeeRepository.AddEmployee(employee, viewModel.EmailAdres, viewModel.Password, RoleEnum.Employee);
             TempData["SuccessMessage"] = "Medewerker is aangemaakt!";
             return RedirectToAction("Index", new { branchId = viewModel.BranchId });
         }

@@ -38,8 +38,8 @@
 
             <div class="col-md-6">
                 <label asp-for="HiringDate" class="form-label">Startdatum contract*</label>
-                <input asp-for="HiringDate" type="date" class="form-control" min="1979-10-18" 
-                       max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                <input asp-for="HiringDate" type="date" class="form-control" min="1979-10-18"
+                       max="@DateTime.Now.AddYears(1).ToString("yyyy-MM-dd")" />
                 <span asp-validation-for="HiringDate" class="text-danger"></span>
             </div>
 
