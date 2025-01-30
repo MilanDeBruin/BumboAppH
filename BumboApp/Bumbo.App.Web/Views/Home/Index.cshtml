@@ -162,9 +162,19 @@
         </div>
     @if (Model.ingeklokt == false)
     {
-        <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-            <input type="button" value="Inklokken" class="btn btn-primary" style=" margin:10px 0px 10px 0px "onclick="clockIn()" />
-        </a>
+        var daySchedule = Model.WorkDays.FirstOrDefault(d => d.Date == DateOnly.FromDateTime(DateTime.Now));
+        @if (daySchedule == null)
+        {
+            <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+                <input type="button" value="Inklokken" class="btn btn-primary" style=" margin:10px 0px 10px 0px " onclick="clockInOnOffDay()" />
+            </a>
+        }else
+        {
+            <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+                <input type="button" value="Inklokken" class="btn btn-primary" style=" margin:10px 0px 10px 0px " onclick="clockIn()" />
+            </a>
+        }
+      
     }
     else
     {
@@ -206,6 +216,14 @@
         let startTime = new Date().getTime();
         localStorage.setItem("clockedInTime", startTime);
         startTimer(startTime);
+    }
+
+    function clockInOnOffDay() {
+        let startTime = new Date().getTime();
+        localStorage.setItem("clockedInTime", startTime);
+        startTimer(startTime);
+        return window.confirm("Weet je zeker dat je wilt inklokken? Je bent niet in gepland.");
+
     }
 
    
