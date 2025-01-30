@@ -25,5 +25,10 @@ public class ScheduleRepository : IScheduleRepository
         return _dbContext.WorkSchedules.Where(s =>
             s.EmployeeId == employeeId && s.Date >= firstDateOfWeeks && s.Date < firstDateOfWeeks.AddDays(7*4)).ToList();
     }
+
+    public WorkSchedule GetSchedule(int employee, int branch, DateOnly date, TimeOnly startTime)
+    {
+        return _dbContext.WorkSchedules.First(ws => ws.EmployeeId == employee && ws.BranchId == branch && ws.Date == date);
+    }
     
 }

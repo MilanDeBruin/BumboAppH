@@ -1,6 +1,7 @@
 using System.Data.Common;
 using Bumbo.App.Web.Models.ViewModels.ShiftTrading;
 using Bumbo.Data.Interfaces;
+using Bumbo.Domain.Enums;
 using Bumbo.Domain.Services.CAO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,6 +39,7 @@ public class ShiftTradingController : Controller
                 Date = shift.Date,
                 Department = shift.Department,
                 EmployeeName = shift.Employee.FirstName + " " + shift.Employee.Infix + " " + shift.Employee.LastName,
+                ClaimEmployeeName = shift.TradeEmployee.FirstName + " " + shift.TradeEmployee.Infix + " " + shift.TradeEmployee.LastName,
                 EmployeeId = shift.EmployeeId,
                 StartTime = shift.StartTime,
                 EndTime = shift.EndTime
@@ -48,12 +50,15 @@ public class ShiftTradingController : Controller
     }
 
     [HttpGet]
-    public IActionResult OfferedShifts()
+    public IActionResult OfferedShifts(CaoSheduleValidatorEnum? claimStatus)
     {
         var branchId = int.Parse(User.FindFirst("branch_id")?.Value);
+        var currectEmployeeId = int.Parse(User.FindFirst("employee_id")?.Value);
         var shifts = _shiftTradeRepository.GetShiftOffers(branchId);
 
-        var model = new ShiftTradingViewModel();
+        var model = new EmployeeShiftTradingViewModel();
+        model.claimStatus = claimStatus;
+        model.CurrentEmployeeId = currectEmployeeId;
 
         foreach (var shift in shifts)
         {
@@ -83,12 +88,29 @@ public class ShiftTradingController : Controller
     }
 
     [HttpPost]
-    public IActionResult ClaimShift(int originalEmployee, int branch, string date, string startTime)
+    public IActionResult ClaimShift(int originalEmployee, int branch, string date, string startTime, int claimEmployee)
     {
-        var currentEmployeeId = int.Parse(User.FindFirst("employee_id")?.Value);
+        var localStartTime = TimeOnly.ParseExact(startTime, "HH:mm:ss");
+        var localDate = DateOnly.ParseExact(date, "dd-MM-yyyy");
+
+        var shift = _scheduleRepository.GetSchedule(originalEmployee, branch, localDate, localStartTime);
+        shift.EmployeeId = claimEmployee;
+
+        var result = _caoScheduleService.ValidateSchedule(shift);
         
+        if (result != CaoSheduleValidatorEnum.Valid)
+        {
+            return RedirectToAction("OfferedShifts", new { claimStatus = result });
+        }
+
+        var claimResult = _shiftTradeRepository.ClaimShift(originalEmployee, branch, localDate, localStartTime, claimEmployee);
+
+        if (claimResult == false)
+        {
+            result = CaoSheduleValidatorEnum.Error;
+        }
         
-        throw new NotImplementedException();
+        return RedirectToAction("OfferedShifts", new { claimStatus = result });
     }
 
     [Authorize(Roles = "manager")]

@@ -8,6 +8,7 @@
         <th>Tijd</th>
         <th>Filiaal</th>
         <th>Afdeling</th>
+        <th>Geclaimd door</th>
         <th>Acties</th>
     </tr>
     </thead>
@@ -20,6 +21,7 @@
             <td>@shift.StartTime.ToString("HH:mm") - @shift.EndTime.ToString("HH:mm")</td>
             <td>@shift.BranchId</td>
             <td>@shift.Department</td>
+            <td>@shift.ClaimEmployeeName</td>
             <td>
                 <form method="post">
                     <input type="hidden" name="employee" value="@shift.EmployeeId"/>

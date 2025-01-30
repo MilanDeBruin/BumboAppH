@@ -9,6 +9,7 @@ public enum CaoSheduleValidatorEnum
     TooLateEndTime,
     TooManyWeeklyWorkDays,
     TooManyWeeklyHours,
-    TooManyAverageWeeklyHoursPerAmountOfWeeks
+    TooManyAverageWeeklyHoursPerAmountOfWeeks,
+    Error
     
 }
