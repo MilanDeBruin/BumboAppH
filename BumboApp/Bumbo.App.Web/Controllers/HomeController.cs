@@ -55,9 +55,12 @@ namespace Bumbo.App.Web.Controllers
                         Date = group.Key,
                         Shifts = group.Select(schedule => new ShiftsViewModel
                         {
-                            Time = $"{schedule.StartTime:HH:mm} - {schedule.EndTime:HH:mm}".ToString(),
+                            EmployeeId = employeeId,
+                            StartTime = schedule.StartTime,
+                            EndTime = schedule.EndTime,
                             Departement = schedule.Department,
-                            Branch_Id = schedule.BranchId
+                            Branch_Id = schedule.BranchId,
+                            ShiftStatus = schedule.WorkStatus
                         }).ToList()
                     };
                     viewModel.WorkDays.Add(daySchedule);
