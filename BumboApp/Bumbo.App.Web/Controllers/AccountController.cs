@@ -57,7 +57,7 @@ public class AccountController : Controller
                 var employee = _employeeRepository.GetEmployeeByUserId(user.Id);
                 if (employee == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Employee not found.");
+                    ModelState.AddModelError(string.Empty, "EmployeeCreate not found.");
                     return View(viewModel);
                 }
 

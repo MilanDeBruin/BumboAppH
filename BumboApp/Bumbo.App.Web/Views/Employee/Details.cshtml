@@ -1,5 +1,5 @@
 ﻿@using Bumbo.App.Web.Models.ViewModels.Employee
-@model EmployeeViewModel
+@model EmployeeCreateViewModel
 
 @{
     ViewData["Title"] = "Medewerkersgegevens";
@@ -76,8 +76,8 @@
         </div>
 
         <div class="col-md-6">
-            <label asp-for="EmailAdres" class="form-label">E-mailadres</label>
-            <input asp-for="EmailAdres" class="form-control" readonly />
+            <label asp-for="EmailAddress" class="form-label">E-mailadres</label>
+            <input asp-for="EmailAddress" class="form-control" readonly />
         </div>
     </div>
 

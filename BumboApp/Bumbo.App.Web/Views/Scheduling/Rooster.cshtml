@@ -17,7 +17,7 @@
 
     <div class="function-filter-container">
         <label for="functionFilter">Filter op functie:</label>
-        <select id="functionFilter" class="form-control" style="display:inline-block; width:auto;" onchange="filterEmployees()">
+        <select id="functionFilter" class="form-control" style="display:inline-block; width:auto;" onchange="filterEmployeeCreates()">
             <option value="all">Alle functies</option>
             @foreach (var functionName in Model.Select(e => e.MainFunction).Distinct())
             {
@@ -134,7 +134,7 @@
 
         
         function openScheduleModal(employeeId, day) {
-            document.getElementById("modalEmployeeId").value = employeeId;
+            document.getElementById("modalEmployeeCreateId").value = employeeId;
             document.getElementById("modalDay").value = day;
             document.getElementById("modalStartTime").value = "09:00";
             document.getElementById("modalEndTime").value = "21:00";  
@@ -218,7 +218,7 @@
             scheduleEntry.remove();
 
             const scheduleData = {
-                EmployeeId: parseInt(employeeId),
+                EmployeeCreateId: parseInt(employeeId),
                 Date: new Date(date).toISOString(),
                 StartTime: startTime + ":00",
                 EndTime: endTime + ":00",
@@ -280,7 +280,7 @@
             function saveSchedule() {
                 const dayMapping = { 'Maandag': 0, 'Dinsdag': 1, 'Woensdag': 2, 'Donderdag': 3, 'Vrijdag': 4, 'Zaterdag': 5, 'Zondag': 6 };
 
-                const employeeId = document.getElementById("modalEmployeeId").value;
+                const employeeId = document.getElementById("modalEmployeeCreateId").value;
                 const day = document.getElementById("modalDay").value;
 
                 const startTime = document.getElementById("modalStartTime").value;
@@ -305,7 +305,7 @@
                 updatedDate = dateObj.toISOString().split('T')[0];
 
                 const scheduleEntry = {
-                    EmployeeId: parseInt(employeeId),
+                    EmployeeCreateId: parseInt(employeeId),
                     Day: day,
                     Date: new Date(updatedDate).toISOString(),
                     StartTime: startTime + ":00",
@@ -407,7 +407,7 @@
 
                 document.querySelectorAll('.schedule-cell div').forEach(cell => (cell.innerHTML = ''));
 
-                const totalHoursPerEmployee = {};
+                const totalHoursPerEmployeeCreate = {};
 
                 schedules.forEach(schedule => {
                     const dayOfWeek = new Date(schedule.date).getDay();
@@ -421,10 +421,10 @@
                         const scheduleElement = document.createElement("div");
                         scheduleElement.classList.add("schedule-entry");
 
-                        const hiddenEmployeeId = document.createElement("input");
-                        hiddenEmployeeId.type = "hidden";
-                        hiddenEmployeeId.name = "employeeId";
-                        hiddenEmployeeId.value = schedule.employeeId;
+                        const hiddenEmployeeCreateId = document.createElement("input");
+                        hiddenEmployeeCreateId.type = "hidden";
+                        hiddenEmployeeCreateId.name = "employeeId";
+                        hiddenEmployeeCreateId.value = schedule.employeeId;
 
                         const hiddenDate = document.createElement("input");
                         hiddenDate.type = "hidden";
@@ -450,7 +450,7 @@
                         <button class="btn btn-sm btn-danger" onclick="removeSchedule(this)">X</button>
                         `;
 
-                        scheduleElement.appendChild(hiddenEmployeeId);
+                        scheduleElement.appendChild(hiddenEmployeeCreateId);
                         scheduleElement.appendChild(hiddenDate);
                         container.appendChild(scheduleElement);
 
@@ -458,17 +458,17 @@
                         const endTime = new Date(`1970-01-01T${schedule.endTime}:00`);
                         const hoursWorked = (endTime - startTime) / (1000 * 60 * 60);
 
-                        if (!totalHoursPerEmployee[schedule.employeeId]) {
-                            totalHoursPerEmployee[schedule.employeeId] = 0;
+                        if (!totalHoursPerEmployeeCreate[schedule.employeeId]) {
+                            totalHoursPerEmployeeCreate[schedule.employeeId] = 0;
                         }
-                        totalHoursPerEmployee[schedule.employeeId] += hoursWorked;
+                        totalHoursPerEmployeeCreate[schedule.employeeId] += hoursWorked;
                     }
                 });
 
                 document.querySelectorAll("[id^='total-hours-']").forEach(element => {
                     element.textContent = "00:00"; 
                 });
-                for (const [employeeId, totalHours] of Object.entries(totalHoursPerEmployee)) {
+                for (const [employeeId, totalHours] of Object.entries(totalHoursPerEmployeeCreate)) {
                     const totalHoursElement = document.getElementById(`total-hours-${employeeId}`);
                     if (totalHoursElement) {
                         const hours = Math.floor(totalHours);
@@ -615,7 +615,7 @@
 
             updateWeekRange();
 
-            function filterEmployees() {
+            function filterEmployeeCreates() {
                 const selectedFunction = document.getElementById('functionFilter').value.toLowerCase();
                 const rows = document.querySelectorAll('.employee-row');
 
@@ -629,7 +629,7 @@
                 });
             }
 
-            document.getElementById('functionFilter').addEventListener('change', filterEmployees);
+            document.getElementById('functionFilter').addEventListener('change', filterEmployeeCreates);
 
             const rowsPerPage = 10; // Als je de hoeveelheid rijen van medewerkers wilt veranderen is dat hier
             let currentPage = 1;

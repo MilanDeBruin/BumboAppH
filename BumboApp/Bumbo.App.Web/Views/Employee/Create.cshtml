@@ -1,5 +1,5 @@
 ﻿@using Bumbo.App.Web.Models.ViewModels.Employee
-@model EmployeeViewModel
+@model EmployeeCreateViewModel
 
 @{
     ViewData["Title"] = "Nieuwe Medewerker Toevoegen";
@@ -87,9 +87,9 @@
             </div>
 
             <div class="col-md-6">
-                <label asp-for="EmailAdres" class="form-label">E-mailadres*</label>
-                <input asp-for="EmailAdres" type="email" placeholder="naam@domein.nl" class="form-control" />
-                <span asp-validation-for="EmailAdres" class="text-danger"></span>
+                <label asp-for="EmailAddress" class="form-label">E-mailadres*</label>
+                <input asp-for="EmailAddress" type="email" placeholder="naam@domein.nl" class="form-control" />
+                <span asp-validation-for="EmailAddress" class="text-danger"></span>
             </div>
 
             <div class="col-md-6">

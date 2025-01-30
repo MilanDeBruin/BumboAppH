@@ -25,7 +25,7 @@ namespace Bumbo.App.Web.Controllers
         {
             var employees = _employeeRepository.GetAllEmployeesByBranchId(branchId);
 
-            var model = employees.Select(employee => new EmployeeViewModel
+            var model = employees.Select(employee => new EmployeeCreateViewModel
             {
                 UserId = employee.UserId,
                 EmployeeId = employee.EmployeeId,
@@ -46,8 +46,10 @@ namespace Bumbo.App.Web.Controllers
         {
             var employee = _employeeRepository.GetEmployeeByEmployeeId(employeeId);
             if (employee == null) return NotFound();
+            
+            var employeeEmail = _employeeRepository.FindEmailFromUserId(employee.UserId);
 
-            var viewModel = new EmployeeViewModel
+            var viewModel = new EmployeeCreateViewModel
             {
                 UserId = employee.UserId,
                 EmployeeId = employee.EmployeeId,
@@ -61,6 +63,7 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = employee.HouseNumber,
                 Addition = employee.Addition,
                 ZipCode = employee.ZipCode,
+                EmailAddress = employeeEmail ?? string.Empty,
                 LaborContract = employee.LaborContract,
             };
 
@@ -70,7 +73,7 @@ namespace Bumbo.App.Web.Controllers
         [HttpGet]
         public IActionResult Create(int branchId)
         {
-            var employeeViewModel = new EmployeeViewModel
+            var employeeViewModel = new EmployeeCreateViewModel
             {
                 BranchId = branchId,
                 Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
@@ -94,61 +97,61 @@ namespace Bumbo.App.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(EmployeeViewModel viewModel)
+        public IActionResult Create(EmployeeCreateViewModel createViewModel)
         {
-            if (!ModelState.IsValid || viewModel.HiringDate < viewModel.DateOfBirth)
+            if (!ModelState.IsValid || createViewModel.HiringDate < createViewModel.DateOfBirth)
             {
-                if (viewModel.HiringDate < viewModel.DateOfBirth)
+                if (createViewModel.HiringDate < createViewModel.DateOfBirth)
                 {
                     ModelState.AddModelError(
-                        nameof(viewModel.HiringDate),
+                        nameof(createViewModel.HiringDate),
                         "Startdatum contract kan niet eerder zijn dan geboortedatum"
                     );
                     ModelState.AddModelError(
-                        nameof(viewModel.DateOfBirth),
+                        nameof(createViewModel.DateOfBirth),
                         "Geboortedatum kan niet later zijn dan startdatum contract"
                     );
                 }
 
-                viewModel.Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
+                createViewModel.Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
                     Text = b.ZipCode,
                 });
-                viewModel.Positions = _positionRepository.GetAllPositions().Select(p => new SelectListItem
+                createViewModel.Positions = _positionRepository.GetAllPositions().Select(p => new SelectListItem
                 {
                     Value = p.Position1,
                     Text = p.Position1,
                 });
-                viewModel.LaborContracts = _laborContractRepository.GetAllLaborContracts().Select(lc =>
+                createViewModel.LaborContracts = _laborContractRepository.GetAllLaborContracts().Select(lc =>
                     new SelectListItem
                     {
                         Value = lc.LaborContract1,
                         Text = lc.LaborContract1,
                     });
 
-                return View(viewModel);
+                return View(createViewModel);
             }
             
             var employee = new Employee
             {
-                EmployeeId = viewModel.EmployeeId,
-                BranchId = viewModel.BranchId,
-                Position = viewModel.Position,
-                HiringDate = viewModel.HiringDate,
-                FirstName = viewModel.FirstName,
-                Infix = viewModel.Infix,
-                LastName = viewModel.LastName,
-                DateOfBirth = viewModel.DateOfBirth,
-                HouseNumber = viewModel.HouseNumber,
-                Addition = viewModel.Addition,
-                ZipCode = viewModel.ZipCode,
-                LaborContract = viewModel.LaborContract,
+                EmployeeId = createViewModel.EmployeeId,
+                BranchId = createViewModel.BranchId,
+                Position = createViewModel.Position,
+                HiringDate = createViewModel.HiringDate,
+                FirstName = createViewModel.FirstName,
+                Infix = createViewModel.Infix,
+                LastName = createViewModel.LastName,
+                DateOfBirth = createViewModel.DateOfBirth,
+                HouseNumber = createViewModel.HouseNumber,
+                Addition = createViewModel.Addition,
+                ZipCode = createViewModel.ZipCode,
+                LaborContract = createViewModel.LaborContract,
             };
 
-            _employeeRepository.AddEmployee(employee, viewModel.EmailAdres, viewModel.Password, RoleEnum.Employee);
+            _employeeRepository.AddEmployee(employee, createViewModel.EmailAddress, createViewModel.Password, RoleEnum.Employee);
             TempData["SuccessMessage"] = "Medewerker is aangemaakt!";
-            return RedirectToAction("Index", new { branchId = viewModel.BranchId });
+            return RedirectToAction("Index", new { branchId = createViewModel.BranchId });
         }
 
         [HttpGet]
@@ -156,9 +159,12 @@ namespace Bumbo.App.Web.Controllers
         {
             var employee = _context.Employees.Find(employeeId);
             if (employee == null) return NotFound();
+            
+            var employeeEmail = _employeeRepository.FindEmailFromUserId(employee.UserId);
 
-            var viewModel = new EmployeeViewModel()
+            var viewModel = new EmployeeUpdateViewModel()
             {
+                UserId = employee.UserId,
                 EmployeeId = employee.EmployeeId,
                 BranchId = employee.BranchId,
                 Position = employee.Position,
@@ -170,7 +176,7 @@ namespace Bumbo.App.Web.Controllers
                 HouseNumber = employee.HouseNumber,
                 Addition = employee.Addition,
                 ZipCode = employee.ZipCode,
-                // EmailAdres = employee.EmailAdres, TODO: Remove?
+                EmailAddress = employeeEmail ?? string.Empty,
                 LaborContract = employee.LaborContract,
                 Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
                 {
@@ -193,88 +199,95 @@ namespace Bumbo.App.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(EmployeeViewModel viewModel)
+        public IActionResult Edit(EmployeeUpdateViewModel updateViewModel)
         {
             if (!ModelState.IsValid)
             {
-                viewModel.Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
+                foreach (var error in ModelState)
+                {
+                    foreach (var err in error.Value.Errors)
+                    {
+                        Console.WriteLine($"ModelState Error - {error.Key}: {err.ErrorMessage}");
+                    }
+                }
+                updateViewModel.Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
                     Text = b.ZipCode,
                 });
-                viewModel.Positions = _positionRepository.GetAllPositions().Select(p => new SelectListItem
+                updateViewModel.Positions = _positionRepository.GetAllPositions().Select(p => new SelectListItem
                 {
                     Value = p.Position1,
                     Text = p.Position1,
                 });
-                viewModel.LaborContracts = _laborContractRepository.GetAllLaborContracts().Select(lc =>
+                updateViewModel.LaborContracts = _laborContractRepository.GetAllLaborContracts().Select(lc =>
                     new SelectListItem
                     {
                         Value = lc.LaborContract1,
                         Text = lc.LaborContract1,
                     });
 
-                return View(viewModel);
+                return View(updateViewModel);
             }
 
-            if (viewModel.HiringDate < viewModel.DateOfBirth)
+            if (updateViewModel.HiringDate < updateViewModel.DateOfBirth)
             {
                 ModelState.AddModelError(
-                    nameof(viewModel.HiringDate),
+                    nameof(updateViewModel.HiringDate),
                     "Startdatum contract kan niet eerder zijn dan geboortedatum"
                 );
                 ModelState.AddModelError(
-                    nameof(viewModel.DateOfBirth),
+                    nameof(updateViewModel.DateOfBirth),
                     "Geboortedatum kan niet later zijn dan startdatum contract"
                 );
 
-                viewModel.Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
+                updateViewModel.Branches = _branchRepository.GetAllBranches().Select(b => new SelectListItem
                 {
                     Value = b.BranchId.ToString(),
                     Text = b.ZipCode,
                 });
-                viewModel.Positions = _positionRepository.GetAllPositions().Select(p => new SelectListItem
+                updateViewModel.Positions = _positionRepository.GetAllPositions().Select(p => new SelectListItem
                 {
                     Value = p.Position1,
                     Text = p.Position1,
                 });
-                viewModel.LaborContracts = _laborContractRepository.GetAllLaborContracts().Select(lc =>
+                updateViewModel.LaborContracts = _laborContractRepository.GetAllLaborContracts().Select(lc =>
                     new SelectListItem
                     {
                         Value = lc.LaborContract1,
                         Text = lc.LaborContract1,
                     });
                 
-                return View(viewModel);
+                return View(updateViewModel);
             }
             
             var employee = new Employee
             {
-                EmployeeId = viewModel.EmployeeId,
-                BranchId = viewModel.BranchId,
-                HiringDate = viewModel.HiringDate,
-                FirstName = viewModel.FirstName,
-                Infix = viewModel.Infix,
-                LastName = viewModel.LastName,
-                DateOfBirth = viewModel.DateOfBirth,
-                HouseNumber = viewModel.HouseNumber,
-                Addition = viewModel.Addition,
-                ZipCode = viewModel.ZipCode,
-                LaborContract = viewModel.LaborContract
+                EmployeeId = updateViewModel.EmployeeId,
+                BranchId = updateViewModel.BranchId,
+                HiringDate = updateViewModel.HiringDate,
+                FirstName = updateViewModel.FirstName,
+                Infix = updateViewModel.Infix,
+                LastName = updateViewModel.LastName,
+                DateOfBirth = updateViewModel.DateOfBirth,
+                HouseNumber = updateViewModel.HouseNumber,
+                Addition = updateViewModel.Addition,
+                ZipCode = updateViewModel.ZipCode,
+                LaborContract = updateViewModel.LaborContract
             };
 
-            if (!_employeeRepository.UpdateEmployee(employee, viewModel.EmailAdres, viewModel.Password))
+            if (!_employeeRepository.UpdateEmployee(employee, updateViewModel.EmailAddress, updateViewModel.NewPassword))
             {
                 TempData["ErrorMessage"] = "Medewerker kon niet worden gewijzigd!";
-                return View(viewModel);
+                return View(updateViewModel);
             }
 
             TempData["SuccessMessage"] = "Medewerker is gewijzigd!";
-            return RedirectToAction("Index", new { branchId = viewModel.BranchId });
+            return RedirectToAction("Index", new { branchId = updateViewModel.BranchId });
         }
 
         [HttpPost]
-        public IActionResult Delete(int employeeId) // Werkt nog niet als Employee een Availability heeft. EmployeeId wordt op null gezet voor de Availability, maar dat kan niet?
+        public IActionResult Delete(int employeeId)
         {
             var employee = _employeeRepository.GetEmployeeByEmployeeId(employeeId);
             if (employee == null) return NotFound();
