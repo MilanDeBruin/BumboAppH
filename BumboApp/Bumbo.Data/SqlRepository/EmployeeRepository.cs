@@ -58,7 +58,7 @@ namespace Bumbo.Data.SqlRepository
             _context.SaveChanges();
         }
 
-        public bool UpdateEmployee(Employee employee, string emailAdres, string password)
+        public bool UpdateEmployee(Employee employee, string emailAdres, string? password)
         {
             var existingEmployee = _context.Employees.Find(employee.EmployeeId);
             if (existingEmployee == null) return false;
@@ -98,7 +98,7 @@ namespace Bumbo.Data.SqlRepository
             user.UserName = email;
             _userManager.UpdateAsync(user).Wait();
         }
-        
+
         public bool DeleteEmployee(int employeeId)
         {
             var employee = _context.Employees.Find(employeeId);
@@ -119,20 +119,16 @@ namespace Bumbo.Data.SqlRepository
                 ? $"{employee.FirstName} {employee.LastName}"
                 : "Employee not found";
         }
-
-        public string FindEmailFromUserId(string userId)
+        
+        public string? FindEmailFromUserId(string userId)
         {
-            var email = _context.Users
-                .Where(u => u.Id == userId)
-                .Select(e => e.Email)
-                .FirstOrDefault();
-
-            return email !=null ? $"{email}" : "Email not found";
+            var user = _userManager.FindByIdAsync(userId).Result;
+            return user?.Email;
         }
         
         public string GetRoles(string userId)
         {
-            var user = _userManager.FindByIdAsync(userId.ToString()).Result;
+            var user = _userManager.FindByIdAsync(userId).Result;
             if (user == null) return "User not found";
 
             var role = _userManager.GetRolesAsync(user).Result.FirstOrDefault(); // TODO: Currently only returns the first role, not all roles (since a user can have multiple roles)
