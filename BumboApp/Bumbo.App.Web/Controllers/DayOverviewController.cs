@@ -132,8 +132,8 @@ namespace Bumbo.App.Web.Controllers
                     var newWorkShift = new WorkShift
                     {
                         EmployeeId = update.EmployeeId,
-                        StartTime = date.ToDateTime(TimeOnly.MinValue),
-                        EndTime = date.ToDateTime(TimeOnly.MinValue).Add(workedTimeSpan)
+                        StartTime = date.ToDateTime(TimeOnly.MinValue.AddHours(8)),
+                        EndTime = date.ToDateTime(TimeOnly.MinValue.AddHours(8)).Add(workedTimeSpan)
                     };
                     _context.WorkShifts.Add(newWorkShift);
                 }

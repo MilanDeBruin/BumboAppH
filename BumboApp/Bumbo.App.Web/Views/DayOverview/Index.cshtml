@@ -54,7 +54,11 @@
         <tbody>
             @foreach (var item in Model)
             {
-                <tr class="employee-row" data-shifts="@string.Join(", ", item.Shifts.Select(s => $"{s.StartTime} - {s.EndTime}"))">
+                <tr class="employee-row"
+                    data-shifts="@string.Join(", ",
+        item.Shifts
+        .Where(s => s.StartTime != "08:00" || s.EndTime != "08:00") 
+        .Select(s => $"{s.StartTime} - {s.EndTime}"))">
                     <td>@item.FirstName</td>
                     <td>@item.LastName</td>
                     <td>@TimeSpan.FromHours((double)item.PlannedHours).ToString(@"hh\:mm")</td>
@@ -90,6 +94,7 @@
             row.addEventListener("mouseenter", function () {
                 const shifts = row.getAttribute("data-shifts");
                 console.log("Tooltip data:", shifts);
+                
                 if (shifts) {
                     showTooltip(row, shifts);
                 }
@@ -110,7 +115,7 @@
                 document.body.appendChild(tooltip);
             }
 
-            tooltip.innerText = text;
+            tooltip.innerText = 'Diensten: ' + text;
 
             // Immediately position the tooltip relative to the element
             let rect = element.getBoundingClientRect();
