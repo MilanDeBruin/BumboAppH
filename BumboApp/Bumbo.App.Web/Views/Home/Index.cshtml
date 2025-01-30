@@ -152,15 +152,55 @@
     @if (Model.ingeklokt == false)
     {
         <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-            <input type="button" value="Inklokken" class="btn btn-primary" style=" margin:10px 0px 10px 0px" />
+            <input type="button" value="Inklokken" class="btn btn-primary" style=" margin:10px 0px 10px 0px "onclick="clockIn()" />
         </a>
     }
     else
     {
         <a asp-controller="Home" asp-action="Uitklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-            <input type="button" value="Uitklokken" class="btn btn-primary" style=" margin:10px 0px 10px 0px" />
+            <div id="timerDisplay" class="fw-bold" style="margin-top: 10px;">Tijd gewerkt: 00:00:00</div>
+            <input type="button" value="Uitklokken" class="btn btn-primary" style=" margin:10px 0px 10px 0px" onclick="clockOut()" />
         </a>
     }
 </body>
-        
-           
+
+<script>
+    let timerInterval;
+
+    function startTimer(startTime) {
+        clearInterval(timerInterval); 
+        timerInterval = setInterval(function () {
+            let now = new Date().getTime();
+            let elapsed = now - startTime;
+
+            let hours = Math.floor(elapsed / (1000 * 60 * 60));
+            let minutes = Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((elapsed % (1000 * 60)) / 1000);
+
+            document.getElementById("timerDisplay").innerText =
+                `Tijd gewerkt: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }, 1000);
+    }
+
+    
+    window.onload = function () {
+        let startTime = localStorage.getItem("clockedInTime");
+        if (startTime) {
+            startTimer(parseInt(startTime));
+        }
+    };
+
+   
+    function clockIn() {
+        let startTime = new Date().getTime();
+        localStorage.setItem("clockedInTime", startTime);
+        startTimer(startTime);
+    }
+
+   
+    function clockOut() {
+        clearInterval(timerInterval);
+        localStorage.removeItem("clockedInTime");
+        document.getElementById("timerDisplay").innerText = "Tijd gewerkt: 00:00:00";
+    }
+</script>
