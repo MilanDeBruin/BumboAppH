@@ -77,7 +77,10 @@ public partial class Employee
     public virtual ICollection<SchoolSchedule> SchoolSchedules { get; set; } = new List<SchoolSchedule>();
 
     [InverseProperty("Employee")]
-    public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new List<WorkSchedule>();
+    public virtual ICollection<WorkSchedule> WorkScheduleEmployees { get; set; } = new List<WorkSchedule>();
+
+    [InverseProperty("TradeEmployee")]
+    public virtual ICollection<WorkSchedule> WorkScheduleTradeEmployees { get; set; } = new List<WorkSchedule>();
 
     [InverseProperty("Employee")]
     public virtual ICollection<WorkShift> WorkShifts { get; set; } = new List<WorkShift>();

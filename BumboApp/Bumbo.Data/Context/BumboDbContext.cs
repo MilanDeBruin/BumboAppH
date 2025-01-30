@@ -207,9 +207,11 @@ public partial class BumboDbContext : IdentityDbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_work_schedule_department");
 
-            entity.HasOne(d => d.Employee).WithMany(p => p.WorkSchedules)
+            entity.HasOne(d => d.Employee).WithMany(p => p.WorkScheduleEmployees)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_work_schedule_employee");
+
+            entity.HasOne(d => d.TradeEmployee).WithMany(p => p.WorkScheduleTradeEmployees).HasConstraintName("FK_work_schedule_employee1");
 
             entity.HasOne(d => d.WorkStatusNavigation).WithMany(p => p.WorkSchedules)
                 .OnDelete(DeleteBehavior.ClientSetNull)
