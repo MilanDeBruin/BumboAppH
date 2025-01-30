@@ -52,10 +52,9 @@ public class ShiftTradeRepository : IShiftTradeRepository
 
     public bool AcceptShiftOffer(int employee, int branch, DateOnly date, TimeOnly startTime)
     {
-        _dbContext.WorkSchedules.First(s =>
-                    s.EmployeeId == employee && s.BranchId == branch && s.Date == date && s.StartTime == startTime)
-                .WorkStatus =
-            "Accepted";
+        var shift = _dbContext.WorkSchedules.First(s =>
+            s.EmployeeId == employee && s.BranchId == branch && s.Date == date && s.StartTime == startTime);
+        shift.WorkStatus = "Accepted";
         try
         {
             _dbContext.SaveChangesAsync().Wait();
@@ -86,13 +85,13 @@ public class ShiftTradeRepository : IShiftTradeRepository
         return true;
     }
 
-    public List<WorkSchedule> GetShiftOfferRequests(int branch)
+    public List<WorkSchedule> GetShiftClaimRequests(int branch)
     {
-        return _dbContext.WorkSchedules.Include(s => s.Employee).Where(s => s.WorkStatus == "Requested" && s.BranchId == branch).ToList();
+        return _dbContext.WorkSchedules.Include(s => s.Employee).Where(s => s.WorkStatus == "Claimed" && s.BranchId == branch).ToList();
     }
 
     public List<WorkSchedule> GetShiftOffers(int branch)
     {
-        return _dbContext.WorkSchedules.Where(s => s.WorkStatus == "Accepted").ToList();
+        return _dbContext.WorkSchedules.Where(s => s.WorkStatus == "Requested").ToList();
     }
 }

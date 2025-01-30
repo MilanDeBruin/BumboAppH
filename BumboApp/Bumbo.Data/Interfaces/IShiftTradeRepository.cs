@@ -15,7 +15,7 @@ public interface IShiftTradeRepository
     /// <summary>
     /// Method returns all offered shifts requests to me assessed by the manager
     /// </summary>
-    public List<WorkSchedule> GetShiftOfferRequests(int branch);
+    public List<WorkSchedule> GetShiftClaimRequests(int branch);
 
     /// <summary>
     /// Method returns all available offered shifts for employees to claim
