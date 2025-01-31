@@ -81,6 +81,8 @@
                     <th>Datum</th>
                     <th>Tijd</th>
                     <th>Afdeling</th>
+                    <th>Filiaal</th>
+                    <th>Shift ruilen</th>
                 </tr>
             </thead>
             <tbody>
@@ -98,7 +100,7 @@
                         foreach (var shift in daySchedule.Shifts)
                         {
                             <tr>
-                                @if(date == today){
+                                                                @if(date == today){
                                     <td style="background-color: rgba(0, 155, 50, 0.75);">
                                         @date.ToString("dd-MM-yyyy")
                                     </td>
@@ -111,15 +113,55 @@
                                 }
                                 @if (shift.Is_Sick)
                                 {
-                                    <td style="background-color: rgba(255, 0, 0, 0.75);">@shift.Time</td>
+                                    <td style="background-color: rgba(255, 0, 0, 0.75);">@shift.StartTime.ToString("HH:mm") - @shift.EndTime.ToString("HH:mm")</td>
                                     <td style="background-color: rgba(255, 0, 0, 0.75);">@shift.Departement</td>
+                                    <td style="background-color: rgba(255, 0, 0, 0.75);">@shift.Branch_Id</td>
                                 }
                                     else{
-                                    <td>@shift.Time</td>
+                                    <td>@shift.StartTime.ToString("HH:mm") - @shift.EndTime.ToString("HH:mm")</td>
                                     <td>@shift.Departement</td>
+                                    <td>@shift.Branch_Id</td>
                                    
-                                    }
-                               
+                                 }
+                                @switch (shift.ShiftStatus)
+                                {
+                                    case "Requested":
+                                        <td class="table-info">
+                                            <p>Shift aangeboden</p>
+                                        </td>
+                                        ;
+                                        break;
+                                    case "Claimed":
+                                        <td class="table-info">
+                                            <p>Shift geclaimd. Wachten op goedkeuring</p>
+                                        </td>
+                                        ;
+                                        break;    
+                                    case "Accepted":
+                                        <td class="table-success">
+                                            <p>Shift overgenomen</p>
+                                        </td>
+                                        ;
+                                        break;
+                                    case "Denied":
+                                        <td class="table-danger">
+                                            <p>Verzoek tot ruilen afgekeurd</p>
+                                        </td>
+                                        ;
+                                        break;
+                                    default:
+                                        <td>
+                                            <form method="post" asp-controller="ShiftTrading" asp-action="OfferShift">
+                                                <input type="hidden" name="employee" value="@shift.EmployeeId"/>
+                                                <input type="hidden" name="branch" value="@shift.Branch_Id"/>
+                                                <input type="hidden" name="date" value="@date.ToString("dd-MM-yyyy")"/>
+                                                <input type="hidden" name="startTime" value="@shift.StartTime.ToString("HH:mm:ss")"/>
+                                                <button type="submit" class="btn btn-primary">Shift aanbieden</button>
+                                            </form>
+                                        </td>
+                                        ;
+                                        break;
+                                }
                             </tr>
                         }
                     }
@@ -127,7 +169,7 @@
                     {
                         <tr>
                             <td>@date.ToString("dd-MM-yyyy")</td>
-                            <td colspan="2">Geen dienst</td>
+                            <td colspan="4">Geen diensten</td>
                         </tr>
                     }
                 }

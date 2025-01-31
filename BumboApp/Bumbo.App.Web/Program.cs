@@ -1,6 +1,5 @@
 using Bumbo.Data.Context;
 using Bumbo.Data.Interfaces;
-using Bumbo.Data.Models;
 using Bumbo.Data.SqlRepository;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -27,6 +26,7 @@ namespace Bumbo.App.Web
             builder.Services.AddTransient<Bumbo.Data.Interfaces.ISchoolScheduleRepository, Bumbo.Data.SqlRepository.SchoolScheduleRepository>();
             builder.Services.AddTransient<Bumbo.Data.Interfaces.IScheduleRepository, Bumbo.Data.SqlRepository.ScheduleRepository>();
             builder.Services.AddTransient<Bumbo.Data.Interfaces.ICaoRepository, Bumbo.Data.SqlRepository.CaoRepository>();
+            builder.Services.AddTransient<IShiftTradeRepository, ShiftTradeRepository>();
             builder.Services.AddTransient<IBranchRepository, BranchRepository>();
             builder.Services.AddTransient<IPositionRepository, PositionRepository>();
             builder.Services.AddTransient<ILaborContractRepository, LaborContractRepository>();

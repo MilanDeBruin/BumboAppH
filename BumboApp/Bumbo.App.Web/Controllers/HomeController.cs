@@ -52,22 +52,24 @@ namespace Bumbo.App.Web.Controllers
             {
                 var daySchedule = new DayPersonalScheduleViewModel
                 {
-                    Date = group.Key,
-                    Shifts = group.Select(schedule => new ShiftsViewModel
-                    {
-                        Time = $"{schedule.StartTime:HH:mm} - {schedule.EndTime:HH:mm}".ToString(),
-                        Departement = schedule.Department,
-                        Branch_Id = schedule.BranchId,
-                        Is_Sick = schedule.IsSick
-                    }).ToList()
-                };
-                viewModel.WorkDays.Add(daySchedule);
+                        Date = group.Key,
+                        Shifts = group.Select(schedule => new ShiftsViewModel
+                        {
+                            EmployeeId = employeeId,
+                            StartTime = schedule.StartTime,
+                            EndTime = schedule.EndTime,
+                            Departement = schedule.Department,
+                            Branch_Id = schedule.BranchId,
+                            ShiftStatus = schedule.WorkStatus
+                        }).ToList()
+                    };
+                    viewModel.WorkDays.Add(daySchedule);
 
-            }
-            viewModel.ingeklokt = _repo.GetIngeklokt(employeeId);
-            viewModel.isSick = _repo.GetSick(employeeId);
-            viewModel.sickListNames = _repo.getSickList();
-            return View(viewModel);
+                }
+                viewModel.ingeklokt = _repo.GetIngeklokt(employeeId);
+                viewModel.isSick = _repo.GetSick(employeeId);
+                viewModel.sickListNames = _repo.getSickList();
+                return View(viewModel);
 
         }
 

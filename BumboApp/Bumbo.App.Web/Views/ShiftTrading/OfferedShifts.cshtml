@@ -1,0 +1,41 @@
+@model Bumbo.App.Web.Models.ViewModels.ShiftTrading.EmployeeShiftTradingViewModel
+
+<h1>Aangeboden verzoeken</h1>
+@if (Model.claimStatus != null)
+{
+    <div class="alert-info">@Model.claimStatus</div>
+}
+<table class="table">
+    <thead>
+    <tr>
+        <th>Medewerker</th>
+        <th>Datum</th>
+        <th>Tijd</th>
+        <th>Filiaal</th>
+        <th>Afdeling</th>
+        <th>Acties</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var shift in Model.Shifts)
+    {
+    <tr>
+        <td>@shift.EmployeeName</td>
+        <td>@shift.Date.ToString("dd-MM-yyyy")</td>
+        <td>@shift.StartTime.ToString("HH:mm") - @shift.EndTime.ToString("HH:mm")</td>
+        <td>@shift.BranchId</td>
+        <td>@shift.Department</td>
+        <td>
+            <form method="post">
+                <input type="hidden" name="originalEmployee" value="@shift.EmployeeId"/>
+                <input type="hidden" name="branch" value="@shift.BranchId"/>
+                <input type="hidden" name="date" value="@shift.Date.ToString("dd-MM-yyyy")"/>
+                <input type="hidden" name="startTime" value="@shift.StartTime.ToString("HH:mm:ss")"/>
+                <input type="hidden" name="claimEmployee" value="@Model.CurrentEmployeeId"/>
+                <button type="submit" asp-action="ClaimShift" class="btn btn-success">Accepteren</button>
+            </form>
+        </td>
+    </tr>
+    }
+    </tbody>
+</table>

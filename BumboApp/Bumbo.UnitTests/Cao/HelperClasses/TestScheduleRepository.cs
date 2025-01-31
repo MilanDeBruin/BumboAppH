@@ -166,5 +166,9 @@ public class TestScheduleRepository : IScheduleRepository
     {
         return new List<WorkSchedule>();
     }
-    
+
+    public WorkSchedule GetSchedule(int employee, int branch, DateOnly date, TimeOnly startTime)
+    {
+        throw new NotImplementedException();
+    }
 }
