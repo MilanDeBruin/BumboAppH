@@ -69,7 +69,6 @@
                     <td>
                         <input type="time"
                                name="updatedHours[@Model.IndexOf(item)].WorkedHoursString"
-
                                value="@TimeSpan.Parse(item.WorkedHoursString).ToString(@"hh\:mm", System.Globalization.CultureInfo.InvariantCulture)"
                                class="worked-hours-input" />
                         <input type="hidden" name="updatedHours[@Model.IndexOf(item)].EmployeeId" value="@item.EmployeeId" />
