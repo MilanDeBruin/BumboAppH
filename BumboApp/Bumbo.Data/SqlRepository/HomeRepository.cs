@@ -59,10 +59,8 @@ public class HomeRepository : IHomeRepository
         return sicklist;
     }
 
-    public void Inklokken(int employeeId)
+    public void Inklokken(int employeeId, DateTime currentTime)
     {
-        var currentTime = DateTime.Now;
-
         var newWorkShift = new WorkShift
         {
             EmployeeId = employeeId,
@@ -70,14 +68,13 @@ public class HomeRepository : IHomeRepository
             EndTime = null
         };
 
+
         _db.WorkShifts.Add(newWorkShift);
         _db.SaveChanges();
     }
 
-    public void Uitklokken(int employeeId)
+    public void Uitklokken(int employeeId, DateTime currentTime)
     {
-        DateTime currentTime = DateTime.Now;
-
 
         var workShift = _db.WorkShifts
             .FirstOrDefault(ws => ws.EmployeeId == employeeId && ws.StartTime != null && ws.EndTime == null);
@@ -91,7 +88,28 @@ public class HomeRepository : IHomeRepository
         }
 
     }
+        public void DeleteShift(int employeeId, DateTime currentTime)
+        {
+            var shift = _db.WorkShifts
+                .FirstOrDefault(s => s.EmployeeId == employeeId && s.StartTime == currentTime);
 
+            if (shift != null)
+            {
+                _db.WorkShifts.Remove(shift);
+                _db.SaveChanges(); // Veranderingen opslaan in de database
+            }
+        }
+
+    public bool CheckStartTime(int employeeId, DateTime currentTime)
+    {
+     
+        var check = _db.WorkShifts
+            .Where(n => n.EmployeeId == employeeId &&
+                       n.StartTime >= currentTime.AddMinutes(-1) &&
+                       n.StartTime <= currentTime.AddMinutes(1));
+
+        return check.Any();
+    }
     public Boolean GetIngeklokt(int employeeId)
     {
         var isClockedIn = _db.WorkShifts
