@@ -64,12 +64,12 @@ namespace Bumbo.Data.SqlRepository
               .Where(n => n.EmployeeId == id && n.StartDate == StartDate)
               .FirstOrDefault();
         }
-        public Boolean getOverlap(DateOnly StartDate, DateOnly endDate, int id)
+        public Boolean getOverlap(DateOnly StartDate, DateOnly EndDate, int id)
         {
-            Boolean result = false;
-
-            result = (0 == ctx.Leaves.Where(n => n.StartDate >= StartDate && n.EndDate <= endDate && n.EmployeeId == id).Count());
-            return result;
+            return ctx.Leaves.Any(n =>
+                n.EmployeeId == id &&
+                !(n.EndDate < StartDate || n.StartDate > EndDate)  // This checks for any kind of overlap
+            );
         }
 
         public Boolean checkStartDateForDuble(int id, DateOnly startDate)
