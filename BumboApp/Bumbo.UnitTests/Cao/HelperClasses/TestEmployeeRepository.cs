@@ -6,7 +6,7 @@ namespace Bumbo.UnitTests.Cao.HelperClasses;
 
 public class TestEmployeeRepository : IEmployeeRepository
 {
-    public Employee GetEmployee(int id)
+    public Employee GetEmployeeByEmployeeId(int id)
     {
         // employee aged 15
         // used in max endtime test and max daily workhour test
@@ -49,17 +49,17 @@ public class TestEmployeeRepository : IEmployeeRepository
         };
     }
 
-    public Employee? GetEmployee(string userId)
+    public Employee? GetEmployeeByUserId(string userId)
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<Employee> GetEmployees(int branchId)
+    public IQueryable<Employee> GetAllEmployeesByBranchId(int branchId)
     {
         throw new NotImplementedException();
     }
 
-    public void SaveEmployee(Employee employee, string email, string password, RoleEnum role)
+    public void AddEmployee(Employee employee, string email, string password, RoleEnum role)
     {
         throw new NotImplementedException();
     }
@@ -75,6 +75,11 @@ public class TestEmployeeRepository : IEmployeeRepository
     }
 
     public string FindNameFromId(int id)
+    {
+        throw new NotImplementedException();
+    }
+    
+    public string FindEmailFromUserId(string userId)
     {
         throw new NotImplementedException();
     }

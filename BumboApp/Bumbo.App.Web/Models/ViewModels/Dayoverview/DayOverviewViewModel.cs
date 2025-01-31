@@ -15,4 +15,5 @@
         public List<ShiftViewModel> Shifts { get; set; } = new List<ShiftViewModel>();
     }
 
+
 }
