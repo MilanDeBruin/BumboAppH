@@ -27,15 +27,13 @@ namespace Bumbo.Domain.Services.Leaves
         {
             if (repo.getOverlap(leaveRequest.StartDate, leaveRequest.EndDate, leaveRequest.EmployeeId))
             {
-                return 4;
+                return 3; 
             }
-            else
-            {
-                return 0;
-            }
+            return 0;
         }
 
-        
+
+
 
         public int checkStartDateForDuble(Leave request)
         {
