@@ -26,7 +26,7 @@
                     @foreach (var shift in Model.WorkShifts)
                     {
                         <tr>
-                            <td>@shift.StartTime.ToString("MM-dd-yyyy")</td> 
+                            <td>@shift.StartTime.ToString("dd-MM-yyyy")</td>
                             <td>@shift.StartTime.ToString("HH:mm:ss")</td>
 
                             <td>@(shift.EndTime?.ToString("HH:mm:ss") ?? "nog bezig")</td>

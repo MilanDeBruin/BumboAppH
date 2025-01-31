@@ -65,8 +65,8 @@
                     {
                         <tr>
                             <td style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
-                                <span style="width: 33%; text-align: left;">@Html.DisplayFor(modelItem => item.StartDate)</span>
-                                <span style="width: 33%; text-align: center;">@Html.DisplayFor(modelItem => item.EndDate)</span>
+                                <span style="width: 33%; text-align: left;"> @item.StartDate.ToString("MM-dd-yyyy")</span>
+                                <span style="width: 33%; text-align: center;">@item.EndDate.ToString("MM-dd-yyyy")</span>
                                 <span style="width: 33%; text-align: right;">@Html.DisplayFor(modelItem => item.LeaveStatus)</span>
                             </td>
                         </tr>

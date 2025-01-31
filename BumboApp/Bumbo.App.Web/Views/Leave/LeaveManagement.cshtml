@@ -45,13 +45,13 @@
                 <tr>
                     <td style="border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
                         <span style="width: 25%; text-align: left;">@Html.DisplayFor(modelItem => item.employeeName)</span>
-                        <span style="width: 25%; text-align: center;">@Html.DisplayFor(modelItem => item.start)</span>
-                        <span style="width: 25%; text-align: center;">@Html.DisplayFor(modelItem => item.end)</span>
+                        <span style="width: 25%; text-align: center;">@item.start.ToString("dd-MM-yyyy")</span>
+                    <span style="width: 25%; text-align: center;">@item.end.ToString("dd-MM-yyyy")</span>
                         <span style="width: 25%; text-align: right;">
                             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                                 <form asp-action="Approve" asp-controller="Leave" method="post">
                                     <input type="hidden" name="employeeId" value="@item.employeeId" />
-                                    <input type="hidden" name="start" value="@item.start" />
+                                <input type="hidden" name="start" value="@item.start.ToString("dd-MM-yyyy")" />
 
                                     <button type="submit" class="btn btn-success" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                         <i class="fas fa-check"></i>
@@ -59,7 +59,7 @@
                                 </form>
                                 <form asp-action="Reject" asp-controller="Leave" method="post">
                                     <input type="hidden" name="employeeId" value="@item.employeeId" />
-                                    <input type="hidden" name="start" value="@item.start" />
+                                <input type="hidden" name="start" value="@item.start.ToString("dd-MM-yyyy")" />
 
                                     <button type="submit" class="btn btn-danger" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                         <i class="fas fa-times"></i>
