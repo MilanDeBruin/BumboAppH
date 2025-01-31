@@ -51,7 +51,15 @@
 							<br />
 							@foreach (var department in Enum.GetValues(typeof(DepartmentEnum)).Cast<DepartmentEnum>())
 							{
-								<small id="forecast-@day-@department" class="text-muted text-smaller">@department: </small>
+								@if (department == DepartmentEnum.Shelf)
+								{
+									<small id="forecast-@day-@department" class="text-muted text-smaller">DKW: </small>
+								}
+								else
+								{
+									<small id="forecast-@day-@department" class="text-muted text-smaller">@department: </small>
+
+								}
 								<small id="scheduled-@day-@department" class="text-muted text-smaller"></small>
 								<br />
 							}
