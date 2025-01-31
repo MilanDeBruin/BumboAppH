@@ -218,14 +218,14 @@ namespace Bumbo.App.Web.Controllers
                 // Filter beschikbaarheden op de geselecteerde positie, indien aanwezig
                 var filteredAvailabilities = weekAvailabilities.Where(a =>
                     a.Weekday.ToLower() == dayDate.ToString("dddd", new System.Globalization.CultureInfo("nl-NL")).ToLower() &&
-                    (string.IsNullOrEmpty(position) /*|| a.Employee.Position == position TODO: Implement using Identity*/)).ToList(); 
+                    (string.IsNullOrEmpty(position) /*|| a.EmployeeCreate.Position == position TODO: Implement using Identity*/)).ToList(); 
 
                 foreach (var availability in filteredAvailabilities)
                 {
                     var employee = availability.Employee;
                     dayAvailability.EmployeeAvailabilities.Add(new EmployeeAvailability
                     {
-                        Employee = new EmployeeViewModel
+                        EmployeeCreate = new EmployeeCreateViewModel
                         {
                             EmployeeId = employee.EmployeeId,
                             BranchId = employee.BranchId,

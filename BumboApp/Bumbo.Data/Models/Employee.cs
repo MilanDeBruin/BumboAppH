@@ -36,7 +36,7 @@ public partial class Employee
     public DateOnly DateOfBirth { get; set; }
 
     [Column("house_number")]
-    public int HouseNumber { get; set; }
+    public int? HouseNumber { get; set; }
 
     [Column("addition")]
     [StringLength(3)]
