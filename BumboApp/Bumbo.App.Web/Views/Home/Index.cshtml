@@ -115,12 +115,12 @@
                                 {
                                     <td style="background-color: rgba(255, 0, 0, 0.75);">@shift.StartTime.ToString("HH:mm") - @shift.EndTime.ToString("HH:mm")</td>
                                     <td style="background-color: rgba(255, 0, 0, 0.75);">@shift.Departement</td>
-                                    <td style="background-color: rgba(255, 0, 0, 0.75);">@shift.Branch</td>
+                                    <td style="background-color: rgba(255, 0, 0, 0.75);">@shift.Branch_Id</td>
                                 }
                                     else{
-                                    <td>@shift.Time</td>
+                                    <td>@shift.StartTime.ToString("HH:mm") - @shift.EndTime.ToString("HH:mm")</td>
                                     <td>@shift.Departement</td>
-                                    <td>@shift.Branch</td>
+                                    <td>@shift.Branch_Id</td>
                                    
                                  }
                                 @switch (shift.ShiftStatus)
