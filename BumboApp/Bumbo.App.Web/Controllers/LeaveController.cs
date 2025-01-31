@@ -61,20 +61,22 @@ namespace Bumbo.App.Web.Controllers
             {
                 case 0:
                     TempData["SuccessMessage"] = $"Verlof is aangevraagd!";
+                    repo.SetLeaveRequest(newRequest);
                     break;
                 case 1:
                     TempData["FailedMessage"] = $"Kan geen verlof aanvragen voor vandaag of eerdere datums!";
                     break;
                 case 2:
-                    TempData["FailedMessage"] = $"Start datum mag niet hoger zijn de de eind datum!";
+                    TempData["FailedMessage"] = $"Start datum mag niet hoger zijn dan de eind datum!";
                     break;
                 case 3:
                     TempData["FailedMessage"] = $"Er is al verlof aangevraagd op deze datum!";
                     break;
-                case 4:
-                    TempData["FailedMessage"] = $"Verlof verzoek loop over een eerder aangevraagd verzoek!";
+                default:
+                    TempData["FailedMessage"] = $"Onbekende fout bij het aanvragen van verlof!";
                     break;
             }
+
 
 
             return RedirectToAction("Index", new { employeeId = viewModel.employeeId });
