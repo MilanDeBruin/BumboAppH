@@ -1,4 +1,5 @@
 ﻿using Bumbo.App.Web.Models.ViewModels.Dayoverview;
+using Bumbo.App.Web.Models.ViewModels.Home;
 using Bumbo.Data.Context;
 
 using Bumbo.Data.Models;
@@ -27,7 +28,6 @@ namespace Bumbo.App.Web.Controllers
             _logger.LogInformation("open action triggered...");
 
             DateTime selectedDate;
-
             if (string.IsNullOrEmpty(date) || !DateTime.TryParse(date, out selectedDate))
             {
                 selectedDate = DateTime.Today;
@@ -38,40 +38,36 @@ namespace Bumbo.App.Web.Controllers
                 .Where(ws => ws.Date == DateOnly.FromDateTime(selectedDate))
                 .ToListAsync();
 
-
             var workShifts = await _context.WorkShifts
                 .Where(ws => ws.StartTime.Date == selectedDate)
                 .ToListAsync();
 
             var viewModel = employees
-    .Where(e => string.IsNullOrEmpty(search) ||
-                e.FirstName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                e.LastName.Contains(search, StringComparison.OrdinalIgnoreCase))
-    .Select(e => new
-    {
-        EmployeeId = e.EmployeeId,
-        FirstName = e.FirstName,
-        LastName = e.LastName,
-        PlannedHours = workSchedules
-            .Where(ws => ws.EmployeeId == e.EmployeeId)
-            .Sum(ws => (decimal)(ws.EndTime - ws.StartTime).TotalHours),
-        WorkedTimeSpan = workShifts
-            .Where(ws => ws.EmployeeId == e.EmployeeId)
-            .Select(ws => ws.EndTime - ws.StartTime)
-            .FirstOrDefault()
-    })
-    .ToList()
-    .Select(e => new DayOverviewViewModel
-    {
-        EmployeeId = e.EmployeeId,
-        FirstName = e.FirstName,
-        LastName = e.LastName,
-        PlannedHours = e.PlannedHours,
-        WorkedHoursString = e.WorkedTimeSpan.HasValue
-            ? string.Format("{0:D2}:{1:D2}", e.WorkedTimeSpan.Value.Hours, e.WorkedTimeSpan.Value.Minutes)
-            : "00:00"
-    })
-    .ToList();
+                .Where(e => string.IsNullOrEmpty(search) ||
+                            e.FirstName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                            e.LastName.Contains(search, StringComparison.OrdinalIgnoreCase))
+                .Select(e => new DayOverviewViewModel
+                {
+                    EmployeeId = e.EmployeeId,
+                    FirstName = e.FirstName,
+                    LastName = e.LastName,
+                    PlannedHours = workSchedules
+                        .Where(ws => ws.EmployeeId == e.EmployeeId)
+                        .Sum(ws => (decimal)(ws.EndTime - ws.StartTime).TotalHours),
+                    WorkedHoursString = TimeSpan.FromMinutes(
+                        workShifts
+                        .Where(ws => ws.EmployeeId == e.EmployeeId)
+                        .Sum(ws => (ws.EndTime - ws.StartTime)?.TotalMinutes ?? 0))
+                        .ToString(@"hh\:mm") ?? "00:00",
+                    Shifts = workShifts
+                        .Where(ws => ws.EmployeeId == e.EmployeeId)
+                        .Select(ws => new ShiftViewModel
+                        {
+                            StartTime = ws.StartTime.ToString("hh:mm"),
+                            EndTime = ws.EndTime?.ToString("hh:mm") ?? "N/A"
+                        }).ToList()
+                })
+                .ToList();
 
             ViewData["Date"] = DateOnly.FromDateTime(selectedDate);
             ViewData["Search"] = search;
@@ -81,44 +77,65 @@ namespace Bumbo.App.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Save(List<DayOverviewViewModel> updatedHours, DateOnly date)
         {
-            _logger.LogInformation("Save action triggered... -------------------------------------------------------------------------");
-
+            _logger.LogInformation("Save action triggered...");
 
             foreach (var update in updatedHours)
             {
-
                 if (!TimeSpan.TryParse(update.WorkedHoursString, out var workedTimeSpan))
                 {
                     _logger.LogWarning($"Invalid time format for EmployeeId {update.EmployeeId}. Skipping...");
                     continue;
                 }
 
-                var workShift = await _context.WorkShifts
-                    .FirstOrDefaultAsync(ws => ws.EmployeeId == update.EmployeeId && ws.StartTime.Date == date.ToDateTime(TimeOnly.MinValue).Date);
+                var workShifts = await _context.WorkShifts
+                    .Where(ws => ws.EmployeeId == update.EmployeeId && ws.StartTime.Date == date.ToDateTime(TimeOnly.MinValue).Date)
+                    .ToListAsync();
 
-                if (workShift == null)
+                if (workedTimeSpan == TimeSpan.Zero && workShifts.Any())
                 {
+                    _logger.LogInformation($"EmployeeId {update.EmployeeId} has no worked hours. Removing all shifts...");
+                    _context.WorkShifts.RemoveRange(workShifts);
+                    continue;
+                }
 
-                    workShift = new WorkShift
+                if (workShifts.Any())
+                {
+                    var totalExistingWorkedTime = workShifts.Skip(1).Sum(ws => (ws.EndTime - ws.StartTime)?.TotalMinutes ?? 0);
+                    var remainingWorkedMinutes = workedTimeSpan.TotalMinutes - totalExistingWorkedTime;
+
+                    if (remainingWorkedMinutes > 0)
                     {
-                        EmployeeId = update.EmployeeId,
-                        StartTime = date.ToDateTime(TimeOnly.MinValue),
-                        EndTime = date.ToDateTime(TimeOnly.MinValue).Add(workedTimeSpan)
-                    };
-                    _context.WorkShifts.Add(workShift);
+                        var firstShift = workShifts.First();
+                        firstShift.EndTime = firstShift.StartTime.AddMinutes(remainingWorkedMinutes);
+                        _context.WorkShifts.Update(firstShift);
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"Total worked time is less than existing shifts' time for EmployeeId {update.EmployeeId}. Skipping update.");
+                        continue;
+                    }
                 }
                 else
                 {
-
-                    workShift.EndTime = workShift.StartTime.Add(workedTimeSpan);
-                    _context.WorkShifts.Update(workShift);
+                    var newWorkShift = new WorkShift
+                    {
+                        EmployeeId = update.EmployeeId,
+                        StartTime = date.ToDateTime(TimeOnly.MinValue.AddHours(8)),
+                        EndTime = date.ToDateTime(TimeOnly.MinValue.AddHours(8)).Add(workedTimeSpan)
+                    };
+                    _context.WorkShifts.Add(newWorkShift);
                 }
             }
 
-
             await _context.SaveChangesAsync();
+
+            
+            TempData["SuccessMessage"] = "Wijzigingen succesvol opgeslagen!";
             return RedirectToAction("Index", new { date });
         }
+
+
+
 
     }
 }
