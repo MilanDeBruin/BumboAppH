@@ -23,7 +23,9 @@ In deze repository gebruiken we .asp en .net 8.0 Om de code consistent en overzi
 
 ### Code Review
 
-Alle merge requests naar de Main- of Develop-branches zijn vergrendeld met een reviewvereiste. Het is verplicht dat elke merge request door minimaal één persoon wordt gereviewd voordat deze wordt samengevoegd.
+Alle merge requests naar de Main- of Develop-branches zijn vergrendeld met een reviewvereiste. Het is verplicht dat elke merge request door minimaal twee personen wordt gereviewd voordat deze wordt samengevoegd.
+
+We willen dat er door 1 persoon wordt gecode reviewd en 1 persoon het testplan voor het gemaakte onderdeel uitvoerd.
 
 Bij een request duidelijke informatie schrijven wat de feature die gebouwd is precies inhoudt en doet.
 
