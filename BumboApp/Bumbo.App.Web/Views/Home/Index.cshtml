@@ -9,119 +9,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/rooster_bekijken.css">
+
+    <script>
+        function startClockedInTimer(startTime) {
+            const timerElement = document.getElementById("clockedInTimer");
+            function updateTimer() {
+                const now = new Date();
+                const elapsedSeconds = Math.floor((now - new Date(startTime)) / 1000);
+                const hours = Math.floor(elapsedSeconds / 3600);
+                const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+                const seconds = elapsedSeconds % 60;
+                timerElement.innerText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+    </script>
 </head>
 
-
 <body>
-    <div>
-        @if (!Model.isSick)
-        {
-            <a asp-controller="Home" asp-action="Ziekmelden" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-                <input type="button" value="Ziekmelden" class="btn btn-secondary"/>
-            </a>
-        }
-        else
-        {
-            <a asp-controller="Home" asp-action="Ziekmelden">
-                <input type="button" value="Ziekgemeld" disabled="disabled" class="btn btn-secondary" />
-            </a>
-        }
-        <h2>Rooster Week</h2>
-    </div>
-
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success text-center mt-3">
-            @TempData["SuccessMessage"]
-        </div>
-    }
-
-    <div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm">
-        <a asp-controller="Home"
-           asp-action="Index"
-           asp-route-date="@Model.FirstDayOfWeek.AddDays(-7).ToString("yyyy-MM-dd")"
-           asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
-           class="btn btn-secondary">
-            Week terug
-        </a>
-
-
-
-        <span class="fw-bold">@Model.FirstDayOfWeek.ToString("dd-MM-yyyy")</span>
-        <span>tot</span>
-        <span class="fw-bold">@Model.FirstDayOfWeek.AddDays(6).ToString("dd-MM-yyyy")</span>
-
-
-        <a asp-controller="Home"
-           asp-action="Index"
-           asp-route-date="@Model.FirstDayOfWeek.AddDays(7).ToString("yyyy-MM-dd")"
-           asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
-           class="btn btn-secondary">
-            Week vooruit
-        </a>
-    </div>
-
-
-    <div class="table-container">
-
-        <table class="schedule-table">
-            <thead>
-                <tr>
-                    <th>Datum</th>
-                    <th>Tijd</th>
-                    <th>Afdeling</th>
-                    <th>Filiaal</th>
-                </tr>
-            </thead>
-            <tbody>
-                @{
-                    var daysOfWeek = Enumerable.Range(0, 7)
-                    .Select(offset => Model.FirstDayOfWeek.AddDays(offset))
-                    .ToList();
-                }
-
-                @foreach (var date in daysOfWeek)
+    <div class="main-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Rooster Week</h2>
+            <div>
+                @if (!Model.isSick)
                 {
-                    var daySchedule = Model.WorkDays.FirstOrDefault(d => d.Date == date);
-                    if (daySchedule != null && daySchedule.Shifts.Any())
+                    <a asp-controller="Home" asp-action="Ziekmelden" asp-route-employeeId="@User.FindFirst("employee_id")?.Value" class="btn btn-warning">Ziekmelden</a>
+                }
+                else
+                {
+                    <button class="btn btn-secondary" disabled>Ziekgemeld</button>
+                }
+            </div>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success text-center">@TempData["SuccessMessage"]</div>
+        }
+
+        <div class="d-flex justify-content-center align-items-center gap-3 border p-3 rounded shadow-sm mb-4">
+            <a asp-controller="Home" asp-action="Index" asp-route-date="@Model.FirstDayOfWeek.AddDays(-7).ToString("yyyy-MM-dd")" asp-route-employeeId="@User.FindFirst("employee_id")?.Value" class="btn btn-secondary">Week terug</a>
+            <span class="fw-bold">@Model.FirstDayOfWeek.ToString("dd-MM-yyyy")</span>
+            <span>tot</span>
+            <span class="fw-bold">@Model.FirstDayOfWeek.AddDays(6).ToString("dd-MM-yyyy")</span>
+            <a asp-controller="Home" asp-action="Index" asp-route-date="@Model.FirstDayOfWeek.AddDays(7).ToString("yyyy-MM-dd")" asp-route-employeeId="@User.FindFirst("employee_id")?.Value" class="btn btn-secondary">Week vooruit</a>
+        </div>
+
+        <div class="table-container">
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Tijd</th>
+                        <th>Afdeling</th>
+                        <th>Filiaal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var daysOfWeek = Enumerable.Range(0, 7)
+                        .Select(offset => Model.FirstDayOfWeek.AddDays(offset))
+                        .ToList();
+                    }
+                    @foreach (var date in daysOfWeek)
                     {
-                        foreach (var shift in daySchedule.Shifts)
+                        var daySchedule = Model.WorkDays.FirstOrDefault(d => d.Date == date);
+                        if (daySchedule != null && daySchedule.Shifts.Any())
+                        {
+                            foreach (var shift in daySchedule.Shifts)
+                            {
+                                <tr>
+                                    <td>@date.ToString("dd-MM-yyyy")</td>
+                                    <td>@shift.Time</td>
+                                    <td>@shift.Departement</td>
+                                    <td>@shift.Branch_Id</td>
+                                </tr>
+                            }
+                        }
+                        else
                         {
                             <tr>
                                 <td>@date.ToString("dd-MM-yyyy")</td>
-                                <td>@shift.Time</td>
-                                <td>@shift.Departement</td>
-                                <td>@shift.Branch_Id</td>
+                                <td colspan="3" class="no-shifts">Geen diensten</td>
                             </tr>
                         }
                     }
-                    else
-                    {
-                        <tr>
-                            <td>@date.ToString("dd-MM-yyyy")</td>
-                            <td colspan="3">Geen diensten</td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
+        <div class="text-center mt-4">
+            @if (!Model.ingeklokt)
+            {
+                <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+                    <input type="button" value="Inklokken" class="btn btn-primary" />
+                </a>
+            }
+            else
+            {
+                <div>
+                    <p>Ingeklokt tijd: <span id="clockedInTimer">00:00:00</span></p>
+                    <script>
+                        startClockedInTimer("@Model.ClockedInTime");
+                    </script>
 
-         @if (User.FindFirst("position")?.Value == "Manager")
-         {
+                    <a asp-controller="Home" asp-action="Uitklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+                        <input type="button" value="Uitklokken" class="btn btn-primary" />
+                    </a>
+                </div>
+            }
+        </div>
+        @if (User.FindFirst("position")?.Value == "manager")
+        {
             <div class="sicktable-container">
                 <h5>Zieke medewerkers van vandaag</h5>
                 <div class="sicktable">
                     <table>
                         <thead>
                             <tr>
-                                <th>Employee Name</th>
+                                <th>Medewerker Naam</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @{
-                                var sickmodel = Model.sickListNames;
-                            }
-                            @foreach (var name in sickmodel)
+                            @foreach (var name in Model.sickListNames)
                             {
                                 <tr>
                                     <td>@name</td>
@@ -131,20 +141,8 @@
                     </table>
                 </div>
             </div>
-         }
-        </div>
-    @if (Model.ingeklokt == false)
-    {
-        <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-            <input type="button" value="Inklokken" class="btn btn-primary"/>
-        </a>
-    }
-    else
-    {
-        <a asp-controller="Home" asp-action="Uitklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-            <input type="button" value="Uitklokken" class="btn btn-primary" />
-        </a>
-    }
+        }
+
+
+    </div>
 </body>
-        
-           

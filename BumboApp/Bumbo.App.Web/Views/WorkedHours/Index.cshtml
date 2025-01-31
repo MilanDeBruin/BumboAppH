@@ -1,0 +1,47 @@
+﻿@using Bumbo.Domain.Models;
+@using Bumbo.App.Web.Models.ViewModels.WorkedHours;
+@model Bumbo.App.Web.Models.ViewModels.WorkedHours.WorkedHoursViewModel;
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/site.css">
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="table-container">
+            <h1>Gewerkte uren</h1>
+            <table class="table table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Begin tijd</th>
+                        <th>Eind tijd</th>
+                        <th>gewerkte tijd</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var shift in Model.WorkShifts)
+                    {
+                        <tr>
+                            <td>@shift.StartTime.ToString("MM-dd-yyyy")</td> 
+                            <td>@shift.StartTime.ToString("HH:mm:ss")</td>
+
+                            <td>@(shift.EndTime?.ToString("HH:mm:ss") ?? "nog bezig")</td>
+                            <td>
+                                @if (shift.EndTime.HasValue)
+                                {
+                                    var workedTime = shift.EndTime.Value - shift.StartTime;
+                                    @workedTime.TotalHours.ToString("HH:mm:ss")
+                                    
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </body>

@@ -64,7 +64,11 @@ namespace Bumbo.App.Web.Controllers
 
                 }
                 viewModel.ingeklokt = _repo.GetIngeklokt(employeeId);
-                viewModel.isSick = _repo.GetSick(employeeId);
+                if(viewModel.ingeklokt == true)
+                {
+                viewModel.ClockedInTime = _repo.getStartTime(employeeId);
+                }
+            viewModel.isSick = _repo.GetSick(employeeId);
                 viewModel.sickListNames = _repo.getSickList();
                 return View(viewModel);
            
@@ -96,7 +100,8 @@ namespace Bumbo.App.Web.Controllers
                 TempData["SuccessMessage"] = "Je bent ziek en mag niet inklokken!";
                 return RedirectToAction("Index");
             }
-            _repo.Inklokken(employeeId);
+           _repo.Inklokken(employeeId);
+            
             TempData["SuccessMessage"] = "Je bent ingeklokt!";
             return RedirectToAction("Index");
         }

@@ -29,6 +29,7 @@ namespace Bumbo.App.Web
             builder.Services.AddTransient<Bumbo.Data.Interfaces.ICaoRepository, Bumbo.Data.SqlRepository.CaoRepository>();
             builder.Services.AddTransient<Bumbo.Domain.Services.Forecast.IGenerateForecastService, Bumbo.Domain.Services.Forecast.GenerateForecastService>();
             builder.Services.AddTransient<IHomeRepository, HomeRepository>();
+            builder.Services.AddTransient<IWorkedHoursRepository, Bumbo.Data.SqlRepository.WorkedHoursrepository>();
             builder.Services.AddTransient<Bumbo.Domain.Services.Leaves.ILeaveChecker, Bumbo.Domain.Services.Leaves.LeaveChecker>();
             builder.Services
                 .AddTransient<Bumbo.Domain.Services.CAO.ICaoScheduleService,

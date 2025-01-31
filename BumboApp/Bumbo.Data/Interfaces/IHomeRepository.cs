@@ -13,4 +13,5 @@ public interface IHomeRepository
     public void Uitklokken(int employeeId);
     public Boolean GetIngeklokt(int employeeId);
     public Boolean CheckShift(int employeeId);
+    public DateTime getStartTime(int employeeId);
 }

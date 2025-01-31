@@ -61,7 +61,7 @@ public class HomeRepository : IHomeRepository
 
     public void Inklokken(int employeeId)
     {
-        var currentTime = DateTime.Now;
+        var currentTime = DateTime.Now;  //uur bij toevoegen
 
         var newWorkShift = new WorkShift
         {
@@ -98,6 +98,18 @@ public class HomeRepository : IHomeRepository
         .Any(ws => ws.EmployeeId == employeeId && ws.StartTime != null && ws.EndTime == null);
 
         return isClockedIn;
+    }
+
+    public DateTime getStartTime(int employeeId)
+    {
+        var workShift = _db.WorkShifts
+            .FirstOrDefault(ws => ws.EmployeeId == employeeId && ws.StartTime != null && ws.EndTime == null);
+
+        if (workShift != null)
+        {
+            return workShift.StartTime;
+        }
+        return DateTime.MinValue;
     }
 
     public Boolean CheckShift(int employeeId)

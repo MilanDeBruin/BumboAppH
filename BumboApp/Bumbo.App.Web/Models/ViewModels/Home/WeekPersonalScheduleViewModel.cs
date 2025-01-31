@@ -13,6 +13,8 @@ namespace Bumbo.App.Web.Models.ViewModels.Home
         public Boolean ingeklokt { get; set; }
         
         public List<string>? sickListNames { get; set; }
+        public DateTime? ClockedInTime { get; set; } // Added this property
+
 
     }
 }
