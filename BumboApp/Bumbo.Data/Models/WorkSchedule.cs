@@ -18,7 +18,7 @@ public partial class WorkSchedule
     [Column("date")]
     public DateOnly Date { get; set; }
 
-  
+    [Key]
     [Column("branch_id")]
     public int BranchId { get; set; }
 
@@ -59,6 +59,4 @@ public partial class WorkSchedule
     [ForeignKey("WorkStatus")]
     [InverseProperty("WorkSchedules")]
     public virtual WorkStatus WorkStatusNavigation { get; set; } = null!;
-
-    public DayOfWeek weekDay { get; set; }
 }

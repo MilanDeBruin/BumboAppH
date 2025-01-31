@@ -74,7 +74,7 @@ namespace Bumbo.App.Web.Controllers
                     .ToListAsync();
                 foreach(var workDay in workSchedules)
                 {
-                    workDay.weekDay = workDay.Date.DayOfWeek;
+                    //workDay.weekDay = workDay.Date.DayOfWeek;
                 }  
                 foreach (var workSchedule in workSchedules)
                 {
