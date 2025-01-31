@@ -3,6 +3,7 @@ using Bumbo.App.Web.Models.ViewModels.Dayoverview;
 using Bumbo.Data.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace Bumbo.App.Web.Controllers
 {
@@ -83,5 +84,43 @@ namespace Bumbo.App.Web.Controllers
             TempData["Message"] = "De gewerkte uren zijn succesvol opgeslagen!";
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> Download(string month)
+        {
+            var selectedMonth = string.IsNullOrEmpty(month)
+                ? DateOnly.FromDateTime(DateTime.Today)
+                : DateOnly.ParseExact(month, "yyyy-MM");
+
+            var firstDayOfMonth = new DateOnly(selectedMonth.Year, selectedMonth.Month, 1);
+            var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+            var employees = await _context.Employees.ToListAsync();
+            var workSchedules = await _context.WorkSchedules
+                .Where(ws => ws.Date >= firstDayOfMonth && ws.Date <= lastDayOfMonth)
+                .ToListAsync();
+
+            var csv = new StringBuilder();
+            csv.AppendLine($"Maandoverzicht;{selectedMonth:MMMM yyyy}");
+            csv.AppendLine("");
+            csv.AppendLine("Voornaam;Achternaam;Geplande Uren;Gewerkte Uren;Verschil");
+
+            foreach (var employee in employees)
+            {
+                var employeeSchedules = workSchedules.Where(ws => ws.EmployeeId == employee.EmployeeId).ToList();
+
+                var totalPlannedHours = employeeSchedules.Sum(ws => (decimal)(ws.EndTime - ws.StartTime).TotalHours);
+                var totalWorkedHours = 0m; 
+
+                if (totalPlannedHours > 0 || totalWorkedHours > 0)
+                {
+                    csv.AppendLine($"{employee.FirstName};{employee.LastName};{totalPlannedHours:F2};{totalWorkedHours:F2};{(totalWorkedHours - totalPlannedHours):F2}");
+                }
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(csv.ToString());
+            return File(bytes, "text/csv", $"Maandoverzicht_{selectedMonth:yyyy-MM}.csv");
+        }
+
+
     }
 }

@@ -15,7 +15,14 @@
     <form asp-controller="MonthOverview" asp-action="Index" method="get" class="form-inline">
         <input type="month" id="monthPicker" name="month" value="@firstDayOfMonth.ToString("yyyy-MM")" class="form-control mx-2" onchange="this.form.submit()" />
     </form>
+
+    <form asp-action="Download" asp-controller="MonthOverview" method="get">
+        <input type="hidden" name="month" value="@firstDayOfMonth.ToString("yyyy-MM")" />
+        <input type="submit" value="Download" class="btn btn-primary" />
+    </form>
+
 </div>
+
 
 @if (Model.Any())
 {
@@ -31,14 +38,18 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var employee in Model)
+                @foreach (var employeeGroup in Model.GroupBy(e => e.EmployeeId))
                 {
+                    var firstEmployee = employeeGroup.First();
+                    var totalPlannedHours = employeeGroup.Sum(e => e.PlannedHours);
+                    var totalWorkedHours = employeeGroup.Sum(e => e.WorkedHours);
+
                     <tr>
-                        <td>@employee.FirstName</td>
-                        <td>@employee.LastName</td>
-                        <td>@employee.PlannedHours</td>
-                        <td>@employee.WorkedHours</td>
-                        <td>@(employee.PlannedHours - employee.WorkedHours)</td>
+                        <td>@firstEmployee.FirstName</td>
+                        <td>@firstEmployee.LastName</td>
+                        <td>@totalPlannedHours</td>
+                        <td>@totalWorkedHours</td>
+                        <td>@(totalWorkedHours - totalPlannedHours)</td>
                     </tr>
                 }
             </tbody>
