@@ -111,7 +111,7 @@ namespace Bumbo.App.Web.Controllers
             DateTime today = DateTime.Today; ;
             if (firstDayOfWeek != null)
             {
-                today = DateTime.Parse(firstDayOfWeek);
+                today = DateTime.ParseExact(firstDayOfWeek, "dd-MM-yyyy", System.Globalization.CultureInfo.InvariantCulture);
             }
 
             viewModel.startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday);
