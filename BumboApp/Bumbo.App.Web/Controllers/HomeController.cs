@@ -104,11 +104,11 @@ namespace Bumbo.App.Web.Controllers
 
             currentTime = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, roundedMinutes, 0);
 
-            //if(_repo.GetSick(employeeId) == true)
-            //{
-            //    TempData["WarningMessage"] = "Je bent ziek en mag niet inklokken!";
-            //    return RedirectToAction("Index");
-            //}
+            if (_repo.GetSick(employeeId) == true)
+            {
+                TempData["WarningMessage"] = "Je bent ziek en mag niet inklokken!";
+                return RedirectToAction("Index");
+            }
             if (_repo.CheckStartTime(employeeId, currentTime))
             {
                 TempData["WarningMessage"] = "Je bent al ingeklokt binnen dit kwartier!";

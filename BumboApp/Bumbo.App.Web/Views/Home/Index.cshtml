@@ -3,7 +3,9 @@
 
 
 @model Bumbo.App.Web.Models.ViewModels.Home.WeekPersonalScheduleViewModel
-
+@{
+    var today = DateOnly.FromDateTime(DateTime.Now);
+}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -91,7 +93,6 @@
                 @foreach (var date in daysOfWeek)
                 {
                     var daySchedule = Model.WorkDays.FirstOrDefault(d => d.Date == date);
-                    var today = DateOnly.FromDateTime(DateTime.Now);
                     if (daySchedule != null && daySchedule.Shifts.Any())
                     {
                         foreach (var shift in daySchedule.Shifts)
