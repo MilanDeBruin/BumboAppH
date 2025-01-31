@@ -27,6 +27,9 @@ namespace Bumbo.App.Web
             builder.Services.AddTransient<Bumbo.Data.Interfaces.ISchoolScheduleRepository, Bumbo.Data.SqlRepository.SchoolScheduleRepository>();
             builder.Services.AddTransient<Bumbo.Data.Interfaces.IScheduleRepository, Bumbo.Data.SqlRepository.ScheduleRepository>();
             builder.Services.AddTransient<Bumbo.Data.Interfaces.ICaoRepository, Bumbo.Data.SqlRepository.CaoRepository>();
+            builder.Services.AddTransient<IBranchRepository, BranchRepository>();
+            builder.Services.AddTransient<IPositionRepository, PositionRepository>();
+            builder.Services.AddTransient<ILaborContractRepository, LaborContractRepository>();
             builder.Services.AddTransient<Bumbo.Domain.Services.Forecast.IGenerateForecastService, Bumbo.Domain.Services.Forecast.GenerateForecastService>();
             builder.Services.AddTransient<IHomeRepository, HomeRepository>();
             builder.Services.AddTransient<Bumbo.Domain.Services.Leaves.ILeaveChecker, Bumbo.Domain.Services.Leaves.LeaveChecker>();

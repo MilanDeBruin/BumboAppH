@@ -31,7 +31,7 @@ public class CaoScheduleService : ICaoScheduleService
             _scheduleRepository.GetWeeklyWorkSchedules(DateOnlyHelper.GetFirstDayOfWeek(schedule.Date),
                 schedule.EmployeeId);
         List<WorkSchedule> dailyWorkSchedule = weeklyWorkSchedule.Where(ws => ws.Date == schedule.Date).ToList();
-        Employee? employee = _employeeRepository.GetEmployee(schedule.EmployeeId);
+        Employee? employee = _employeeRepository.GetEmployeeByEmployeeId(schedule.EmployeeId);
         int employeeAge = employee != null
             ? new DateTime((DateTime.Today - employee.DateOfBirth.ToDateTime(new TimeOnly())).Ticks).Year - 1
             : 18;
