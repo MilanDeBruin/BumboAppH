@@ -49,7 +49,7 @@ namespace Bumbo.App.Web.Controllers
                             LastName = employee.LastName,
                             PlannedHours = plannedHours,
                             WorkedHours = workedHours,
-                            Date = date,
+                            //Date = date,
                         });
                     }
                 }
