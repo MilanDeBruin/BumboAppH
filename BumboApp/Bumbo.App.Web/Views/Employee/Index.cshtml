@@ -1,5 +1,5 @@
 ﻿@using Bumbo.App.Web.Models.ViewModels.Employee
-@model IEnumerable<EmployeeViewModel>
+@model IEnumerable<EmployeeCreateViewModel>
 
 @{
     ViewData["Title"] = "Medewerkers";
@@ -32,7 +32,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model != null && Model.Any())
+            @if (Model.Any())
             {
                 foreach (var employee in Model)
                 {

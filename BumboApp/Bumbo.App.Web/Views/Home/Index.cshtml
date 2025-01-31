@@ -3,7 +3,9 @@
 
 
 @model Bumbo.App.Web.Models.ViewModels.Home.WeekPersonalScheduleViewModel
-
+@{
+    var today = DateOnly.FromDateTime(DateTime.Now);
+}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,54 +15,63 @@
 
 
 <body>
-    <div>
-        @if (!Model.isSick)
-        {
-            <a asp-controller="Home" asp-action="Ziekmelden" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-                <input type="button" value="Ziekmelden" class="btn btn-secondary"/>
-            </a>
-        }
-        else
-        {
-            <a asp-controller="Home" asp-action="Ziekmelden">
-                <input type="button" value="Ziekgemeld" disabled="disabled" class="btn btn-secondary" />
-            </a>
-        }
-        <h2>Rooster Week</h2>
-    </div>
+    <h2>Rooster Week</h2>
+   
 
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success text-center mt-3">
             @TempData["SuccessMessage"]
         </div>
+
     }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <div class="alert alert-warning text-center mt-3">
+                @TempData["WarningMessage"]
+            </div>
+    }
+    <div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm" style="width:70%; margin:10px 0px 10px 0px">
 
-    <div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm">
-        <a asp-controller="Home"
-           asp-action="Index"
-           asp-route-date="@Model.FirstDayOfWeek.AddDays(-7).ToString("yyyy-MM-dd")"
-           asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
-           class="btn btn-secondary">
-            Week terug
-        </a>
+        <div class="d-flex align-items-center gap-3 border p-3 rounded shadow-sm" style="width:fit-content">
+            <a asp-controller="Home"
+               asp-action="Index"
+               asp-route-date="@Model.FirstDayOfWeek.AddDays(-7).ToString("yyyy-MM-dd")"
+               asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
+               class="btn btn-secondary">
+                Week terug
+            </a>
 
+            <span class="fw-bold">@Model.FirstDayOfWeek.ToString("dd-MM-yyyy")</span>
+            <span>tot</span>
+            <span class="fw-bold">@Model.FirstDayOfWeek.AddDays(6).ToString("dd-MM-yyyy")</span>
 
+            <a asp-controller="Home"
+               asp-action="Index"
+               asp-route-date="@Model.FirstDayOfWeek.AddDays(7).ToString("yyyy-MM-dd")"
+               asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
+               class="btn btn-secondary">
+                Week vooruit
+            </a>
+        </div>
 
-        <span class="fw-bold">@Model.FirstDayOfWeek.ToString("dd-MM-yyyy")</span>
-        <span>tot</span>
-        <span class="fw-bold">@Model.FirstDayOfWeek.AddDays(6).ToString("dd-MM-yyyy")</span>
+        <div class="ms-auto">
+            @if (!Model.isSick)
+            {
+                <a asp-controller="Home" asp-action="Ziekmelden" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+                    <input type="button" value="Ziekmelden" class="btn btn-secondary" />
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Home" asp-action="Ziekmelden">
+                    <input type="button" value="Ziekgemeld" disabled="disabled" class="btn btn-secondary" />
+                </a>
+            }
+        </div>
 
-
-        <a asp-controller="Home"
-           asp-action="Index"
-           asp-route-date="@Model.FirstDayOfWeek.AddDays(7).ToString("yyyy-MM-dd")"
-           asp-route-employeeId="@User.FindFirst("employee_id")?.Value"
-           class="btn btn-secondary">
-            Week vooruit
-        </a>
     </div>
-
+   
 
     <div class="table-container">
 
@@ -70,7 +81,6 @@
                     <th>Datum</th>
                     <th>Tijd</th>
                     <th>Afdeling</th>
-                    <th>Filiaal</th>
                 </tr>
             </thead>
             <tbody>
@@ -88,10 +98,28 @@
                         foreach (var shift in daySchedule.Shifts)
                         {
                             <tr>
-                                <td>@date.ToString("dd-MM-yyyy")</td>
-                                <td>@shift.Time</td>
-                                <td>@shift.Departement</td>
-                                <td>@shift.Branch_Id</td>
+                                @if(date == today){
+                                    <td style="background-color: rgba(0, 155, 50, 0.75);">
+                                        @date.ToString("dd-MM-yyyy")
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        @date.ToString("dd-MM-yyyy")
+                                    </td>
+                                }
+                                @if (shift.Is_Sick)
+                                {
+                                    <td style="background-color: rgba(255, 0, 0, 0.75);">@shift.Time</td>
+                                    <td style="background-color: rgba(255, 0, 0, 0.75);">@shift.Departement</td>
+                                }
+                                    else{
+                                    <td>@shift.Time</td>
+                                    <td>@shift.Departement</td>
+                                   
+                                    }
+                               
                             </tr>
                         }
                     }
@@ -99,7 +127,7 @@
                     {
                         <tr>
                             <td>@date.ToString("dd-MM-yyyy")</td>
-                            <td colspan="3">Geen diensten</td>
+                            <td colspan="2">Geen dienst</td>
                         </tr>
                     }
                 }
@@ -114,7 +142,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Employee Name</th>
+                                <th>EmployeeCreate Name</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -135,16 +163,74 @@
         </div>
     @if (Model.ingeklokt == false)
     {
-        <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-            <input type="button" value="Inklokken" class="btn btn-primary"/>
-        </a>
+        var daySchedule = Model.WorkDays.FirstOrDefault(d => d.Date == DateOnly.FromDateTime(DateTime.Now));
+        @if (daySchedule == null)
+        {
+            <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+                <input type="button" value="Inklokken" class="btn btn-primary" style=" margin:10px 0px 10px 0px " onclick="clockInOnOffDay()" />
+            </a>
+        }else
+        {
+            <a asp-controller="Home" asp-action="Inklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
+                <input type="button" value="Inklokken" class="btn btn-primary" style=" margin:10px 0px 10px 0px " onclick="clockIn()" />
+            </a>
+        }
+      
     }
     else
     {
         <a asp-controller="Home" asp-action="Uitklokken" asp-route-employeeId="@User.FindFirst("employee_id")?.Value">
-            <input type="button" value="Uitklokken" class="btn btn-primary" />
+            <div id="timerDisplay" class="fw-bold" style="margin-top: 10px;">Tijd gewerkt: 00:00:00</div>
+            <input type="button" value="Uitklokken" class="btn btn-primary" style=" margin:10px 0px 10px 0px" onclick="clockOut()" />
         </a>
     }
 </body>
-        
-           
+
+<script>
+    let timerInterval;
+
+    function startTimer(startTime) {
+        clearInterval(timerInterval); 
+        timerInterval = setInterval(function () {
+            let now = new Date().getTime();
+            let elapsed = now - startTime;
+
+            let hours = Math.floor(elapsed / (1000 * 60 * 60));
+            let minutes = Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((elapsed % (1000 * 60)) / 1000);
+
+            document.getElementById("timerDisplay").innerText =
+                `Tijd gewerkt: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }, 1000);
+    }
+
+    
+    window.onload = function () {
+        let startTime = localStorage.getItem("clockedInTime");
+        if (startTime) {
+            startTimer(parseInt(startTime));
+        }
+    };
+
+   
+    function clockIn() {
+        let startTime = new Date().getTime();
+        localStorage.setItem("clockedInTime", startTime);
+        startTimer(startTime);
+    }
+
+    function clockInOnOffDay() {
+        let startTime = new Date().getTime();
+        localStorage.setItem("clockedInTime", startTime);
+        startTimer(startTime);
+        return window.confirm("Weet je zeker dat je wilt inklokken? Je bent niet in gepland.");
+
+    }
+
+   
+    function clockOut() {
+        clearInterval(timerInterval);
+        localStorage.removeItem("clockedInTime");
+        document.getElementById("timerDisplay").innerText = "Tijd gewerkt: 00:00:00";
+    }
+</script>

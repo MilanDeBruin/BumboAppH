@@ -1,5 +1,5 @@
 ﻿@using Bumbo.App.Web.Models.ViewModels.Employee
-@model EmployeeViewModel
+@model EmployeeCreateViewModel
 
 @{
     ViewData["Title"] = "Medewerkersgegevens";
@@ -10,7 +10,7 @@
 
     <div class="row gy-3">
         <div class="col-md-6">
-            <label asp-for="EmployeeId" class="form-label">Medewerkercode</label>
+            <label asp-for="EmployeeId" class="form-label">Medewerkersnummer</label>
             <input asp-for="EmployeeId" class="form-control" readonly />
         </div>
 
@@ -39,10 +39,13 @@
             <input asp-for="FirstName" class="form-control" readonly />
         </div>
 
-        <div class="col-md-6">
-            <label asp-for="Infix" class="form-label">Tussenvoegsel</label>
-            <input asp-for="Infix" value="@((Model.Infix ?? " -"))" class="form-control" readonly />
-        </div>
+        @if (!string.IsNullOrEmpty(Model.Infix))
+        {
+            <div class="col-md-6">
+                <label asp-for="Infix" class="form-label">Tussenvoegsel</label>
+                <input asp-for="Infix" value="@Model.Infix" class="form-control" readonly />
+            </div>
+        }
 
         <div class="col-md-6">
             <label asp-for="LastName" class="form-label">Achternaam</label>
@@ -59,30 +62,30 @@
             <input asp-for="HouseNumber" class="form-control" readonly />
         </div>
 
-        <div class="col-md-6">
-            <label asp-for="Addition" class="form-label">Toevoeging</label>
-            <input asp-for="Addition" value="@((Model.Addition ?? " -"))" class="form-control" class="form-control" readonly />
-        </div>
+        @if (!string.IsNullOrEmpty(Model.Addition))
+        {
+            <div class="col-md-6">
+                <label asp-for="Addition" class="form-label">Toevoeging</label>
+                <input asp-for="Addition" value="@Model.Addition" class="form-control" readonly />
+            </div>
+        }
 
         <div class="col-md-6">
-            <label asp-for="ZipCode" class="form-label">Postcode*</label>
+            <label asp-for="ZipCode" class="form-label">Postcode</label>
             <input asp-for="ZipCode" class="form-control" readonly />
         </div>
 
         <div class="col-md-6">
-            <label asp-for="EmailAdres" class="form-label">E-mailadres</label>
-            <input asp-for="EmailAdres" class="form-control" readonly />
-        </div>
-
-        <div class="col-md-6">
-            <label asp-for="Password" class="form-label">Wachtwoord</label>
-            <input asp-for="Password" class="form-control" readonly />
+            <label asp-for="EmailAddress" class="form-label">E-mailadres</label>
+            <input asp-for="EmailAddress" class="form-control" readonly />
         </div>
     </div>
 
-    <div class="mt-4 d-flex gap-3">
+    <div class="mt-4 d-flex gap-2">
         <a asp-action="Index" asp-route-branchId="@Model.BranchId" class="btn btn-secondary">Terug</a>
+        
         <a asp-action="Edit" asp-route-employeeId="@Model.EmployeeId" class="btn btn-primary">Wijzig</a>
+        
         <form asp-action="Delete" method="post" class="d-inline">
             <input type="hidden" name="employeeId" value="@Model.EmployeeId" />
             <button type="submit" class="btn btn-danger" onclick="return confirm('Weet je zeker dat je @Model.FirstName wil verwijderen?')">
