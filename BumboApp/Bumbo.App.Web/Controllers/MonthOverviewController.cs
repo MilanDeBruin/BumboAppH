@@ -1,8 +1,10 @@
 ﻿using Bumbo.App.Web.Models.ViewModels;
 using Bumbo.App.Web.Models.ViewModels.Dayoverview;
 using Bumbo.Data.Context;
+using Bumbo.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Bumbo.App.Web.Controllers
 {
@@ -31,33 +33,54 @@ namespace Bumbo.App.Web.Controllers
 
             var monthlyOverview = new List<DayOverviewViewModel>();
 
-            foreach (var date in Enumerable.Range(0, (lastDayOfMonth.DayNumber - firstDayOfMonth.DayNumber) + 1)
-                                          .Select(offset => firstDayOfMonth.AddDays(offset)))
+            foreach (var employee in employees)
             {
-                foreach (var employee in employees)
+                decimal totalPlannedHours = 0;
+                decimal totalWorkedHours = 0;
+
+                foreach (var date in Enumerable.Range(0, (lastDayOfMonth.DayNumber - firstDayOfMonth.DayNumber) + 1)
+                                               .Select(offset => firstDayOfMonth.AddDays(offset)))
                 {
                     var workSchedule = workSchedules.FirstOrDefault(ws => ws.EmployeeId == employee.EmployeeId && ws.Date == date);
                     var plannedHours = workSchedule != null ? (decimal)(workSchedule.EndTime - workSchedule.StartTime).TotalHours : 0;
-                    var workedHours = 0m;
+                    var workedHours = workSchedules
+                                    .Where(ws => ws.EmployeeId == employee.EmployeeId && ws.Date == date)
+                                    .Select(ws => ws.EndTime - ws.StartTime)
+                                    .FirstOrDefault();
 
-                    if (plannedHours > 0 || workedHours > 0)
+                    totalPlannedHours += plannedHours;
+                    totalWorkedHours += (decimal)workedHours.TotalHours;
+                }
+
+                if (totalPlannedHours > 0 || totalWorkedHours > 0)
+                {
+                    monthlyOverview.Add(new DayOverviewViewModel
                     {
-                        monthlyOverview.Add(new DayOverviewViewModel
-                        {
-                            EmployeeId = employee.EmployeeId,
-                            FirstName = employee.FirstName,
-                            LastName = employee.LastName,
-                            PlannedHours = plannedHours,
-                            WorkedHours = workedHours,
-                            //Date = date,
-                        });
-                    }
+                        EmployeeId = employee.EmployeeId,
+                        FirstName = employee.FirstName,
+                        LastName = employee.LastName,
+                        PlannedHours = totalPlannedHours,
+                        WorkedHours = totalWorkedHours,
+                    });
                 }
             }
 
+            // **Groeperen op voor- en achternaam en geplande uren optellen**
+            var groupedOverview = monthlyOverview
+                .GroupBy(e => new { e.FirstName, e.LastName })
+                .Select(g => new DayOverviewViewModel
+                {
+                    FirstName = g.Key.FirstName,
+                    LastName = g.Key.LastName,
+                    PlannedHours = g.Sum(e => e.PlannedHours),
+                    WorkedHours = g.Sum(e => e.WorkedHours),
+                })
+                .ToList();
+
             ViewData["SelectedMonth"] = selectedMonth;
-            return View(monthlyOverview);
+            return View(groupedOverview);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Save(Dictionary<int, decimal> WorkedHours)

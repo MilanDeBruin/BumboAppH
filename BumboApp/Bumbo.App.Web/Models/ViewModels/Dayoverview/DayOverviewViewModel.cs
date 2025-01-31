@@ -10,9 +10,8 @@
         public string WorkedHoursString { get; set; }
 		public TimeSpan WorkedHoursTimeSpan { get; set; }
         public Decimal Difference => PlannedHours - WorkedHours;
-		public DateOnly Date {  get; set; }
+		public DateOnly Date { get; internal set; }
         public int BranchId { get; set; }
-
-	}
-
+        public List<ShiftViewModel> Shifts { get; set; } = new List<ShiftViewModel>();
+    }
 }
