@@ -76,9 +76,6 @@ namespace Bumbo.App.Web.Controllers
                     TempData["FailedMessage"] = $"Onbekende fout bij het aanvragen van verlof!";
                     break;
             }
-
-
-
             return RedirectToAction("Index", new { employeeId = viewModel.employeeId });
         }
 

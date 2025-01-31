@@ -32,9 +32,6 @@ namespace Bumbo.Domain.Services.Leaves
             return 0;
         }
 
-
-
-
         public int checkStartDateForDuble(Leave request)
         {
             if (repo.checkStartDateForDuble(request.EmployeeId, request.StartDate))

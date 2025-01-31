@@ -14,6 +14,4 @@
         public int BranchId { get; set; }
         public List<ShiftViewModel> Shifts { get; set; } = new List<ShiftViewModel>();
     }
-
-
 }
