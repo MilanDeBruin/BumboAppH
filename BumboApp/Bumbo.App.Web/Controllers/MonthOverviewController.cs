@@ -72,7 +72,10 @@ namespace Bumbo.App.Web.Controllers
                 var workSchedules = await _context.WorkSchedules
                     .Where(ws => ws.EmployeeId == employeeId && ws.Date.Month == DateTime.Today.Month && ws.Date.Year == DateTime.Today.Year)
                     .ToListAsync();
-
+                foreach(var workDay in workSchedules)
+                {
+                    workDay.weekDay = workDay.Date.DayOfWeek;
+                }  
                 foreach (var workSchedule in workSchedules)
                 {
                     //workSchedule. = workedHours; // Werk de gewerkte uren bij
@@ -102,7 +105,7 @@ namespace Bumbo.App.Web.Controllers
             var csv = new StringBuilder();
             csv.AppendLine($"Maandoverzicht;{selectedMonth:MMMM yyyy}");
             csv.AppendLine("");
-            csv.AppendLine("Voornaam;Achternaam;Geplande Uren;Gewerkte Uren;Verschil");
+            csv.AppendLine("Voornaam;Achternaam;Geplande Uren;Gewerkte Uren;Verschil;Te betalen uren");
 
             foreach (var employee in employees)
             {
@@ -110,10 +113,10 @@ namespace Bumbo.App.Web.Controllers
 
                 var totalPlannedHours = employeeSchedules.Sum(ws => (decimal)(ws.EndTime - ws.StartTime).TotalHours);
                 var totalWorkedHours = 0m; 
-
+                
                 if (totalPlannedHours > 0 || totalWorkedHours > 0)
                 {
-                    csv.AppendLine($"{employee.FirstName};{employee.LastName};{totalPlannedHours:F2};{totalWorkedHours:F2};{(totalWorkedHours - totalPlannedHours):F2}");
+                    csv.AppendLine($"{employee.FirstName};{employee.LastName};{totalPlannedHours:F2};{totalWorkedHours:F2};{(totalWorkedHours - totalPlannedHours):F2};{(totalWorkedHours - totalPlannedHours):F2}");
                 }
             }
 

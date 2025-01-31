@@ -33,6 +33,7 @@ namespace Bumbo.App.Web
             builder.Services
                 .AddTransient<Bumbo.Domain.Services.CAO.ICaoScheduleService,
                     Bumbo.Domain.Services.CAO.CaoScheduleService>();
+            builder.Services.AddTransient<Bumbo.Domain.Services.MonthOverview.IMonthOverview, Bumbo.Domain.Services.MonthOverview.MonthOverview>();
 
             builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
