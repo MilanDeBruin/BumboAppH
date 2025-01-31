@@ -11,8 +11,8 @@
 		public TimeSpan WorkedHoursTimeSpan { get; set; }
         public Decimal Difference => PlannedHours - WorkedHours;
 		public DateOnly Date {  get; set; }
-
         public int BranchId { get; set; }
+
 	}
 
 }
